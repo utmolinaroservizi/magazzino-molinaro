@@ -462,6 +462,14 @@ body{
 .scanner-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
 #reader{width:100%;overflow:hidden;border-radius:var(--radius-sm)}
 .scan-result{margin-top:12px;padding:12px;border-radius:var(--radius-sm);background:var(--brand-50);color:var(--brand-700);font-size:13px;font-weight:600;display:none}
+.scan-open-btn{
+  display:block;width:100%;margin-top:10px;padding:13px;
+  background:var(--brand-500);color:#fff;border:none;
+  border-radius:var(--radius-sm);font-size:14px;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:var(--transition);
+  box-shadow:var(--shadow-brand);letter-spacing:-.1px;
+}
+.scan-open-btn:active{transform:scale(.97)}
 .scan-note{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:12px}
 
 /* SYNC INDICATOR */
@@ -1372,26 +1380,42 @@ function openProductByCode(code){
   const product=itemsList.find(i=>i.code.toLowerCase()===clean.toLowerCase());
   const result=document.getElementById('scan-result');
   if(!product){
-    if(result){result.style.display='block';result.textContent='Codice: '+clean+' — non trovato.'}
+    if(result){
+      result.style.display='block';
+      result.innerHTML='<span>⚠️ Codice <strong>'+clean+'</strong> non trovato.</span>';
+    }
     showToast('Prodotto non trovato','toast-danger');
     return;
   }
-  if(result){result.style.display='block';result.textContent='Trovato: '+product.code+' — '+product.name}
   stopQrScanner();
+  // Salva l'id del prodotto trovato globalmente
+  window._scannedProductId = product.id;
+  // Mostra risultato con pulsante
+  if(result){
+    result.style.display='block';
+    const cfg=categories[product.cat]||{};
+    result.innerHTML=
+      '<div style="margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;opacity:.7">Prodotto trovato</div>'+
+      '<div style="font-size:15px;font-weight:700;margin-bottom:2px">'+product.code+' — '+product.name+'</div>'+
+      '<div style="font-size:12px;font-weight:500;opacity:.75;margin-bottom:12px">'+(cfg.label||product.cat)+'</div>'+
+      '<button class="scan-open-btn" onclick="openScannedProduct()">'+
+        '📦 Apri scheda prodotto →'+
+      '</button>';
+  }
+}
 
-  // Naviga a materiali, apri la categoria e poi apri il modal
-  // Usiamo un flag per evitare che listenRealtime chiuda il modal mentre si apre
+window.openScannedProduct = function(){
+  const id = window._scannedProductId;
+  if(!id) return;
+  const product = itemsList.find(i=>i.id===id);
+  if(!product) return;
   openCats[product.cat]=true;
   showPage('materiali');
-
-  // Aspetta che il DOM sia renderizzato completamente prima di aprire il modal
+  renderMateriali();
   setTimeout(()=>{
     openModal(product.id);
-    // Scorri fino al prodotto nella lista
-    const card = document.querySelector('[onclick*="'+product.id+'"]');
-    if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
-  }, 400);
-}
+  }, 350);
+};
 function handleUrlProductCode(){
   const params=new URLSearchParams(window.location.search);
   const code=params.get('code')||params.get('product');
