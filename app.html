@@ -1376,7 +1376,22 @@ function handleUrlProductCode(){
   const params=new URLSearchParams(window.location.search);
   const code=params.get('code')||params.get('product');
   if(!code) return;
-  setTimeout(()=>openProductByCode(code),500);
+
+  // Aspetta che Firestore abbia caricato i dati prima di aprire il modal
+  let attempts=0;
+  const tryOpen=()=>{
+    attempts++;
+    if(itemsList.length>0){
+      const loading=document.getElementById('loading-screen');
+      if(loading) loading.style.display='none';
+      openProductByCode(code);
+    } else if(attempts<20){
+      setTimeout(tryOpen,300);
+    } else {
+      showToast('Timeout caricamento. Riprova.','toast-danger');
+    }
+  };
+  setTimeout(tryOpen,600);
 }
 
 // ══════════════════════════════════════════════
