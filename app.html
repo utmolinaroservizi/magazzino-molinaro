@@ -906,15 +906,19 @@ function listenRealtime() {
   onSnapshot(collection(db, 'inventario'), snap => {
     itemsList = [];
     snap.forEach(d => itemsList.push({ id: d.id, ...d.data() }));
-    if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
-    if (document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
-    // Aggiorna quantità nel modal aperto
+    const modalOpen = document.getElementById('modal-backdrop').classList.contains('open');
+    // Se il modal è aperto aggiorna solo la quantità, non rifare il render del DOM
     if (currentModalItem) {
       const updated = itemsList.find(i=>i.id===currentModalItem.id);
       if (updated) {
         currentModalItem = updated;
         document.getElementById('m-qty').textContent = updated.qty;
       }
+    }
+    // Aggiorna le pagine solo se il modal non è aperto (evita di distruggere il modal)
+    if (!modalOpen) {
+      if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+      if (document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
     }
   });
 
@@ -1367,10 +1371,26 @@ function openProductByCode(code){
   const clean=String(code||'').trim();
   const product=itemsList.find(i=>i.code.toLowerCase()===clean.toLowerCase());
   const result=document.getElementById('scan-result');
-  if(!product){if(result){result.style.display='block';result.textContent='Codice: '+clean+' — non trovato.'}showToast('Prodotto non trovato','toast-danger');return}
+  if(!product){
+    if(result){result.style.display='block';result.textContent='Codice: '+clean+' — non trovato.'}
+    showToast('Prodotto non trovato','toast-danger');
+    return;
+  }
   if(result){result.style.display='block';result.textContent='Trovato: '+product.code+' — '+product.name}
-  stopQrScanner();showPage('materiali');openCats[product.cat]=true;renderMateriali();
-  setTimeout(()=>openModal(product.id),250);
+  stopQrScanner();
+
+  // Naviga a materiali, apri la categoria e poi apri il modal
+  // Usiamo un flag per evitare che listenRealtime chiuda il modal mentre si apre
+  openCats[product.cat]=true;
+  showPage('materiali');
+
+  // Aspetta che il DOM sia renderizzato completamente prima di aprire il modal
+  setTimeout(()=>{
+    openModal(product.id);
+    // Scorri fino al prodotto nella lista
+    const card = document.querySelector('[onclick*="'+product.id+'"]');
+    if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 400);
 }
 function handleUrlProductCode(){
   const params=new URLSearchParams(window.location.search);
