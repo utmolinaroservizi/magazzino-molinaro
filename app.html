@@ -7,354 +7,177 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --brand-400: #65C24D;
-  --brand-500: #4DAB3D;
-  --brand-600: #3D8B2E;
-  --brand-700: #2D6A21;
-  --brand-800: #1F4D17;
-  --brand-900: #163910;
-  --brand-50:  #EAF5E3;
-  --brand-100: #D4ECCA;
-  --bg: #F7F8F5;
-  --bg-card: #FFFFFF;
-  --bg-surface: #EEF1EA;
-  --bg-tint: #EEF1EA;
-  --text: #1A1A1A;
-  --text-muted: #5E6B5E;
-  --text-light: #9AA39A;
-  --border: #E3E6DF;
-  --border-light: #EBEEE6;
-  --green: var(--brand-500);
-  --green-dark: var(--brand-600);
-  --green-darker: var(--brand-700);
-  --green-light: var(--brand-50);
-  --green-mid: var(--brand-400);
-  --cat-plafoniere: #2c5f87;  --cat-plafoniere-bg: #e8f0f7;
-  --cat-pali: #5e7236;        --cat-pali-bg: #eef2e6;
-  --cat-cavi: #a8780a;        --cat-cavi-bg: #fbf2dc;
-  --cat-impianti: #823560;    --cat-impianti-bg: #f7e8f0;
-  --cat-fotovoltaico: #553687;--cat-fotovoltaico-bg: #ede6f7;
-  --cat-domotica: #2f8472;    --cat-domotica-bg: #e6f3f0;
-  --radius: 14px;
-  --radius-sm: 10px;
-  --radius-xs: 6px;
-  --shadow-xs: 0 1px 2px rgba(40,60,40,.04);
-  --shadow-sm: 0 1px 3px rgba(40,60,40,.04), 0 4px 14px rgba(40,60,40,.05);
-  --shadow-md: 0 1px 3px rgba(40,60,40,.04), 0 12px 40px rgba(40,60,40,.08);
-  --shadow-lg: 0 1px 3px rgba(40,60,40,.04), 0 24px 64px rgba(40,60,40,.14);
-  --shadow-brand: 0 4px 12px rgba(77,171,61,.25);
-  --transition: .2s cubic-bezier(.25,.46,.45,.94);
+:root{
+  --brand-400:#65C24D;--brand-500:#4DAB3D;--brand-600:#3D8B2E;--brand-700:#2D6A21;
+  --brand-50:#EAF5E3;--brand-100:#D4ECCA;
+  --bg:#F7F8F5;--bg-card:#fff;--bg-surface:#EEF1EA;
+  --text:#1A1A1A;--text-muted:#5E6B5E;--text-light:#9AA39A;
+  --border:#E3E6DF;--border-light:#EBEEE6;
+  --radius:14px;--radius-sm:10px;--radius-xs:6px;
+  --shadow-xs:0 1px 2px rgba(40,60,40,.04);
+  --shadow-sm:0 1px 3px rgba(40,60,40,.04),0 4px 14px rgba(40,60,40,.05);
+  --shadow-md:0 1px 3px rgba(40,60,40,.04),0 12px 40px rgba(40,60,40,.08);
+  --shadow-lg:0 1px 3px rgba(40,60,40,.04),0 24px 64px rgba(40,60,40,.14);
+  --shadow-brand:0 4px 12px rgba(77,171,61,.25);
+  --transition:.2s cubic-bezier(.25,.46,.45,.94);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{
-  font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
-  background:var(--bg);
-  background-image:
-    radial-gradient(circle at 20% 20%, rgba(77,171,61,.06) 0%, transparent 55%),
-    radial-gradient(circle at 85% 90%, rgba(45,106,33,.06) 0%, transparent 50%),
-    repeating-linear-gradient(45deg, transparent 0 38px, rgba(77,171,61,.025) 38px 39px);
-  background-attachment:fixed;
-  color:var(--text);
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-  letter-spacing:-.005em;
-}
-::selection{background:var(--brand-100);color:var(--brand-600)}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);background-image:radial-gradient(circle at 20% 20%,rgba(77,171,61,.06) 0%,transparent 55%),radial-gradient(circle at 85% 90%,rgba(45,106,33,.06) 0%,transparent 50%);background-attachment:fixed;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* LOADING SCREEN */
-#loading-screen{
-  position:fixed;inset:0;z-index:999;
-  background:var(--bg);
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:16px;
-}
+#loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 #loading-screen img{height:44px;object-fit:contain}
-.loading-spinner{
-  width:32px;height:32px;
-  border:3px solid var(--brand-100);
-  border-top-color:var(--brand-500);
-  border-radius:50%;
-  animation:spin .8s linear infinite;
-}
+.loading-spinner{width:32px;height:32px;border:3px solid var(--brand-100);border-top-color:var(--brand-500);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:13px;color:var(--text-muted);font-weight:500}
 
-/* HEADER */
-.header{
-  background:var(--bg-card);color:var(--text);
-  padding:0 18px;height:64px;
-  display:flex;align-items:center;gap:14px;
-  position:sticky;top:0;z-index:100;
-  border-bottom:1px solid var(--border);
-  box-shadow:0 1px 0 rgba(40,60,40,.02);
-}
+.header{background:var(--bg-card);color:var(--text);padding:0 18px;height:64px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
 .header-logo{height:34px;object-fit:contain}
 .header-divider{width:1px;height:26px;background:var(--border)}
-.header-title{font-size:14px;font-weight:600;letter-spacing:-.1px;color:var(--text)}
+.header-title{font-size:14px;font-weight:600;letter-spacing:-.1px}
 .header-sub{font-size:10px;font-weight:500;color:var(--text-light);text-transform:uppercase;letter-spacing:.12em;margin-top:2px}
 .header-spacer{flex:1}
-.header-user{
-  display:flex;align-items:center;gap:8px;
-  padding:5px 12px 5px 8px;
-  background:var(--brand-50);border:1px solid var(--brand-100);
-  border-radius:99px;cursor:pointer;transition:var(--transition);
-}
+.header-user{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 8px;background:var(--brand-50);border:1px solid var(--brand-100);border-radius:99px;cursor:pointer;transition:var(--transition)}
 .header-user:hover{background:var(--brand-100)}
-.header-user-avatar{
-  width:26px;height:26px;border-radius:50%;
-  background:var(--brand-500);color:#fff;
-  font-size:11px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-}
+.header-user-avatar{width:26px;height:26px;border-radius:50%;background:var(--brand-500);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .header-user-name{font-size:12px;font-weight:600;color:var(--brand-700)}
 
-/* NAV */
-.nav{
-  display:flex;gap:4px;padding:8px;
-  background:var(--bg-card);
-  border-bottom:1px solid var(--border);
-  position:sticky;top:64px;z-index:99;
-}
-.nav-btn{
-  flex:1;padding:9px 0 8px;
-  text-align:center;font-size:12px;font-weight:500;
-  color:var(--text-muted);border:none;background:transparent;
-  cursor:pointer;border-radius:10px;transition:var(--transition);
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  font-family:inherit;
-}
+.nav{display:flex;gap:4px;padding:8px;background:var(--bg-card);border-bottom:1px solid var(--border);position:sticky;top:64px;z-index:99;overflow-x:auto}
+.nav-btn{flex:1;min-width:0;padding:9px 4px 8px;text-align:center;font-size:11px;font-weight:500;color:var(--text-muted);border:none;background:transparent;cursor:pointer;border-radius:10px;transition:var(--transition);display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit;white-space:nowrap}
 .nav-btn:active{transform:scale(.96)}
-.nav-btn:hover{background:var(--bg-surface);color:var(--text)}
 .nav-btn.active{color:var(--brand-500);background:var(--brand-50);font-weight:600}
 .nav-btn svg{width:18px;height:18px;stroke-width:2}
 .nav-btn.hidden{display:none}
 
-/* PAGES */
-.page{display:none;padding:18px 16px 96px}
-.page.active{display:block;animation:fadeUp .35s cubic-bezier(.32,.72,0,1) both}
-@keyframes fadeUp{from{transform:translateY(8px)}to{transform:translateY(0)}}
+.page{display:none;padding:18px 16px 96px;animation:fadeUp .35s cubic-bezier(.32,.72,0,1) both}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.section-label{
-  font-size:10px;font-weight:700;
-  color:var(--text-light);text-transform:uppercase;letter-spacing:.12em;
-  margin:6px 2px 12px;display:flex;align-items:center;gap:8px;
-}
-.section-label::before{
-  content:"";width:12px;height:2px;border-radius:2px;background:var(--brand-500);
-}
+.section-label{font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.12em;margin:6px 2px 12px;display:flex;align-items:center;gap:8px}
+.section-label::before{content:"";width:12px;height:2px;border-radius:2px;background:var(--brand-500)}
 
-/* HERO */
-.hero{
-  background:var(--bg-card);color:var(--text);
-  padding:18px 20px 20px;border-radius:var(--radius);
-  margin-bottom:22px;position:relative;overflow:hidden;
-  border:1px solid var(--border);box-shadow:var(--shadow-sm);
-}
-.hero::before{
-  content:"";position:absolute;top:0;left:24px;right:24px;height:3px;
-  background:linear-gradient(90deg,var(--brand-500),var(--brand-600));
-  border-radius:0 0 3px 3px;
-}
-.hero-eyebrow{
-  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.22em;
-  color:var(--brand-500);display:inline-flex;align-items:center;gap:6px;
-}
-.hero-eyebrow::before{
-  content:"";width:6px;height:6px;border-radius:50%;
-  background:var(--brand-500);box-shadow:0 0 0 3px var(--brand-50);
-}
-.hero-title{font-size:21px;font-weight:600;line-height:1.2;margin-top:10px;letter-spacing:-.2px;color:var(--text)}
+.hero{background:var(--bg-card);padding:18px 20px 20px;border-radius:var(--radius);margin-bottom:22px;position:relative;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.hero::before{content:"";position:absolute;top:0;left:24px;right:24px;height:3px;background:linear-gradient(90deg,var(--brand-500),var(--brand-600));border-radius:0 0 3px 3px}
+.hero-eyebrow{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.22em;color:var(--brand-500);display:inline-flex;align-items:center;gap:6px}
+.hero-eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand-500);box-shadow:0 0 0 3px var(--brand-50)}
+.hero-title{font-size:21px;font-weight:600;line-height:1.2;margin-top:10px;letter-spacing:-.2px}
 .hero-meta{font-size:12px;font-weight:500;color:var(--text-muted);margin-top:8px}
 
-/* STATS */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px}
-.stat-card{
-  background:var(--bg-card);border-radius:var(--radius-sm);
-  padding:14px 10px 13px;text-align:center;
-  border:1px solid var(--border);box-shadow:var(--shadow-xs);
-}
-.stat-val{font-size:26px;font-weight:600;color:var(--brand-500);line-height:1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.stat-card{background:var(--bg-card);border-radius:var(--radius-sm);padding:14px 10px 13px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
+.stat-val{font-size:24px;font-weight:600;color:var(--brand-500);line-height:1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
 .stat-label{font-size:10px;color:var(--text-light);margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.stat-card.value-card .stat-val{font-size:18px}
 
-/* TREE */
-.tree-wrap{
-  background:var(--bg-card);border-radius:var(--radius);
-  border:1px solid var(--border);padding:22px 16px 18px;
-  box-shadow:var(--shadow-sm);margin-bottom:20px;
-}
-.tree-root-label{
-  background:var(--brand-500);color:#fff;
-  font-size:12.5px;font-weight:600;padding:9px 18px;border-radius:99px;
-  text-align:center;margin:0 auto;width:fit-content;
-  display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-brand);
-}
+.tree-wrap{background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:22px 16px 18px;box-shadow:var(--shadow-sm);margin-bottom:20px}
+.tree-root-label{background:var(--brand-500);color:#fff;font-size:12.5px;font-weight:600;padding:9px 18px;border-radius:99px;text-align:center;margin:0 auto;width:fit-content;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-brand)}
 .tree-connector{width:2px;height:18px;margin:0 auto;background:var(--border)}
-.tree-h-line{height:1px;background:var(--border);margin:0 14px 16px;border-radius:1px}
+.tree-h-line{height:1px;background:var(--border);margin:0 14px 16px}
 .tree-branches{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tree-branch{
-  border-radius:var(--radius-sm);padding:12px;cursor:pointer;
-  transition:var(--transition);border:1px solid var(--border);
-  position:relative;overflow:hidden;background:var(--bg-card);
-}
+.tree-branch{border-radius:var(--radius-sm);padding:12px;cursor:pointer;transition:var(--transition);border:1px solid var(--border);background:var(--bg-card)}
 .tree-branch:hover{border-color:var(--brand-100);background:var(--brand-50)}
 .tree-branch:active{transform:scale(.97)}
 .tree-branch-top{display:flex;align-items:center;gap:7px;margin-bottom:6px}
 .tree-branch-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.tree-branch-name{font-size:11px;font-weight:600;letter-spacing:.01em}
+.tree-branch-name{font-size:11px;font-weight:600}
 .tree-branch-qty{font-size:22px;font-weight:600;line-height:1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
 .tree-branch-sub{font-size:11px;color:var(--text-light);margin-top:3px;font-weight:500}
+.tree-branch-val{font-size:10px;color:var(--text-light);margin-top:2px;font-weight:600}
 
-/* SEARCH */
 .search-bar{position:relative;margin-bottom:16px}
-.search-bar input{
-  width:100%;padding:12px 16px 12px 42px;
-  border:1px solid var(--border);border-radius:var(--radius-sm);
-  font-size:14px;font-family:inherit;background:var(--bg-card);color:var(--text);
-  outline:none;transition:var(--transition);
-}
+.search-bar input{width:100%;padding:12px 16px 12px 42px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--bg-card);color:var(--text);outline:none;transition:var(--transition)}
 .search-bar input:focus{border-color:var(--brand-500)}
 .search-bar input::placeholder{color:var(--text-light)}
 .search-bar svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--text-light)}
 
-/* FAB */
-.fab{
-  position:fixed;bottom:24px;right:20px;
-  width:54px;height:54px;border-radius:50%;
-  background:var(--brand-500);color:#fff;border:none;
-  font-size:28px;font-weight:300;cursor:pointer;
-  box-shadow:0 4px 14px rgba(77,171,61,.3);z-index:90;
-  display:flex;align-items:center;justify-content:center;transition:var(--transition);
-}
-.fab:hover{background:var(--brand-600)}
+.fab{position:fixed;bottom:24px;right:20px;width:54px;height:54px;border-radius:50%;background:var(--brand-500);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 4px 14px rgba(77,171,61,.3);z-index:90;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
 .fab:active{transform:scale(.92)}
 
-/* CATEGORIES */
 .cat-group{margin-bottom:12px}
-.cat-header{
-  display:flex;align-items:center;gap:12px;padding:13px 14px;
-  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
-  cursor:pointer;transition:var(--transition);box-shadow:var(--shadow-xs);user-select:none;
-}
+.cat-header{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition);box-shadow:var(--shadow-xs);user-select:none}
 .cat-header:active{transform:scale(.985)}
 .cat-icon-wrap{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .cat-info{flex:1;min-width:0}
-.cat-name{font-size:14px;font-weight:600;letter-spacing:-.1px}
+.cat-name{font-size:14px;font-weight:600}
 .cat-sub{font-size:11.5px;color:var(--text-light);margin-top:2px;font-weight:500}
 .cat-arrow{width:22px;height:22px;transition:transform .25s ease;color:var(--text-light);flex-shrink:0}
 .cat-arrow.open{transform:rotate(180deg)}
-.cat-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;min-width:28px;text-align:center;font-variant-numeric:tabular-nums}
+.cat-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;min-width:28px;text-align:center}
 .items-container{overflow:hidden;max-height:0;transition:max-height .4s cubic-bezier(.32,.72,0,1);padding:0 2px}
-.items-container.open{max-height:8000px;padding-top:4px}
-.item-card{
-  display:flex;align-items:center;gap:11px;padding:10px 13px;
-  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
-  margin-top:6px;cursor:pointer;transition:var(--transition);position:relative;
-}
+.items-container.open{max-height:9000px;padding-top:4px}
+
+.item-card{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:6px;cursor:pointer;transition:var(--transition);position:relative}
 .item-card:hover{border-color:var(--brand-100);background:var(--brand-50)}
-.item-card:active{transform:scale(.985);background:var(--bg-surface)}
+.item-card:active{transform:scale(.985)}
 .item-code{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:4px 8px;border-radius:6px;flex-shrink:0;letter-spacing:.04em}
-.item-name{font-size:13px;font-weight:500;flex:1;line-height:1.35;color:var(--text);min-width:0}
-.item-qty-col{text-align:right;flex-shrink:0;min-width:46px}
-.item-qty-val{font-size:20px;font-weight:600;line-height:1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
-.item-qty-unit{font-size:10px;color:var(--text-light);font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
-.item-delete{
-  position:absolute;right:-7px;top:-7px;width:24px;height:24px;border-radius:50%;
-  background:#e53935;color:#fff;border:2px solid var(--bg-card);
-  font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;
-  z-index:2;font-family:inherit;line-height:1;padding:0;box-shadow:0 4px 12px rgba(229,57,53,.35);
-}
+.item-name{font-size:12px;font-weight:500;flex:1;line-height:1.35;min-width:0}
+.item-right{text-align:right;flex-shrink:0;min-width:52px}
+.item-qty-val{font-size:19px;font-weight:600;line-height:1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.item-qty-unit{font-size:9px;color:var(--text-light);font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.item-price{font-size:10px;font-weight:600;color:var(--text-muted);margin-top:2px}
+
+.item-delete{position:absolute;right:-7px;top:-7px;width:24px;height:24px;border-radius:50%;background:#e53935;color:#fff;border:2px solid var(--bg-card);font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2;font-family:inherit;line-height:1;padding:0}
 .editing .item-delete{display:flex}
-.add-item-btn{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:10px;margin-top:6px;border:1px dashed var(--border);
-  border-radius:var(--radius-sm);color:var(--text-muted);
-  font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);
-  background:transparent;width:100%;font-family:inherit;
-}
+.add-item-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;margin-top:6px;border:1px dashed var(--border);border-radius:var(--radius-sm);color:var(--text-muted);font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);background:transparent;width:100%;font-family:inherit}
 .add-item-btn:hover{background:var(--brand-50);border-color:var(--brand-100);color:var(--brand-600)}
 
-/* MODAL */
-.modal-backdrop{
-  display:none;position:fixed;inset:0;
-  background:rgba(26,26,26,.45);z-index:200;animation:fadeIn .2s ease;
-}
+/* MODAL PRODOTTO */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(26,26,26,.45);z-index:200;animation:fadeIn .2s ease}
 .modal-backdrop.open{display:flex;align-items:flex-end;justify-content:center}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal-sheet{
-  background:var(--bg-card);border-radius:18px 18px 0 0;
-  width:100%;max-width:500px;
-  padding-bottom:env(safe-area-inset-bottom,24px);
-  animation:sheetUp .3s cubic-bezier(.32,.72,0,1);
-  border-top:3px solid var(--brand-500);
-}
+.modal-sheet{background:var(--bg-card);border-radius:18px 18px 0 0;width:100%;max-width:500px;padding-bottom:env(safe-area-inset-bottom,24px);animation:sheetUp .3s cubic-bezier(.32,.72,0,1);border-top:3px solid var(--brand-500)}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 0}
 .modal-top{padding:16px 22px 14px;border-bottom:1px solid var(--border)}
 .modal-cat-badge{display:inline-block;font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
-.modal-product-code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-light);letter-spacing:.04em}
-.modal-product-name{font-size:17px;font-weight:600;line-height:1.35;margin-top:4px;letter-spacing:-.2px;color:var(--text)}
-.modal-qty-zone{padding:28px 20px 22px;text-align:center;background:var(--bg-surface);border-bottom:1px solid var(--border)}
+.modal-product-code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-light)}
+.modal-product-name{font-size:17px;font-weight:600;line-height:1.35;margin-top:4px;letter-spacing:-.2px}
+
+.modal-qty-zone{padding:24px 20px 18px;text-align:center;background:var(--bg-surface);border-bottom:1px solid var(--border)}
 .modal-qty-label{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--text-light);font-weight:600;margin-bottom:10px}
 .modal-qty-num{font-size:62px;font-weight:600;line-height:1;color:var(--brand-500);letter-spacing:-2px;transition:var(--transition);font-variant-numeric:tabular-nums}
 .modal-qty-unit-text{font-size:13px;color:var(--text-muted);margin-top:6px;font-weight:500}
 
-/* MODAL — niente chip per operatore: è già loggato */
-.modal-operator-info{
-  padding:12px 22px;
-  display:flex;align-items:center;gap:8px;
-  border-bottom:1px solid var(--border);
-  font-size:13px;color:var(--text-muted);font-weight:500;
-}
-.modal-operator-info strong{color:var(--brand-700)}
+/* PRICE SECTION - solo responsabile */
+.modal-price-zone{padding:12px 22px;border-bottom:1px solid var(--border);display:none}
+.modal-price-zone.visible{display:block}
+.modal-price-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.modal-price-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);font-weight:600}
+.modal-price-val{font-size:20px;font-weight:700;color:var(--brand-700);letter-spacing:-.5px}
+.modal-price-total{font-size:12px;color:var(--text-muted);font-weight:500;margin-top:3px}
+.modal-price-edit-btn{padding:6px 14px;border:1px solid var(--brand-100);background:var(--brand-50);border-radius:8px;font-size:12px;font-weight:600;color:var(--brand-600);cursor:pointer;font-family:inherit;transition:var(--transition)}
+.modal-price-edit-btn:active{transform:scale(.95)}
+.modal-price-input-row{display:flex;align-items:center;gap:8px;margin-top:10px;display:none}
+.modal-price-input-row.visible{display:flex}
+.modal-price-input{flex:1;padding:9px 12px;border:1.5px solid var(--brand-500);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;outline:none;font-variant-numeric:tabular-nums}
+.modal-price-save{padding:9px 16px;background:var(--brand-500);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.modal-price-cancel{padding:9px 12px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit}
 
+.modal-operator-info{padding:12px 22px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-muted);font-weight:500}
+.modal-operator-info strong{color:var(--brand-700)}
 .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px 0}
-.action-btn{
-  border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:16px 12px;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  transition:var(--transition);font-family:inherit;background:var(--bg-card);
-}
+.action-btn{border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:var(--transition);font-family:inherit;background:var(--bg-card)}
 .action-btn:hover{background:var(--bg-surface)}
 .action-btn:active{transform:scale(.97)}
-.action-icon{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:300}
+.action-icon{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
 .action-label{font-size:12px;font-weight:600;line-height:1.3;text-align:center}
 .btn-take .action-icon{background:#FFF3D6;color:#9A6C1E}.btn-take .action-label{color:#9A6C1E}
 .btn-return .action-icon{background:var(--brand-50);color:var(--brand-500)}.btn-return .action-label{color:var(--brand-600)}
-.modal-close{
-  display:block;width:calc(100% - 40px);margin:14px auto 0;padding:12px;
-  border:1px solid var(--border);border-radius:var(--radius-sm);
-  background:transparent;font-size:13px;font-weight:500;color:var(--text-muted);
-  cursor:pointer;font-family:inherit;transition:var(--transition);
-}
+.modal-close{display:block;width:calc(100% - 40px);margin:14px auto 0;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:var(--transition)}
 .modal-close:hover{background:var(--bg-surface)}
 
 /* FORM MODAL */
 .form-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(26,26,26,.45);z-index:210}
-.form-modal-backdrop.open{display:flex;align-items:center;justify-content:center}
-.form-modal{
-  background:var(--bg-card);border-radius:18px;
-  width:calc(100% - 32px);max-width:420px;
-  padding:26px 22px 22px;box-shadow:var(--shadow-md);
-  animation:fadeUp .25s ease;border-top:3px solid var(--brand-500);
-}
+.form-modal-backdrop.open{display:flex;align-items:center;justify-content:center;padding:16px}
+.form-modal{background:var(--bg-card);border-radius:18px;width:100%;max-width:420px;padding:26px 22px 22px;box-shadow:var(--shadow-md);animation:fadeUp .25s ease;border-top:3px solid var(--brand-500);max-height:90vh;overflow-y:auto}
 .form-modal h2{font-size:17px;font-weight:600;margin-bottom:18px;color:var(--text);letter-spacing:-.2px}
 .form-group{margin-bottom:14px}
 .form-group label{display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
-.form-group input,.form-group select{
-  width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);
-  font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);
-  outline:none;transition:var(--transition);
-}
+.form-group input,.form-group select{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;transition:var(--transition)}
 .form-group input:focus,.form-group select:focus{border-color:var(--brand-500);background:var(--bg-card)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .form-btns{display:flex;gap:10px;margin-top:18px}
-.form-btns button{
-  flex:1;padding:12px;border-radius:var(--radius-sm);
-  font-size:14px;font-weight:600;cursor:pointer;
-  font-family:inherit;border:1px solid transparent;transition:var(--transition);
-}
+.form-btns button{flex:1;padding:12px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid transparent;transition:var(--transition)}
 .form-btns button:active{transform:scale(.97)}
 .btn-cancel{background:var(--bg-card);color:var(--text-muted);border-color:var(--border)!important}
 .btn-confirm{background:var(--brand-500);color:#fff}
@@ -363,38 +186,21 @@ body{
 .color-opt.selected{border-color:var(--text);transform:scale(1.15)}
 
 /* TOAST */
-.toast{
-  position:fixed;top:20px;left:50%;
-  transform:translateX(-50%) translateY(-20px);
-  padding:11px 22px;border-radius:var(--radius-sm);
-  font-size:13px;font-weight:500;z-index:300;
-  opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;box-shadow:var(--shadow-md);
-}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);padding:11px 22px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;z-index:300;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;box-shadow:var(--shadow-md)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast-take{background:#9A6C1E;color:#fff}
-.toast-return{background:var(--brand-500);color:#fff}
-.toast-info{background:var(--text);color:#fff}
-.toast-danger{background:#B33A3A;color:#fff}
+.toast-take{background:#9A6C1E;color:#fff}.toast-return{background:var(--brand-500);color:#fff}
+.toast-info{background:var(--text);color:#fff}.toast-danger{background:#B33A3A;color:#fff}
 .toast-sync{background:var(--brand-700);color:#fff}
 
 /* LOG */
-.log-item{
-  display:flex;align-items:center;gap:11px;padding:11px 13px;
-  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
-  margin-bottom:7px;
-}
+.log-item{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:7px}
 .log-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.log-icon.take{background:#FFF3D6;color:#9A6C1E}
-.log-icon.ret{background:var(--brand-50);color:var(--brand-500)}
+.log-icon.take{background:#FFF3D6;color:#9A6C1E}.log-icon.ret{background:var(--brand-50);color:var(--brand-500)}
 .log-info{flex:1;min-width:0}
-.log-text{font-size:12.5px;font-weight:500;line-height:1.35;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.log-text{font-size:12.5px;font-weight:500;line-height:1.35;overflow:hidden;text-overflow:ellipsis}
 .log-operator{font-size:11px;color:var(--brand-600);font-weight:600;margin-top:2px}
 .log-time{font-size:11px;color:var(--text-light);margin-top:2px;font-weight:500}
-.log-undo{
-  background:transparent;border:1px solid var(--border);border-radius:8px;
-  padding:5px 11px;font-size:11px;font-weight:500;color:var(--text-muted);
-  cursor:pointer;font-family:inherit;flex-shrink:0;transition:var(--transition);
-}
+.log-undo{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;flex-shrink:0;transition:var(--transition)}
 .log-undo:hover{background:#FDF5F5;color:#B33A3A;border-color:#F0C0C0}
 
 .empty-state{text-align:center;padding:48px 20px;color:var(--text-light)}
@@ -404,25 +210,11 @@ body{
 /* FAB MENU */
 .fab-menu{position:fixed;bottom:88px;right:20px;z-index:91;display:none;flex-direction:column;gap:8px;align-items:flex-end}
 .fab-menu.open{display:flex;animation:fadeUp .25s cubic-bezier(.32,.72,0,1)}
-.fab-option{
-  display:flex;align-items:center;gap:10px;padding:9px 18px 9px 9px;
-  background:var(--bg-card);border-radius:99px;box-shadow:var(--shadow-sm);
-  cursor:pointer;border:1px solid var(--border);font-size:13px;font-weight:500;
-  color:var(--text);transition:var(--transition);font-family:inherit;white-space:nowrap;
-}
+.fab-option{display:flex;align-items:center;gap:10px;padding:9px 18px 9px 9px;background:var(--bg-card);border-radius:99px;box-shadow:var(--shadow-sm);cursor:pointer;border:1px solid var(--border);font-size:13px;font-weight:500;color:var(--text);transition:var(--transition);font-family:inherit;white-space:nowrap}
 .fab-option:hover{background:var(--bg-surface)}
 .fab-option:active{transform:scale(.95)}
 .fab-option .fo-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0}
-
-/* EDIT TOGGLE */
-.edit-toggle{
-  position:fixed;bottom:24px;left:20px;height:44px;padding:0 16px;
-  border-radius:var(--radius-sm);border:1px solid var(--border);
-  background:var(--bg-card);color:var(--text-muted);font-size:12.5px;font-weight:500;
-  cursor:pointer;z-index:90;box-shadow:var(--shadow-sm);font-family:inherit;
-  display:flex;align-items:center;gap:6px;transition:var(--transition);
-}
-.edit-toggle:hover{background:var(--bg-surface)}
+.edit-toggle{position:fixed;bottom:24px;left:20px;height:44px;padding:0 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);font-size:12.5px;font-weight:500;cursor:pointer;z-index:90;box-shadow:var(--shadow-sm);font-family:inherit;display:flex;align-items:center;gap:6px;transition:var(--transition)}
 .edit-toggle.active{background:#FDF5F5;color:#B33A3A;border-color:#F0C0C0}
 .edit-toggle:active{transform:scale(.95)}
 
@@ -432,88 +224,56 @@ body{
 .resp-card p{font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;font-weight:500}
 .resp-btn{width:100%;padding:12px;border-radius:var(--radius-sm);border:none;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:8px}
 .resp-btn:active{transform:scale(.97)}
-.resp-btn-green{background:var(--brand-500);color:#fff}
-.resp-btn-green:hover{background:var(--brand-600)}
-.resp-btn-red{background:#FDF5F5;color:#B33A3A;border:1px solid #F0C0C0}
-.resp-btn-red:hover{background:#FDE8E8}
+.resp-btn-green{background:var(--brand-500);color:#fff}.resp-btn-green:hover{background:var(--brand-600)}
+.resp-btn-red{background:#FDF5F5;color:#B33A3A;border:1px solid #F0C0C0}.resp-btn-red:hover{background:#FDE8E8}
 .resp-btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
 .resp-cat-list{margin-top:4px}
 .resp-cat-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-light)}
 .resp-cat-item:last-child{border-bottom:none}
 .resp-cat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .resp-cat-info{flex:1}
-.resp-cat-name{font-size:13px;font-weight:600;color:var(--text)}
+.resp-cat-name{font-size:13px;font-weight:600}
 .resp-cat-sub{font-size:11px;color:var(--text-light);margin-top:2px}
 .resp-cat-del{width:32px;height:32px;border-radius:50%;border:1.5px solid #F0C0C0;background:transparent;color:#B33A3A;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition);font-family:inherit}
 .resp-cat-del:hover{background:#e53935;color:#fff;border-color:#e53935}
 
+/* VALORE TOTALE MAGAZZINO (solo responsabile) */
+.valore-card{background:linear-gradient(135deg,var(--brand-600),var(--brand-800));color:#fff;border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-brand)}
+.valore-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;opacity:.8;margin-bottom:6px}
+.valore-num{font-size:32px;font-weight:700;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.valore-sub{font-size:12px;opacity:.7;margin-top:4px;font-weight:500}
+
 /* QR */
 .qr-tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.qr-tool-btn{padding:12px;border:none;border-radius:var(--radius-sm);background:var(--brand-500);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 2px 8px rgba(77,171,61,.2)}
-.qr-tool-btn.secondary{background:var(--bg-card);color:var(--brand-600);border:1px solid var(--brand-100);box-shadow:none}
+.qr-tool-btn{padding:12px;border:none;border-radius:var(--radius-sm);background:var(--brand-500);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
+.qr-tool-btn.secondary{background:var(--bg-card);color:var(--brand-600);border:1px solid var(--brand-100)}
 .qr-tool-btn:active{transform:scale(.97)}
 .qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
 .qr-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;box-shadow:var(--shadow-xs)}
 .qr-box{display:flex;justify-content:center;align-items:center;min-height:126px;background:#fff;border-radius:10px;margin-bottom:9px}
 .qr-box canvas,.qr-box img{width:118px!important;height:118px!important}
 .qr-code-label{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--brand-600);margin-bottom:4px}
-.qr-name{font-size:11.5px;line-height:1.25;font-weight:600;color:var(--text)}
+.qr-name{font-size:11.5px;line-height:1.25;font-weight:600}
 .qr-cat{font-size:10px;margin-top:4px;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em}
 .scanner-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
 #reader{width:100%;overflow:hidden;border-radius:var(--radius-sm)}
-.scan-result{margin-top:12px;padding:12px;border-radius:var(--radius-sm);background:var(--brand-50);color:var(--brand-700);font-size:13px;font-weight:600;display:none}
-.scan-open-btn{
-  display:block;width:100%;margin-top:10px;padding:13px;
-  background:var(--brand-500);color:#fff;border:none;
-  border-radius:var(--radius-sm);font-size:14px;font-weight:700;
-  font-family:inherit;cursor:pointer;transition:var(--transition);
-  box-shadow:var(--shadow-brand);letter-spacing:-.1px;
-}
+.scan-result{margin-top:12px;padding:14px;border-radius:var(--radius-sm);background:var(--brand-50);color:var(--brand-700);font-size:13px;font-weight:600;display:none;border:1px solid var(--brand-100)}
+.scan-open-btn{display:block;width:100%;margin-top:10px;padding:13px;background:var(--brand-500);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:var(--shadow-brand)}
 .scan-open-btn:active{transform:scale(.97)}
-.scan-note{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:12px}
-
-/* SYNC INDICATOR */
-.sync-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--brand-500);
-  box-shadow:0 0 0 3px rgba(77,171,61,.18);
-  transition:background .3s;
-}
-.sync-dot.syncing{background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.18);animation:pulse 1s infinite}
-.sync-dot.error{background:#e53935;box-shadow:0 0 0 3px rgba(229,57,53,.18)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 @media(min-width:500px){.page{padding:24px;max-width:540px;margin:0 auto}}
-@media print{
-  .header,.nav,.fab,.fab-menu,.edit-toggle,.qr-tools,.scanner-box{display:none!important}
-  body{background:#fff!important}
-  .page{display:block!important;padding:0!important;max-width:none!important}
-  .page:not(#page-qrcode){display:none!important}
-  .qr-grid{grid-template-columns:repeat(3,1fr);gap:10px}
-  .qr-card{break-inside:avoid;box-shadow:none}
-}
+@media print{.header,.nav,.fab,.fab-menu,.edit-toggle,.qr-tools,.scanner-box{display:none!important}body{background:#fff!important}.page{display:block!important;padding:0!important;max-width:none!important}.page:not(#page-qrcode){display:none!important}.qr-grid{grid-template-columns:repeat(3,1fr);gap:10px}.qr-card{break-inside:avoid;box-shadow:none}}
 </style>
-
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
+<div id="loading-screen"><img src="logo-molinaro.png" alt="Molinaro"><div class="loading-spinner"></div><div class="loading-text">Caricamento...</div></div>
 
-<!-- LOADING -->
-<div id="loading-screen">
-  <img src="logo-molinaro.png" alt="Molinaro ESCo">
-  <div class="loading-spinner"></div>
-  <div class="loading-text">Caricamento in corso...</div>
-</div>
-
-<!-- HEADER -->
 <div class="header">
   <img src="logo-molinaro.png" class="header-logo" alt="Molinaro ESCo">
   <div class="header-divider"></div>
-  <div>
-    <div class="header-title">Magazzino</div>
-    <div class="header-sub">ESCo · Energy Service Co.</div>
-  </div>
+  <div><div class="header-title">Magazzino</div><div class="header-sub">ESCo · Energy</div></div>
   <div class="header-spacer"></div>
   <div class="header-user" id="header-user" onclick="doLogout()">
     <div class="header-user-avatar" id="user-avatar">?</div>
@@ -521,7 +281,6 @@ body{
   </div>
 </div>
 
-<!-- NAV -->
 <div class="nav">
   <button class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -536,10 +295,7 @@ body{
     Registro
   </button>
   <button class="nav-btn" onclick="showPage('qrcode')" id="nav-qrcode">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
-      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-      <path d="M14 14h2v2h-2zM18 14h3M14 18h3M19 18h2v3h-3"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h2v2h-2zM18 14h3M14 18h3M19 18h2v3h-3"/></svg>
     QR
   </button>
   <button class="nav-btn hidden" onclick="showPage('responsabile')" id="nav-resp">
@@ -552,25 +308,20 @@ body{
 <div class="page active" id="page-dashboard">
   <div class="hero">
     <div class="hero-eyebrow">Inventario · Operativo</div>
-    <div class="hero-title" id="hero-title">Benvenuto<br>nel Magazzino Molinaro</div>
-    <div class="hero-meta" id="hero-meta">Aggiornato adesso</div>
+    <div class="hero-title" id="hero-title">Magazzino Molinaro</div>
+    <div class="hero-meta" id="hero-meta"></div>
   </div>
   <div class="section-label">Panoramica</div>
   <div class="stats-grid" id="stats-grid"></div>
   <div class="section-label">Struttura magazzino</div>
-  <div class="tree-wrap">
-    <div class="tree-root-label">🏭 Magazzino</div>
-    <div class="tree-connector"></div>
-    <div class="tree-h-line"></div>
-    <div class="tree-branches" id="tree-branches"></div>
-  </div>
+  <div class="tree-wrap"><div class="tree-root-label">🏭 Magazzino</div><div class="tree-connector"></div><div class="tree-h-line"></div><div class="tree-branches" id="tree-branches"></div></div>
 </div>
 
 <!-- MATERIALI -->
 <div class="page" id="page-materiali">
   <div class="search-bar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" placeholder="Cerca materiale..." id="search-input" oninput="filterItems()">
+    <input type="text" placeholder="Cerca prodotto o codice..." id="search-input" oninput="filterItems()">
   </div>
   <div id="categories-container"></div>
 </div>
@@ -590,10 +341,9 @@ body{
   </div>
   <div class="scanner-box">
     <div class="section-label" style="margin-top:0">Scanner fotocamera</div>
-    <p class="scan-note">Serve HTTPS per usare la fotocamera. Su GitHub Pages funziona correttamente.</p>
     <div class="qr-tools">
       <button class="qr-tool-btn" onclick="startQrScanner()">Avvia scanner</button>
-      <button class="qr-tool-btn secondary" onclick="stopQrScanner()">Ferma scanner</button>
+      <button class="qr-tool-btn secondary" onclick="stopQrScanner()">Ferma</button>
     </div>
     <div id="reader"></div>
     <div class="scan-result" id="scan-result"></div>
@@ -602,20 +352,25 @@ body{
   <div class="qr-grid" id="qr-grid"></div>
 </div>
 
-<!-- RESPONSABILE (solo per ruolo responsabile) -->
+<!-- RESPONSABILE -->
 <div class="page" id="page-responsabile">
   <div class="section-label">Area responsabile</div>
+  <div class="valore-card" id="valore-card">
+    <div class="valore-label">Valore totale magazzino</div>
+    <div class="valore-num" id="valore-num">—</div>
+    <div class="valore-sub" id="valore-sub">Calcolato su prezzi disponibili</div>
+  </div>
   <div class="resp-card">
     <h3>📊 Report movimentazioni</h3>
-    <p>Scarica un file CSV con lo storico completo: operatore, data, ora, prodotto e quantità.</p>
+    <p>Scarica CSV con storico completo: operatore, data, ora, prodotto, quantità.</p>
     <button class="resp-btn resp-btn-green" onclick="exportExcel()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Scarica Excel movimentazioni
     </button>
   </div>
   <div class="resp-card">
-    <h3>📦 Inventario corrente</h3>
-    <p>Scarica l'elenco completo dei materiali con categorie, codici e quantità.</p>
+    <h3>📦 Inventario con prezzi</h3>
+    <p>Scarica l'elenco completo dei materiali con categorie, codici, quantità e prezzi.</p>
     <button class="resp-btn resp-btn-green" onclick="exportInventory()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Scarica Excel inventario
@@ -623,12 +378,12 @@ body{
   </div>
   <div class="resp-card">
     <h3>🗂️ Gestione categorie</h3>
-    <p>Elimina una categoria. Attenzione: verranno eliminati anche tutti i prodotti al suo interno.</p>
+    <p>Elimina una categoria. Verranno eliminati anche tutti i prodotti al suo interno.</p>
     <div class="resp-cat-list" id="resp-cat-list"></div>
   </div>
   <div class="resp-card">
     <h3>🗑️ Svuota registro</h3>
-    <p>Cancella definitivamente tutti i movimenti. Le quantità non verranno modificate.</p>
+    <p>Cancella definitivamente tutti i movimenti. Le quantità non saranno modificate.</p>
     <button class="resp-btn resp-btn-red" onclick="clearAllLogs()">Svuota registro movimentazioni</button>
   </div>
 </div>
@@ -646,6 +401,22 @@ body{
       <div class="modal-qty-label">Disponibilità in magazzino</div>
       <div class="modal-qty-num" id="m-qty">0</div>
       <div class="modal-qty-unit-text" id="m-unit">pezzi disponibili</div>
+    </div>
+    <!-- SEZIONE PREZZI: visibile solo responsabile -->
+    <div class="modal-price-zone" id="modal-price-zone">
+      <div class="modal-price-row">
+        <div>
+          <div class="modal-price-label">Prezzo unitario</div>
+          <div class="modal-price-val" id="m-price-val">—</div>
+          <div class="modal-price-total" id="m-price-total"></div>
+        </div>
+        <button class="modal-price-edit-btn" onclick="togglePriceEdit()">✏️ Modifica</button>
+      </div>
+      <div class="modal-price-input-row" id="price-input-row">
+        <input type="number" class="modal-price-input" id="price-input" step="0.01" min="0" placeholder="0.00">
+        <button class="modal-price-save" onclick="savePrice()">Salva</button>
+        <button class="modal-price-cancel" onclick="togglePriceEdit()">✕</button>
+      </div>
     </div>
     <div class="modal-operator-info">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -670,14 +441,9 @@ body{
   <div class="form-modal" id="form-modal" onclick="event.stopPropagation()"></div>
 </div>
 
-<!-- FAB -->
 <div class="fab-menu" id="fab-menu">
-  <button class="fab-option" onclick="openAddCategoryForm()">
-    <div class="fo-icon" style="background:var(--green)">+</div>Nuova categoria
-  </button>
-  <button class="fab-option" onclick="openAddProductForm()">
-    <div class="fo-icon" style="background:var(--cat-plafoniere)">+</div>Nuovo prodotto
-  </button>
+  <button class="fab-option" onclick="openAddCategoryForm()"><div class="fo-icon" style="background:var(--brand-500)">+</div>Nuova categoria</button>
+  <button class="fab-option" onclick="openAddProductForm()"><div class="fo-icon" style="background:#3d6b8e">+</div>Nuovo prodotto</button>
 </div>
 <button class="fab" id="fab-btn" onclick="toggleFab()" style="display:none">+</button>
 <button class="edit-toggle" id="edit-toggle" onclick="toggleEditMode()" style="display:none">
@@ -691,13 +457,13 @@ import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   doc, getDoc, collection, getDocs, setDoc, deleteDoc,
-  onSnapshot, writeBatch, serverTimestamp, query, orderBy, limit
+  onSnapshot, writeBatch, query, orderBy, limit
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  STATO GLOBALE
-// ══════════════════════════════════════════════
-let currentUser    = null;   // { uid, nome, email, ruolo }
+// ═══════════════════════════════════════
+let currentUser    = null;
 let categories     = {};
 let itemsList      = [];
 let actLog         = [];
@@ -707,320 +473,366 @@ let editMode       = false;
 let currentModalItem = null;
 let fabOpen        = false;
 let html5QrCodeInstance = null;
+let priceEditOpen  = false;
 
 const PALETTE = [
-  {color:'#3d6b8e',bg:'#ebf2f7'},{color:'#6b7c3d',bg:'#f0f3e8'},{color:'#b8860b',bg:'#faf3e0'},
-  {color:'#8e3d6b',bg:'#f7ebf2'},{color:'#5c3d8e',bg:'#f0ebf7'},{color:'#3d8e7c',bg:'#ebf7f4'},
+  {color:'#2c5f87',bg:'#e8f0f7'},{color:'#5e7236',bg:'#eef2e6'},{color:'#a8780a',bg:'#fbf2dc'},
+  {color:'#823560',bg:'#f7e8f0'},{color:'#553687',bg:'#ede6f7'},{color:'#2f8472',bg:'#e6f3f0'},
   {color:'#8e5c3d',bg:'#f7f0eb'},{color:'#3d5c8e',bg:'#ebf0f7'},{color:'#8e3d3d',bg:'#f7ebeb'},
   {color:'#3d8e5c',bg:'#ebf7f0'}
 ];
 const ICONS = ['💡','🔩','🔌','⚡','☀️','🏠','🔧','📦','🛠️','🏗️'];
 
 const DEFAULT_CATS = {
-  "Plafoniera":         {prefix:"PL",label:"Plafoniere",         icon:"💡",color:"#3d6b8e",bg:"#ebf2f7"},
-  "Pali":               {prefix:"PA",label:"Pali e accessori",   icon:"🔩",color:"#6b7c3d",bg:"#f0f3e8"},
-  "Cavi":               {prefix:"CV",label:"Cavi e Cavidotti",   icon:"🔌",color:"#b8860b",bg:"#faf3e0"},
-  "Impianti elettrici": {prefix:"IE",label:"Impianti Elettrici", icon:"⚡",color:"#8e3d6b",bg:"#f7ebf2"},
-  "Fotovoltaico":       {prefix:"FV",label:"Fotovoltaico",       icon:"☀️",color:"#5c3d8e",bg:"#f0ebf7"},
-  "Domotica":           {prefix:"DM",label:"Domotica",           icon:"🏠",color:"#3d8e7c",bg:"#ebf7f4"},
+  "Illuminazione":          {prefix:"IL",label:"Illuminazione",          icon:"💡",color:"#2c5f87",bg:"#e8f0f7"},
+  "Sostegni e Accessori":   {prefix:"SA",label:"Sostegni e Accessori",   icon:"🔩",color:"#5e7236",bg:"#eef2e6"},
+  "Cavi":                   {prefix:"CV",label:"Cavi",                   icon:"🔌",color:"#a8780a",bg:"#fbf2dc"},
+  "Materiale Elettrico":    {prefix:"ME",label:"Materiale Elettrico",    icon:"⚡",color:"#823560",bg:"#f7e8f0"},
+  "Fotovoltaico":           {prefix:"FV",label:"Fotovoltaico",           icon:"☀️",color:"#553687",bg:"#ede6f7"},
+  "Accessori e Consumabili":{prefix:"AC",label:"Accessori e Consumabili",icon:"📦",color:"#2f8472",bg:"#e6f3f0"},
 };
+
 const DEFAULT_ITEMS = [
-  ["PHAENOMENA 57 W","Plafoniera",20,"pz"],["EULUX EVION 40 30W","Plafoniera",25,"pz"],
-  ["EULUX EVION 40 40W","Plafoniera",8,"pz"],["EULUX EVION 60 60W","Plafoniera",12,"pz"],
-  ["EULUX GLADIO 20 20W","Plafoniera",15,"pz"],["PLAYLED PROIETTORE BIGHP 6000 35W 90° 3000K","Plafoniera",2,"pz"],
-  ["EULUX GLADIO 30 30W","Plafoniera",18,"pz"],["EULUX GLADIO PLUS 30 24W","Plafoniera",32,"pz"],
-  ["GMR ENLIGHTS ORN400 78W","Plafoniera",100,"pz"],["PROIETTORE PERFORMANCE INLIGHTING GUELL L+ 125/5W 840 GR94","Plafoniera",2,"pz"],
-  ["OXANA 40W 3000K","Plafoniera",8,"pz"],["OXANA 40W 4000K","Plafoniera",94,"pz"],
-  ["OXANA 60W 4000K","Plafoniera",2,"pz"],["OXANA 20W 4000K","Plafoniera",1,"pz"],
-  ["TRIANON 60W","Plafoniera",26,"pz"],["GMR LA FOGLIA 80W","Plafoniera",8,"pz"],
-  ["TRIANON 100W","Plafoniera",6,"pz"],["GLADIO 100W","Plafoniera",6,"pz"],
-  ["GLADIO 30W PLUS","Plafoniera",3,"pz"],["GONNELLA EULUX VUOTE","Plafoniera",8,"pz"],
-  ["OXANA PER GONNELLE 60W 4000K","Plafoniera",4,"pz"],["OXANA PER GONNELLE 40W","Plafoniera",3,"pz"],
-  ["OXANA PER GONNELLE 30W","Plafoniera",1,"pz"],["SCUDO TES 30W","Plafoniera",1,"pz"],
-  ["EULUX AURA 30W","Plafoniera",3,"pz"],["EULUX GLADIO 60W RIF. (GUARDIA SANFRAMONDI)","Plafoniera",10,"pz"],
-  ["THORN BONEA 75W","Plafoniera",4,"pz"],["ARMATURA STRADALE LUMEITALIA 80W","Plafoniera",4,"pz"],
-  ["CAVIDOTTO CORRUGATO φ62 (50m)","Cavi",17,"pz"],["CAVIDOTTO CORRUGATO φ40","Cavi",4,"pz"],
-  ["CAVIDOTTO CORRUGATO φ50","Cavi",1,"pz"],["TUBO IN CLS φ200","Cavi",13,"pz"],
-  ["CHIUSINI IN CLS 30X30","Cavi",13,"pz"],["CAVO PRECORDATO 2X16","Cavi",1000,"m"],
-  ["CAVO FG16(O)R16 4X6","Cavi",700,"m"],["CAVO FG16(O)R16 3X1,5","Cavi",300,"m"],
-  ["CAVO FG16(O)R16 4X4","Cavi",0,"m"],
-  ["PROLUNGA IN CLS 30X30","Pali",12,"pz"],["PLINTO PREFABBRICATO IN CLS X ALLOGGIO PALO","Pali",4,"pz"],
-  ["MENSOLA A PALO ACCIAIO ZINCATO 1,5X1,5","Pali",41,"pz"],["MENSOLA A PALO ACCIAIO ZINCATO 1X1,5","Pali",32,"pz"],
-  ["PROLUNGA φ60 PER PALI L 1,5m","Pali",10,"pz"],["PALO R114 7Z/4","Pali",14,"pz"],
-  ["PALO R1447Z/3","Pali",12,"pz"],["PALO R1448Z/3","Pali",9,"pz"],
-  ["PIPETTA DOPPIA ACCIAIO ZINCATO","Pali",7,"pz"],["PALO R1149Z/4","Pali",8,"pz"],
-  ["PALINA SEMAFORICA φ102 H. 3,5m","Pali",3,"pz"],["PALO R1397Z (X IMPIANTO AEREO)","Pali",20,"pz"],
-  ["PALO R127/7Z","Pali",2,"pz"],["PALO CARPAL MONTECARLO","Pali",5,"pz"],
-  ["PALO φ100 CILINDRICO 1026Z","Pali",3,"pz"],["SCUDO TES STRUTTURA","Pali",4,"pz"],
-  ["PORTELLA DA PALO","Pali",50,"pz"],["STRUTTURA LANTERNA EULUX","Pali",10,"pz"],
-  ["PALO RASTREMATO 3m VERNICIATO NERO φ127","Pali",4,"pz"],["CHIUSINO GHISA C.250 50X50","Pali",28,"pz"],
-  ["CHIUSINO GHISA C.250 40X40","Pali",32,"pz"],["CHIUSINO GHISA C.250 70X70","Pali",1,"pz"],
-  ["ARMADIO VETRORESINA A DOPPIO SCOMPARTO","Impianti elettrici",1,"pz"],
-  ["ZIPPO MORSETTIERA A PALO 4X16","Impianti elettrici",237,"pz"],
-  ["DISPERSORI DI TERRA (1m)","Impianti elettrici",60,"pz"],
-  ["CASSETTA IN LAMIERA ZINCATA PORTABATTERIA","Impianti elettrici",12,"pz"],
-  ["CASSETTA IN PLASTICA PORTABATTERIA","Impianti elettrici",3,"pz"],
-  ["KIT FOTOVOLTAICO ENNEGI (PLAFONIERA)","Fotovoltaico",2,"pz"],
-  ["BATTERIA ZENITH SSAH (X FOTOVOLTAICO)","Fotovoltaico",7,"pz"],
-  ["COMELIT (FOIANO DI VALFORTORE)","Domotica",14,"kit"],
-  ["KSENIA (FOIANO DI VALFORTORE)","Domotica",7,"kit"],
+  ["PHAENOMENA  phLuminaELP2XS57 W","Illuminazione",20,"pz","IL.001",79.85],
+  ["PHAENOMENA PHWOW 120 W PV","Illuminazione",1,"pz","IL.002",599.85],
+  ["EULUX EVION 40 30W","Illuminazione",25,"pz","IL.003",88.55],
+  ["EULUX EVION 40 40W","Illuminazione",8,"pz","IL.004",88.55],
+  ["EULUX EVION 60 60W","Illuminazione",12,"pz","IL.005",94.46],
+  ["EULUX GLADIO 20 20W","Illuminazione",15,"pz","IL.006",106.0],
+  ["PLAYLED PROEITTORE BIGHP 6000 35 W, FASCIO 90\u00b0, LUCE 3000 K","Illuminazione",2,"pz","IL.007",50.44],
+  ["EULUX GLADIO 30 30W","Illuminazione",18,"pz","IL.008",109.0],
+  ["EULUX GLADIO PLUS 30 24W","Illuminazione",32,"pz","IL.009",108.8],
+  ["EVION 20 W 12 V","Illuminazione",0,"pz","IL.010",83.0],
+  ["GMR ENLIGHTS ORN400 78W","Illuminazione",100,"pz","IL.011",92.0],
+  ["PROEITTORE PERFORMANCE INLIGHTING GUELL L+ 125/5 W 840 GR94","Illuminazione",2,"pz","IL.012",180.0],
+  ["EULUX OXANA 40W 3000K","Illuminazione",8,"pz","IL.013",74.0],
+  ["EULUX OXANA 40W 4000K","Illuminazione",94,"pz","IL.014",74.0],
+  ["EULUX OXANA 60W 4000K","Illuminazione",2,"pz","IL.015",72.26],
+  ["EULUX OXANA 20W 4000K","Illuminazione",1,"pz","IL.016",59.0],
+  ["EULUX TRIANON 65 60 W","Illuminazione",26,"pz","IL.017",126.7],
+  ["GMR LA FOGLIA 400 80W","Illuminazione",8,"pz","IL.018",160.8],
+  ["EULUX TRIANON 100W","Illuminazione",6,"pz","IL.019",138.81],
+  ["EULUX GLADIO 100W","Illuminazione",6,"pz","IL.020",144.55],
+  ["EULUX GLADIO  PLUS 30W","Illuminazione",3,"pz","IL.021",108.8],
+  ["GONNELLA EULUX VUOTE","Illuminazione",8,"pz","IL.022",81.39],
+  ["EULUX OXANA PER GONNELLE 60W 4000 K","Illuminazione",4,"pz","IL.023",72.2],
+  ["EULUX OXANA PER GONNELLE 40W","Illuminazione",3,"pz","IL.024",74.0],
+  ["EULUX OXANA PER GONNELLE 30W","Illuminazione",1,"pz","IL.025",59.0],
+  ["CAVIDOTTO CORRUGATO \u03c6 63 (50 m)","Sostegni e Accessori",17,"mat","SA.001",55.0],
+  ["CAVIDOTTO CORRUGATO \u03c6 40","Sostegni e Accessori",4,"mat","SA.002",40.0],
+  ["CAVIDOTTO CORRUGATO \u03c6 50","Sostegni e Accessori",1,"mat","SA.003",47.0],
+  ["TUBO IN CLS \u03c6 200","Sostegni e Accessori",13,"pz","SA.004",8.0],
+  ["CHIUSINI IN CLS 30X30","Sostegni e Accessori",13,"pz","SA.005",6.0],
+  ["PROLUNGA IN CLS 30X30","Sostegni e Accessori",12,"pz","SA.006",6.0],
+  ["CHIUSINI IN CLS 40X40","Sostegni e Accessori",14,"pz","SA.007",6.5],
+  ["PROLUNGA IN CLS 40X40","Sostegni e Accessori",25,"pz","SA.008",7.5],
+  ["PLINTO PREFABBRICATO 100X80 H=75","Sostegni e Accessori",4,"pz","SA.009",150.0],
+  ["SBRACCIO IN ACCIAIO ZINCATO 1,5X1,5","Sostegni e Accessori",41,"pz","SA.010",35.0],
+  ["SBRACCIO IN ACCIAIO ZINCATO 1X1,5","Sostegni e Accessori",32,"pz","SA.011",30.0],
+  ["SBRACCIO IN ACCIAIO ZINCATO 1X1,5","Sostegni e Accessori",0,"pz","SA.012",26.5],
+  ["PROLUNGA \u03c6 60 PER PALI L 1,5m","Sostegni e Accessori",10,"pz","SA.013",21.5],
+  ["PALO RASTREMATO R1147Z/4","Sostegni e Accessori",14,"pz","SA.014",null],
+  ["PALO RASTREMATO R1447Z/3","Sostegni e Accessori",12,"pz","SA.015",110.0],
+  ["PALO RASTREMATO R1448Z/3","Sostegni e Accessori",9,"pz","SA.016",124.0],
+  ["PIPETTA DOPPIA IN ACCIAIO ZINCATO","Sostegni e Accessori",7,"pz","SA.017",null],
+  ["PIPETTA TRIPLA IN ACCIAO ZINCATO","Sostegni e Accessori",0,"pz","SA.018",45.0],
+  ["PALO RASTREMATO R1149Z/4","Sostegni e Accessori",8,"pz","SA.019",null],
+  ["PALINA SEMAFORICA \u03c6102 H. 3,5m","Sostegni e Accessori",3,"pz","SA.020",null],
+  ["PALO RASTREMATO R1397Z (X IMPIANTO AEREO)","Sostegni e Accessori",20,"pz","SA.021",160.0],
+  ["PALO RASTREMATO R127/7Z","Sostegni e Accessori",2,"pz","SA.022",128.0],
+  ["PALO CARPAL MONTECARLO","Sostegni e Accessori",5,"pz","SA.023",null],
+  ["PALO \u03c6 100 CLINDRICO 1026Z","Sostegni e Accessori",3,"pz","SA.024",null],
+  ["EULUX SCUDO TES STRUTTURA","Illuminazione",4,"pz","IL.026",98.5],
+  ["EULUX SCUDO_TES 30 W","Illuminazione",1,"pz","IL.027",146.65],
+  ["EULUX AURA 30 W","Illuminazione",3,"pz","IL.028",110.0],
+  ["EULUX GLADIO 60W","Illuminazione",10,"pz","IL.029",112.0],
+  ["THORN BONEA(BONEA) 75 W","Illuminazione",4,"pz","IL.030",300.0],
+  ["KIT FOTOVOLTAICO ENNEGI (PLAFONIERA)","Illuminazione",2,"pz","IL.031",500.0],
+  ["PANNELLI TRINASOLAR VERTEX S+ 445","Fotovoltaico",0,"pz","FV.001",56.0],
+  ["REGOLATORI DI CARICA PV","Fotovoltaico",3,"pz","FV.002",50.0],
+  ["ARMADIO VETRORESINA A DOPPIO SCOMPARTO","Sostegni e Accessori",1,"pz","SA.025",288.0],
+  ["ZIPPO MORSETTIERA A PALO 4X16","Sostegni e Accessori",237,"pz","SA.026",9.0],
+  ["PORTELLA DA PALO","Sostegni e Accessori",50,"pz","SA.027",6.0],
+  ["DISPERSORI DI TERRA (1 m)","Sostegni e Accessori",60,"pz","SA.028",8.4],
+  ["MORSETTO TERMINALE SINGOLO TERRA","Sostegni e Accessori",50,"pz","SA.029",0.67],
+  ["BATTERIA ZENITH 55Ah 12 V (X FOTOVOLTAICO)","Illuminazione",7,"pz","IL.032",106.4],
+  ["BATTERIA ZENITH 130Ah 12 V (X FOTOVOLTAICO)","Illuminazione",0,"pz","IL.033",167.45],
+  ["ARMATURA STRADALE LUMEITALIA 80W","Illuminazione",4,"pz","IL.034",150.0],
+  ["CASSETTA IN LAMIERA ZINCATA PORTABATTERIA","Materiale Elettrico",12,"pz","ME.001",25.0],
+  ["CASSETTA IN PLASTICA PORTABATTERIA","Materiale Elettrico",3,"pz","ME.002",27.0],
+  ["STRUTTURA LANTERNA LIGRA EULUX","Illuminazione",10,"pz","IL.035",85.4],
+  ["CAVO PRECORDATO 2X16","Cavi",1000,"m","CV.001",2.16],
+  ["CAVO FG16(O)R16 4X6","Cavi",700,"m","CV.002",4.25],
+  ["CAVO FG16(O)R16 3X1,5","Cavi",300,"m","CV.003",1.07],
+  ["CAVO FG16(O)R16 4X4","Cavi",0,"m","CV.004",2.97],
+  ["COMELIT (FOIANO DI VALFORTORE)","Materiale Elettrico",14,"kit","ME.003",84.0],
+  ["KSENIA (FOIANO DI VALFORTORE)","Materiale Elettrico",7,"kit","ME.004",663.0],
+  ["PALO RASTREMATO 3 metri VERNICIATO NERO \u03c6127","Sostegni e Accessori",4,"pz","SA.030",387.0],
+  ["CHIUSINO GHISA C.250 50X50","Sostegni e Accessori",28,"pz","SA.031",87.5],
+  ["CHIUSINO GHISA C.250 40X40","Sostegni e Accessori",32,"pz","SA.032",55.0],
+  ["CHIUSINO GHISA C.250 70X70","Sostegni e Accessori",1,"pz","SA.033",100.0],
+  ["NASTRO CARTA 50X50","Accessori e Consumabili",53,"pz","AC.001",2.52],
+  ["NASTRO IMBALLAGGIO 50X50","Accessori e Consumabili",11,"pz","AC.002",1.18],
+  ["NASTRO CARTA 38X50","Accessori e Consumabili",27,"pz","AC.003",1.9],
+  ["NASTRO ISOLANTE","Accessori e Consumabili",68,"pz","AC.004",1.22],
+  ["SCOTCH TRASPARENTE 50X50","Accessori e Consumabili",3,"pz","AC.005",1.18],
+  ["CASSETTA DERIVAZIONE 100X100X50 IP56","Materiale Elettrico",18,"pz","ME.005",2.93],
+  ["CASSETTA DERIVAZIONE 80X80X45 IP55","Materiale Elettrico",26,"pz","ME.006",1.8],
+  ["CASSETTA DERIVAZIONE 240X190X90 IP56","Materiale Elettrico",6,"pz","ME.007",14.41],
+  ["MINIQUADRO PRESE 4 MOD. 3 PRESE","Materiale Elettrico",2,"pz","ME.008",29.89],
+  ["MINIQUADRO PRESE 3 MOD. 2 PRESE","Materiale Elettrico",1,"pz","ME.009",25.24],
+  ["MINIQUADRO IP65 8 MODULI","Materiale Elettrico",4,"pz","ME.010",39.96],
+  ["SCATOLA DERIV. LATI LISCI COP.ALTO 150X110X140 IP56","Materiale Elettrico",3,"pz","ME.011",9.39],
+  ["MINIQUADRO IP65 3 MODULI","Materiale Elettrico",13,"pz","ME.012",10.9],
+  ["QUADRO IP65 2X18 MODULI","Materiale Elettrico",1,"pz","ME.013",79.12],
+  ["QUADRO IP40 550X400X130 54 MOD.","Materiale Elettrico",1,"pz","ME.014",79.12],
+  ["QUADRO","Materiale Elettrico",0,"pz","ME.015",79.12],
+  ["QUADRO IP65 54 MODULI 410X655X140","Materiale Elettrico",1,"pz","ME.016",128.88],
+  ["QUADRO (CON SPORTELLO) IP40 12 MODULI","Materiale Elettrico",2,"pz","ME.017",19.06],
+  ["CASSETTA 240X130X90 COPERCHIO TRASP.","Materiale Elettrico",3,"pz","ME.018",55.47],
+  ["QUADRO IP40 12 MODULI SENZA SPORTELLO","Materiale Elettrico",2,"pz","ME.019",12.05],
+  ["QUADRO X APPARECCHI MODULARI IP65 1R","Materiale Elettrico",18,"pz","ME.020",55.0],
+  ["CORDA ACCIAIO  ZINCATO 4 MM","Cavi",230,"m","CV.005",0.44],
+  ["CORDA ACCIAIO  5 MM","Cavi",200,"m","CV.006",0.52],
+  ["CENTRALINO DA INCASSO IP40 8 MODULI \\\"HABITA\\\"","Materiale Elettrico",1,"pz","ME.021",13.53],
+  ["CENTRALINO PER EMERGENZA 8 MODULI","Materiale Elettrico",2,"pz","ME.022",46.43],
+  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 25","Materiale Elettrico",22,"pz","ME.023",31.1],
+  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 16","Materiale Elettrico",13,"pz","ME.024",21.59],
+  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 10","Materiale Elettrico",58,"pz","ME.025",19.44],
+  ["NASTRO SEGNALETICO BIANCO/ROSSO","Accessori e Consumabili",9,"pz","AC.006",2.29],
+  ["NASTRO SEGNALETICO ROSSO \\\"ATT. CAVO ELETTRICO\\\"","Accessori e Consumabili",5,"pz","AC.007",3.0],
+  ["CAVO UNIPOLARE 1X1,5 FS17 GIALLO VERDE","Cavi",5,"mat","CV.007",28.98],
+  ["CAVO UNIPOLARE 1X1,5 FS17 BLU","Cavi",4,"mat","CV.008",19.49],
+  ["CAVO UNIPOLARE 1X1,5 FS17 MARRONE","Cavi",4,"mat","CV.009",19.49],
+  ["CAVO UNIPOLARE 1X1,5 FS17 GRIGIO","Cavi",2,"mat","CV.010",19.49],
+  ["CAVO UNIPOLARE 1X1,5 FS17 NERO","Cavi",3,"mat","CV.011",19.49],
+  ["CAVO UNIPOLARE 1X1,5 FS17 BIANCO","Cavi",2,"mat","CV.012",19.49],
+  ["CAVO UNIPOLARE 1X1,5 FS17 ROSA","Cavi",3,"mat","CV.013",19.49],
+  ["CAVO UNIPOLARE 1X1,5 FS17 ARANCIONE","Cavi",3,"mat","CV.014",19.49],
+  ["CAVO UNIPOLARE 1X1,5 FS17 FUCSIA","Cavi",1,"mat","CV.015",19.49],
+  ["CAVO UNIPOLARE 1X1 FS17 ROSSO","Cavi",1,"mat","CV.016",28.98],
+  ["CAVO UNIPOLARE 1X2,5 FS17 MARRONE","Cavi",4,"mat","CV.017",31.8],
+  ["CAVO UNIPOLARE 1X2,5 FS17 BLU","Cavi",1,"mat","CV.018",31.8],
+  ["CAVO UNIPOLARE 1X2,5 FS17 GRIGIO","Cavi",5,"mat","CV.019",31.8],
+  ["CAVO UNIPOLARE 1X2,5 FS17 BIANCO","Cavi",6,"mat","CV.020",31.8],
+  ["CAVO UNIPOLARE 1X4 FS17 BLU","Cavi",6,"mat","CV.021",50.41],
+  ["CAVO UNIPOLARE 1X4 FS17 GIALLO VERDE","Cavi",2,"mat","CV.022",50.41],
+  ["CAVO UNIPOLARE 1X4 FS17 MARRONE","Cavi",2,"mat","CV.023",50.41],
+  ["CAVO UNIPOLARE 1X4 FS17 NERA","Cavi",1,"mat","CV.024",50.41],
+  ["CAVO VIDEOCITOFONO","Cavi",1,"mat","CV.025",360.0],
+  ["CAVO 2X0,50 \\\"PIATTINA\\\"","Cavi",3,"mat","CV.026",25.09],
+  ["CAVO UNIPOLARE 1X10 FS17 BLU","Cavi",1,"mat","CV.027",148.78],
+  ["CAVO UNIPOLARE 1X10 FS17 GRIGIO","Cavi",1,"mat","CV.028",148.78],
+  ["CAVO UNIPOLARE 1X10 FS17 MARRONE","Cavi",1,"mat","CV.029",148.78],
+  ["CAVO UNIPOLARE 1X10 FS17 GIALLO VERDE","Cavi",1,"mat","CV.030",148.78],
+  ["BOMBOLETTA SMALTO ACRILICO GRIGIO ANTRACITE","Accessori e Consumabili",5,"pz","AC.008",5.0],
+  ["BOMBOLETTA SMALTO ACRILICO GRIGIO SEMPLICE","Accessori e Consumabili",9,"pz","AC.009",5.0],
+  ["BOMBOLETTA SMALTO ACRILICO GRIGIO TRAFFICO","Accessori e Consumabili",2,"pz","AC.010",5.0],
+  ["VERNICE SMALTO GRIGIO ARGENTO 7001","Accessori e Consumabili",8,"conf","AC.011",35.9],
+  ["VERNICE SMALTO GRIGIO ANTRACITE 7016","Accessori e Consumabili",4,"conf","AC.012",35.9],
+  ["VERNICE SMALTO GRIGIO SCURO 145","Accessori e Consumabili",2,"conf","AC.013",35.9],
+  ["DILUENTE NITRO ANTINEBBIA","Accessori e Consumabili",2,"conf","AC.014",13.9],
+  ["DILUENTE SINTETICO","Accessori e Consumabili",2,"conf","AC.015",3.5],
+  ["ALIMENTATORI TCI 15W-40W","Illuminazione",244,"pz","IL.036",19.0],
+  ["ALIMENTATORI TCI 40W-60W","Illuminazione",45,"pz","IL.037",25.0],
+  ["ALIMENTATO TCI 110 W","Illuminazione",0,"pz","IL.038",27.0],
+  ["ALIMENTATORI MW 100H-48V","Illuminazione",3,"pz","IL.039",45.0],
+  ["ALIMENTATORI MW 40H-48V","Illuminazione",8,"pz","IL.040",22.0],
+  ["ALIMENTATORI MW 60H-36V","Illuminazione",3,"pz","IL.041",24.0],
+  ["CIRCUITO LED 2X6 5050 3000K mod.4535","Illuminazione",112,"pz","IL.042",8.5],
+  ["CIRCUITO LED 2X6 5050 4000K mod.4535","Illuminazione",55,"pz","IL.043",8.5],
+  ["CIRCUITO LED 2X6 5050 5000K mod.4535","Illuminazione",146,"pz","IL.044",8.5],
+  ["CAVO 2X4,5 mmq","Cavi",100,"m","CV.031",1.41],
+  ["CAVO 3X1,5 MARRONE","Cavi",80,"m","CV.032",0.67],
+  ["CAVO 3X1 MARRONE","Cavi",80,"m","CV.033",4.83],
+  ["CAVO 5X1,5 MARRONE","Cavi",30,"m","CV.034",1.11],
+  ["CORDA DI RAME NUDO 35 mmq","Cavi",100,"m","CV.035",4.81]
 ];
 
-function genId() { return Math.random().toString(36).substr(2,9); }
-function getItemsByCat(cat) { return itemsList.filter(i=>i.cat===cat); }
-function rebuildCodes(cat) {
-  const cfg = categories[cat]; if(!cfg) return;
-  itemsList.filter(i=>i.cat===cat).forEach((it,idx)=>{
-    it.code = cfg.prefix+'.'+String(idx+1).padStart(2,'0');
-  });
+function genId(){return Math.random().toString(36).substr(2,9)}
+function getItemsByCat(cat){return itemsList.filter(i=>i.cat===cat)}
+function rebuildCodes(cat){
+  // I codici sono permanenti — non vengono mai ricalcolati dopo un'eliminazione.
+  // Questo garantisce che i QR code stampati restino validi per sempre.
 }
 
-// ══════════════════════════════════════════════
-//  AUTH — controllo accesso
-// ══════════════════════════════════════════════
-onAuthStateChanged(auth, async (firebaseUser) => {
-  if (!firebaseUser) {
-    // Non loggato → torna al login
-    window.location.href = 'index.html';
-    return;
+function nextCodeForCat(cat){
+  // Trova il numero più alto usato in questa categoria e aggiunge 1
+  const cfg=categories[cat];
+  const prefix=cfg.prefix+'.';
+  const nums=itemsList
+    .filter(i=>i.cat===cat && i.code && i.code.startsWith(prefix))
+    .map(i=>parseInt(i.code.replace(prefix,''))||0);
+  const maxNum=nums.length>0?Math.max(...nums):0;
+  return prefix+String(maxNum+1).padStart(3,'0');
+}
+function isResp(){return currentUser&&currentUser.ruolo==='responsabile'}
+function fmtPrice(p){return p!=null?'€ '+Number(p).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}):'N/D'}
+
+// ═══════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════
+onAuthStateChanged(auth, async (firebaseUser)=>{
+  if(!firebaseUser){window.location.href='index.html';return}
+  try{
+    const snap=await getDoc(doc(db,'utenti',firebaseUser.uid));
+    const data=snap.exists()?snap.data():{};
+    currentUser={uid:firebaseUser.uid,email:firebaseUser.email,nome:data.nome||firebaseUser.email.split('@')[0],ruolo:data.ruolo||'operaio'};
+  }catch(e){
+    currentUser={uid:firebaseUser.uid,email:firebaseUser.email,nome:firebaseUser.email.split('@')[0],ruolo:'operaio'};
   }
-
-  // Leggi ruolo da Firestore
-  try {
-    const snap = await getDoc(doc(db, 'utenti', firebaseUser.uid));
-    const data = snap.exists() ? snap.data() : {};
-    currentUser = {
-      uid:   firebaseUser.uid,
-      email: firebaseUser.email,
-      nome:  data.nome  || firebaseUser.email.split('@')[0],
-      ruolo: data.ruolo || 'operaio',
-    };
-  } catch(e) {
-    currentUser = {
-      uid: firebaseUser.uid, email: firebaseUser.email,
-      nome: firebaseUser.email.split('@')[0], ruolo: 'operaio'
-    };
-  }
-
-  // Aggiorna UI header
-  const initials = currentUser.nome.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  document.getElementById('user-avatar').textContent = initials;
-  document.getElementById('user-name').textContent   = currentUser.nome.split(' ')[0];
-
-  // Mostra tab Responsabile solo se responsabile
-  if (currentUser.ruolo === 'responsabile') {
+  const initials=currentUser.nome.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('user-avatar').textContent=initials;
+  document.getElementById('user-name').textContent=currentUser.nome.split(' ')[0];
+  if(isResp()){
     document.getElementById('nav-resp').classList.remove('hidden');
   }
-
-  // Aggiorna hero
-  const heroTitle = document.getElementById('hero-title');
-  if (heroTitle) heroTitle.innerHTML = `Ciao, ${currentUser.nome.split(' ')[0]}!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>`;
-
-  // Carica dati da Firestore
+  const heroTitle=document.getElementById('hero-title');
+  if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
   await loadFromFirestore();
-
-  // Nascondi loading
-  document.getElementById('loading-screen').style.display = 'none';
-
-  // Ascolta cambiamenti in tempo reale
+  document.getElementById('loading-screen').style.display='none';
   listenRealtime();
-
-  // Gestisci QR da URL
-  setTimeout(handleUrlProductCode, 300);
+  setTimeout(handleUrlProductCode,300);
 });
 
-window.doLogout = async function() {
-  if (!confirm('Vuoi disconnetterti?')) return;
-  await signOut(auth);
-  window.location.href = 'index.html';
+window.doLogout=async function(){
+  if(!confirm('Vuoi disconnetterti?')) return;
+  await signOut(auth);window.location.href='index.html';
 };
 
-// ══════════════════════════════════════════════
-//  FIRESTORE — CARICAMENTO INIZIALE
-// ══════════════════════════════════════════════
-async function loadFromFirestore() {
-  try {
-    // Categorie
-    const catSnap = await getDocs(collection(db, 'categorie'));
-    if (!catSnap.empty) {
-      categories = {};
-      catOrder   = [];
-      catSnap.forEach(d => {
-        const data = d.data();
-        categories[d.id] = data;
-        catOrder.push(d.id);
-      });
-      // Ordine fisso se disponibile
-      if (categories['__order__']) {
-        catOrder = categories['__order__'].order || catOrder;
-        delete categories['__order__'];
-      }
+// ═══════════════════════════════════════
+//  FIRESTORE — LOAD
+// ═══════════════════════════════════════
+async function loadFromFirestore(){
+  try{
+    const catSnap=await getDocs(collection(db,'categorie'));
+    if(!catSnap.empty){
+      categories={};catOrder=[];
+      catSnap.forEach(d=>{categories[d.id]=d.data();catOrder.push(d.id);});
     } else {
-      // Prima volta: carica i default e salvali
-      await initDefaultData();
-      return;
+      await initDefaultData();return;
     }
-
-    // Prodotti
-    const itemsSnap = await getDocs(collection(db, 'inventario'));
-    itemsList = [];
-    itemsSnap.forEach(d => itemsList.push({ id: d.id, ...d.data() }));
-
-    // Log movimenti (ultimi 200)
-    const logSnap = await getDocs(query(collection(db, 'movimenti'), orderBy('time','desc'), limit(200)));
-    actLog = [];
-    logSnap.forEach(d => actLog.push({ id: d.id, ...d.data() }));
-
-  } catch(e) {
-    console.error('Errore caricamento Firestore:', e);
-    showToast('Errore caricamento dati','toast-danger');
-  }
+    const itemsSnap=await getDocs(collection(db,'inventario'));
+    itemsList=[];itemsSnap.forEach(d=>itemsList.push({id:d.id,...d.data()}));
+    const logSnap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(200)));
+    actLog=[];logSnap.forEach(d=>actLog.push({id:d.id,...d.data()}));
+  }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
 }
 
-async function initDefaultData() {
-  showToast('Prima configurazione in corso...','toast-sync');
-  const batch = writeBatch(db);
-
-  // Salva categorie
-  categories = JSON.parse(JSON.stringify(DEFAULT_CATS));
-  catOrder   = ["Plafoniera","Pali","Cavi","Impianti elettrici","Fotovoltaico","Domotica"];
-  for (const [id, data] of Object.entries(categories)) {
-    batch.set(doc(db, 'categorie', id), data);
-  }
-
-  // Salva prodotti
-  itemsList = [];
-  const counters = {};
-  DEFAULT_ITEMS.forEach(([name, cat, qty, unit]) => {
-    const cfg = categories[cat];
-    counters[cat] = (counters[cat]||0)+1;
-    const code = cfg.prefix+'.'+String(counters[cat]).padStart(2,'0');
-    const id   = genId();
-    const item = { id, name, cat, qty, unit: unit||'pz', code };
+async function initDefaultData(){
+  showToast('Prima configurazione...','toast-sync');
+  const batch=writeBatch(db);
+  categories=JSON.parse(JSON.stringify(DEFAULT_CATS));
+  catOrder=["Illuminazione","Sostegni e Accessori","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili"];
+  for(const [id,data] of Object.entries(categories)) batch.set(doc(db,'categorie',id),data);
+  itemsList=[];
+  DEFAULT_ITEMS.forEach(([name,cat,qty,unit,code,prezzo])=>{
+    const id=genId();
+    const item={id,name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null};
     itemsList.push(item);
-    batch.set(doc(db, 'inventario', id), { name, cat, qty, unit: unit||'pz', code });
+    batch.set(doc(db,'inventario',id),{name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null});
   });
-
-  await batch.commit();
-  actLog = [];
+  await batch.commit();actLog=[];
   showToast('Dati iniziali caricati!','toast-return');
 }
 
-// ══════════════════════════════════════════════
-//  FIRESTORE — REAL-TIME LISTENER
-// ══════════════════════════════════════════════
-function listenRealtime() {
-  // Ascolta inventario in tempo reale
-  onSnapshot(collection(db, 'inventario'), snap => {
-    itemsList = [];
-    snap.forEach(d => itemsList.push({ id: d.id, ...d.data() }));
-    const modalOpen = document.getElementById('modal-backdrop').classList.contains('open');
-    // Se il modal è aperto aggiorna solo la quantità, non rifare il render del DOM
-    if (currentModalItem) {
-      const updated = itemsList.find(i=>i.id===currentModalItem.id);
-      if (updated) {
-        currentModalItem = updated;
-        document.getElementById('m-qty').textContent = updated.qty;
-      }
+// ═══════════════════════════════════════
+//  FIRESTORE — REALTIME
+// ═══════════════════════════════════════
+function listenRealtime(){
+  onSnapshot(collection(db,'inventario'),snap=>{
+    itemsList=[];snap.forEach(d=>itemsList.push({id:d.id,...d.data()}));
+    const modalOpen=document.getElementById('modal-backdrop').classList.contains('open');
+    if(currentModalItem){
+      const updated=itemsList.find(i=>i.id===currentModalItem.id);
+      if(updated){currentModalItem=updated;document.getElementById('m-qty').textContent=updated.qty;}
     }
-    // Aggiorna le pagine solo se il modal non è aperto (evita di distruggere il modal)
-    if (!modalOpen) {
-      if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
-      if (document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
+    if(!modalOpen){
+      if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+      if(document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
     }
   });
-
-  // Ascolta movimenti in tempo reale
-  onSnapshot(query(collection(db,'movimenti'),orderBy('time','desc'),limit(200)), snap => {
-    actLog = [];
-    snap.forEach(d => actLog.push({ id: d.id, ...d.data() }));
-    if (document.getElementById('page-registro').classList.contains('active')) renderLog();
+  onSnapshot(query(collection(db,'movimenti'),orderBy('time','desc'),limit(200)),snap=>{
+    actLog=[];snap.forEach(d=>actLog.push({id:d.id,...d.data()}));
+    if(document.getElementById('page-registro').classList.contains('active')) renderLog();
   });
 }
 
-// ══════════════════════════════════════════════
-//  FIRESTORE — SCRITTURA
-// ══════════════════════════════════════════════
-async function saveItem(item) {
-  const { id, ...data } = item;
-  await setDoc(doc(db, 'inventario', id), data);
-}
-async function deleteItemFromDB(id) {
-  await deleteDoc(doc(db, 'inventario', id));
-}
-async function saveCategory(catName, data) {
-  await setDoc(doc(db, 'categorie', catName), data);
-}
-async function deleteCategoryFromDB(catName) {
-  await deleteDoc(doc(db, 'categorie', catName));
-}
-async function saveMovimento(entry) {
-  const { id, ...data } = entry;
-  await setDoc(doc(db, 'movimenti', id), { ...data, time: entry.time });
-}
-async function deleteMovimento(id) {
-  await deleteDoc(doc(db, 'movimenti', id));
-}
+async function saveItem(item){const{id,...data}=item;await setDoc(doc(db,'inventario',id),data)}
+async function deleteItemFromDB(id){await deleteDoc(doc(db,'inventario',id))}
+async function saveCategory(name,data){await setDoc(doc(db,'categorie',name),data)}
+async function deleteCategoryFromDB(name){await deleteDoc(doc(db,'categorie',name))}
+async function saveMovimento(entry){const{id,...data}=entry;await setDoc(doc(db,'movimenti',id),data)}
+async function deleteMovimento(id){await deleteDoc(doc(db,'movimenti',id))}
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  PAGE NAV
-// ══════════════════════════════════════════════
-let currentPage = 'dashboard';
-window.showPage = function(id) {
-  if (currentPage==='qrcode' && id!=='qrcode') stopQrScanner();
-  currentPage = id;
+// ═══════════════════════════════════════
+let currentPage='dashboard';
+window.showPage=function(id){
+  if(currentPage==='qrcode'&&id!=='qrcode') stopQrScanner();
+  currentPage=id;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  const navEl = document.getElementById('nav-'+id);
-  if (navEl) navEl.classList.add('active');
-  const isMat = id==='materiali';
-  document.getElementById('edit-toggle').style.display = isMat?'flex':'none';
-  document.getElementById('fab-btn').style.display     = isMat?'flex':'none';
-  if (id==='dashboard')    renderDashboard();
-  if (id==='materiali')    renderMateriali();
-  if (id==='registro')     renderLog();
-  if (id==='qrcode')       renderQrPage();
-  if (id==='responsabile') renderResponsabile();
+  const navEl=document.getElementById('nav-'+id);if(navEl) navEl.classList.add('active');
+  const isMat=id==='materiali';
+  document.getElementById('edit-toggle').style.display=isMat?'flex':'none';
+  document.getElementById('fab-btn').style.display=isMat?'flex':'none';
+  if(id==='dashboard') renderDashboard();
+  if(id==='materiali') renderMateriali();
+  if(id==='registro') renderLog();
+  if(id==='qrcode') renderQrPage();
+  if(id==='responsabile') renderResponsabile();
   closeFab();
 };
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  DASHBOARD
-// ══════════════════════════════════════════════
-function renderDashboard() {
-  const tq = itemsList.reduce((s,it)=>s+it.qty,0);
-  const now = new Date();
-  const day = now.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
-  const heroMeta = document.getElementById('hero-meta');
-  if (heroMeta) heroMeta.textContent = day.charAt(0).toUpperCase()+day.slice(1)+' · '+itemsList.length+' prodotti';
+// ═══════════════════════════════════════
+function renderDashboard(){
+  const tq=itemsList.reduce((s,it)=>s+it.qty,0);
+  const day=new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
+  const heroMeta=document.getElementById('hero-meta');
+  if(heroMeta) heroMeta.textContent=day.charAt(0).toUpperCase()+day.slice(1)+' · '+itemsList.length+' prodotti';
 
-  document.getElementById('stats-grid').innerHTML=`
+  // Stats — responsabili vedono valore totale
+  let statsHTML=`
     <div class="stat-card"><div class="stat-val">${itemsList.length}</div><div class="stat-label">Prodotti</div></div>
     <div class="stat-card"><div class="stat-val">${catOrder.length}</div><div class="stat-label">Categorie</div></div>
     <div class="stat-card"><div class="stat-val">${tq.toLocaleString('it')}</div><div class="stat-label">Totale stock</div></div>`;
+  if(isResp()){
+    const totalVal=itemsList.reduce((s,it)=>{
+      const p=it.prezzo!=null?it.prezzo:0;return s+p*it.qty;
+    },0);
+    statsHTML+=`<div class="stat-card value-card" style="grid-column:1/-1"><div class="stat-val">€ ${totalVal.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}</div><div class="stat-label">Valore totale magazzino</div></div>`;
+  }
+  document.getElementById('stats-grid').innerHTML=statsHTML;
 
-  let treeHTML='';
+  let th='';
   catOrder.forEach(cat=>{
-    const cfg=categories[cat]; if(!cfg) return;
-    const ci=getItemsByCat(cat); const cq=ci.reduce((s,it)=>s+it.qty,0);
-    treeHTML+=`<div class="tree-branch" style="background:${cfg.bg};border:1px solid ${cfg.bg}" onclick="showPage('materiali');setTimeout(()=>openCategory('${cat}'),150)">
+    const cfg=categories[cat];if(!cfg) return;
+    const ci=getItemsByCat(cat);const cq=ci.reduce((s,it)=>s+it.qty,0);
+    const catVal=ci.reduce((s,it)=>s+(it.prezzo!=null?it.prezzo:0)*it.qty,0);
+    th+=`<div class="tree-branch" style="background:${cfg.bg};border:1px solid ${cfg.bg}" onclick="showPage('materiali');setTimeout(()=>openCategory('${cat}'),150)">
       <div class="tree-branch-top"><div class="tree-branch-dot" style="background:${cfg.color}"></div><div class="tree-branch-name" style="color:${cfg.color}">${cfg.label}</div></div>
       <div class="tree-branch-qty" style="color:${cfg.color}">${cq.toLocaleString('it')}</div>
-      <div class="tree-branch-sub">${ci.length} prodotti</div></div>`;
+      <div class="tree-branch-sub">${ci.length} prodotti</div>
+      ${isResp()?'<div class="tree-branch-val">€ '+catVal.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>':''}
+    </div>`;
   });
-  document.getElementById('tree-branches').innerHTML=treeHTML;
+  document.getElementById('tree-branches').innerHTML=th;
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  MATERIALI
-// ══════════════════════════════════════════════
-function renderMateriali() {
+// ═══════════════════════════════════════
+function renderMateriali(){
   let html='';
   catOrder.forEach(cat=>{
-    const cfg=categories[cat]; if(!cfg) return;
-    const ci=getItemsByCat(cat); const cq=ci.reduce((s,it)=>s+it.qty,0);
-    const isOpen=openCats[cat]||false; const ek=cat.replace(/\s/g,'_');
+    const cfg=categories[cat];if(!cfg) return;
+    const ci=getItemsByCat(cat);const cq=ci.reduce((s,it)=>s+it.qty,0);
+    const isOpen=openCats[cat]||false;const ek=cat.replace(/\s/g,'_');
     html+=`<div class="cat-group ${editMode?'editing':''}" id="grp-${ek}">
       <div class="cat-header" onclick="toggleCategory('${cat}')">
         <div class="cat-icon-wrap" style="background:${cfg.bg}">${cfg.icon}</div>
@@ -1031,79 +843,65 @@ function renderMateriali() {
       </div>
       <div class="items-container ${isOpen?'open':''}" id="items-${ek}">`;
     ci.forEach(it=>{
+      const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
       html+=`<div class="item-card" onclick='openModal("${it.id}")'>
         <button class="item-delete" onclick="event.stopPropagation();deleteItem('${it.id}')">✕</button>
         <span class="item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
         <span class="item-name">${it.name}</span>
-        <div class="item-qty-col"><div class="item-qty-val" style="color:${cfg.color}">${it.qty}</div><div class="item-qty-unit">${it.unit}</div></div>
+        <div class="item-right"><div class="item-qty-val" style="color:${cfg.color}">${it.qty}</div><div class="item-qty-unit">${it.unit}</div>${priceHTML}</div>
       </div>`;
     });
-    html+=`<button class="add-item-btn" onclick="event.stopPropagation();openAddProductForm('${cat}')">+ Aggiungi prodotto</button>`;
-    html+=`</div></div>`;
+    html+=`<button class="add-item-btn" onclick="event.stopPropagation();openAddProductForm('${cat}')">+ Aggiungi prodotto</button></div></div>`;
   });
   document.getElementById('categories-container').innerHTML=html;
 }
 
-window.toggleCategory = function(cat) {
-  openCats[cat]=!openCats[cat];
-  const k=cat.replace(/\s/g,'_');
-  const c=document.getElementById('items-'+k), a=document.getElementById('arrow-'+k);
-  if(c) c.classList.toggle('open'); if(a) a.classList.toggle('open');
+window.toggleCategory=function(cat){
+  openCats[cat]=!openCats[cat];const k=cat.replace(/\s/g,'_');
+  const c=document.getElementById('items-'+k),a=document.getElementById('arrow-'+k);
+  if(c) c.classList.toggle('open');if(a) a.classList.toggle('open');
 };
-window.openCategory = function(cat) {
+window.openCategory=function(cat){
   if(!openCats[cat]) toggleCategory(cat);
   const el=document.getElementById('grp-'+cat.replace(/\s/g,'_'));
   if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 };
-window.filterItems = function() {
+window.filterItems=function(){
   const q=document.getElementById('search-input').value.toLowerCase().trim();
   document.querySelectorAll('.cat-group').forEach(grp=>{
-    const cards=grp.querySelectorAll('.item-card'); let any=false;
+    const cards=grp.querySelectorAll('.item-card');let any=false;
     cards.forEach(card=>{
       const nm=card.querySelector('.item-name').textContent.toLowerCase();
       const cd=card.querySelector('.item-code').textContent.toLowerCase();
       const show=!q||nm.includes(q)||cd.includes(q);
-      card.style.display=show?'flex':'none'; if(show) any=true;
+      card.style.display=show?'flex':'none';if(show) any=true;
     });
     grp.style.display=(any||!q)?'block':'none';
-    if(q&&any){
-      const k=grp.id.replace('grp-','');
-      const c=document.getElementById('items-'+k), a=document.getElementById('arrow-'+k);
-      if(c) c.classList.add('open'); if(a) a.classList.add('open');
-    }
+    if(q&&any){const k=grp.id.replace('grp-','');const c=document.getElementById('items-'+k),a=document.getElementById('arrow-'+k);if(c) c.classList.add('open');if(a) a.classList.add('open');}
   });
 };
-window.toggleEditMode = function() {
-  editMode=!editMode;
-  const btn=document.getElementById('edit-toggle');
-  btn.classList.toggle('active',editMode);
+window.toggleEditMode=function(){
+  editMode=!editMode;const btn=document.getElementById('edit-toggle');btn.classList.toggle('active',editMode);
   btn.innerHTML=editMode
     ?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg> Fine'
     :'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Elimina';
   renderMateriali();
 };
-window.deleteItem = async function(id) {
-  const it=itemsList.find(i=>i.id===id); if(!it) return;
-  if(!confirm('Eliminare "'+it.name+'"?')) return;
-  const cat=it.cat;
+window.deleteItem=async function(id){
+  const it=itemsList.find(i=>i.id===id);if(!it) return;
+  if(!confirm('Eliminare "'+it.name+'"?\n\nIl codice '+it.code+' andrà in pensione e non verrà riassegnato.\nI QR già stampati resteranno validi.')) return;
   itemsList=itemsList.filter(i=>i.id!==id);
-  rebuildCodes(cat);
   await deleteItemFromDB(id);
-  // Aggiorna codici su Firestore
-  for (const item of itemsList.filter(i=>i.cat===cat)) {
-    await saveItem(item);
-  }
-  renderMateriali();
-  showToast('Prodotto eliminato','toast-danger');
+  renderMateriali();showToast('Prodotto '+it.code+' eliminato','toast-danger');
 };
 
-// ══════════════════════════════════════════════
-//  PRODUCT MODAL
-// ══════════════════════════════════════════════
-window.openModal = function(id) {
+// ═══════════════════════════════════════
+//  MODAL PRODOTTO
+// ═══════════════════════════════════════
+window.openModal=function(id){
   if(editMode) return;
-  const item=itemsList.find(i=>i.id===id); if(!item) return;
-  currentModalItem=item;
+  const item=itemsList.find(i=>i.id===id);if(!item) return;
+  currentModalItem=item;priceEditOpen=false;
   const cfg=categories[item.cat];
   document.getElementById('m-badge').textContent=cfg.label;
   document.getElementById('m-badge').style.background=cfg.bg;
@@ -1112,50 +910,79 @@ window.openModal = function(id) {
   document.getElementById('m-name').textContent=item.name;
   document.getElementById('m-qty').textContent=item.qty;
   document.getElementById('modal-operator-name').textContent=currentUser.nome;
-  const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili'};
+  const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili'};
   document.getElementById('m-unit').textContent=um[item.unit]||'disponibili';
+
+  // Sezione prezzi: solo responsabili
+  const priceZone=document.getElementById('modal-price-zone');
+  if(isResp()){
+    priceZone.classList.add('visible');
+    renderPriceSection(item);
+    document.getElementById('price-input-row').classList.remove('visible');
+  } else {
+    priceZone.classList.remove('visible');
+  }
+
   document.getElementById('modal-backdrop').classList.add('open');
   document.body.style.overflow='hidden';
 };
-window.closeModal = function(e) {
+
+function renderPriceSection(item){
+  const p=item.prezzo;
+  document.getElementById('m-price-val').textContent=fmtPrice(p);
+  if(p!=null){
+    const tot=p*item.qty;
+    document.getElementById('m-price-total').textContent='Valore totale: '+fmtPrice(tot)+' ('+item.qty+' '+item.unit+')';
+  } else {
+    document.getElementById('m-price-total').textContent='Prezzo non impostato';
+  }
+}
+
+window.togglePriceEdit=function(){
+  priceEditOpen=!priceEditOpen;
+  const row=document.getElementById('price-input-row');
+  row.classList.toggle('visible',priceEditOpen);
+  if(priceEditOpen){
+    const inp=document.getElementById('price-input');
+    inp.value=currentModalItem.prezzo!=null?currentModalItem.prezzo:'';
+    inp.focus();
+  }
+};
+window.savePrice=async function(){
+  const val=parseFloat(document.getElementById('price-input').value);
+  if(isNaN(val)||val<0){showToast('Prezzo non valido','toast-danger');return}
+  currentModalItem.prezzo=Math.round(val*100)/100;
+  await saveItem(currentModalItem);
+  renderPriceSection(currentModalItem);
+  document.getElementById('price-input-row').classList.remove('visible');
+  priceEditOpen=false;
+  showToast('Prezzo aggiornato','toast-info');
+};
+
+window.closeModal=function(e){
   if(e&&e.target&&e.target.id!=='modal-backdrop') return;
   document.getElementById('modal-backdrop').classList.remove('open');
-  document.body.style.overflow=''; currentModalItem=null;
+  document.body.style.overflow='';currentModalItem=null;priceEditOpen=false;
 };
-window.doAdjust = async function(delta) {
+window.doAdjust=async function(delta){
   if(!currentModalItem) return;
   const next=Math.max(0,currentModalItem.qty+delta);
   if(next===currentModalItem.qty&&delta<0) return;
   currentModalItem.qty=next;
-
-  // Salva quantità su Firestore
   await saveItem(currentModalItem);
-
-  // Salva movimento su Firestore
-  const entry = {
-    id: genId(),
-    itemId: currentModalItem.id,
-    code: currentModalItem.code,
-    name: currentModalItem.name,
-    delta, prevQty: next-delta,
-    operator: currentUser.nome,
-    operatorUid: currentUser.uid,
-    time: Date.now()
-  };
+  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta,prevQty:next-delta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now()};
   await saveMovimento(entry);
-
   document.getElementById('m-qty').textContent=next;
-  const qe=document.getElementById('m-qty');
-  qe.style.transform='scale(1.15)'; setTimeout(()=>qe.style.transform='scale(1)',200);
+  if(isResp()) renderPriceSection(currentModalItem);
+  const qe=document.getElementById('m-qty');qe.style.transform='scale(1.15)';setTimeout(()=>qe.style.transform='scale(1)',200);
   const cls=delta<0?'toast-take':'toast-return';
-  const msg=delta<0?`−1 ${currentModalItem.code} · ${currentUser.nome}`:`+1 ${currentModalItem.code} · ${currentUser.nome}`;
-  showToast(msg,cls);
+  showToast((delta<0?'−1 ':'+ 1 ')+currentModalItem.code+' · '+currentUser.nome,cls);
 };
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  LOG
-// ══════════════════════════════════════════════
-function renderLog() {
+// ═══════════════════════════════════════
+function renderLog(){
   if(actLog.length===0){
     document.getElementById('log-container').innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg><p>Nessun movimento registrato</p></div>';
     return;
@@ -1167,72 +994,65 @@ function renderLog() {
     const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
     html+=`<div class="log-item">
       <div class="log-icon ${isTake?'take':'ret'}">${isTake?'−':'+'}</div>
-      <div class="log-info">
-        <div class="log-text"><strong>${entry.code}</strong> — ${entry.name}</div>
-        <div class="log-operator">👷 ${entry.operator||'N/D'}</div>
-        <div class="log-time">${isTake?'Prelevato':'Rimesso'} · ${ts}</div>
-      </div>
+      <div class="log-info"><div class="log-text"><strong>${entry.code}</strong> — ${entry.name}</div>
+      <div class="log-operator">👷 ${entry.operator||'N/D'}</div>
+      <div class="log-time">${isTake?'Prelevato':'Rimesso'} · ${ts}</div></div>
       <button class="log-undo" onclick="undoLog('${entry.id}')">Annulla</button>
     </div>`;
   });
   document.getElementById('log-container').innerHTML=html;
 }
-window.undoLog = async function(logId) {
-  const entry=actLog.find(e=>e.id===logId); if(!entry) return;
+window.undoLog=async function(logId){
+  const entry=actLog.find(e=>e.id===logId);if(!entry) return;
   if(!confirm('Annullare questo movimento?\n'+entry.code+' — '+(entry.delta<0?'Prelevato':'Rimesso')+' da '+entry.operator)) return;
   const item=itemsList.find(i=>i.id===entry.itemId);
-  if(item){ item.qty=Math.max(0,item.qty-entry.delta); await saveItem(item); }
-  await deleteMovimento(logId);
-  showToast('Movimento annullato','toast-info');
+  if(item){item.qty=Math.max(0,item.qty-entry.delta);await saveItem(item);}
+  await deleteMovimento(logId);showToast('Movimento annullato','toast-info');
 };
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  FAB
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 window.toggleFab=()=>{fabOpen=!fabOpen;document.getElementById('fab-menu').classList.toggle('open',fabOpen);document.getElementById('fab-btn').style.transform=fabOpen?'rotate(45deg)':''};
 function closeFab(){fabOpen=false;document.getElementById('fab-menu').classList.remove('open');document.getElementById('fab-btn').style.transform=''}
 
-// ══════════════════════════════════════════════
-//  FORM: NUOVA CATEGORIA
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
+//  FORMS
+// ═══════════════════════════════════════
 let selectedColorIdx=0;
-window.openAddCategoryForm = function() {
+window.openAddCategoryForm=function(){
   closeFab();
   let colorsHTML='';
   PALETTE.forEach((p,i)=>{colorsHTML+=`<div class="color-opt" style="background:${p.color}" onclick="selectColor(this,${i})"></div>`;});
   document.getElementById('form-modal').innerHTML=`
     <h2>Nuova categoria</h2>
-    <div class="form-group"><label>Nome categoria</label><input id="fc-name" placeholder="es. Interruttori"></div>
+    <div class="form-group"><label>Nome</label><input id="fc-name" placeholder="es. Interruttori"></div>
     <div class="form-row">
       <div class="form-group"><label>Sigla (2-3 lettere)</label><input id="fc-prefix" placeholder="es. IN" maxlength="3" style="text-transform:uppercase"></div>
       <div class="form-group"><label>Icona</label><select id="fc-icon">${ICONS.map(ic=>'<option value="'+ic+'">'+ic+'</option>').join('')}</select></div>
     </div>
     <div class="form-group"><label>Colore</label><div class="color-options">${colorsHTML}</div></div>
     <div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" onclick="submitCategory()">Aggiungi</button></div>`;
-  selectedColorIdx=0; document.querySelector('.color-opt').classList.add('selected');
+  selectedColorIdx=0;document.querySelector('.color-opt').classList.add('selected');
   document.getElementById('form-backdrop').classList.add('open');
 };
 window.selectColor=(el,idx)=>{document.querySelectorAll('.color-opt').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selectedColorIdx=idx};
-window.submitCategory = async function() {
+window.submitCategory=async function(){
   const name=document.getElementById('fc-name').value.trim();
   const prefix=document.getElementById('fc-prefix').value.trim().toUpperCase();
   const icon=document.getElementById('fc-icon').value;
-  if(!name){alert('Inserisci un nome');return;}
-  if(!prefix||prefix.length<2){alert('Sigla di almeno 2 lettere');return;}
-  if(categories[name]){alert('Categoria già esistente');return;}
-  if(Object.values(categories).some(c=>c.prefix===prefix)){alert('Sigla già utilizzata');return;}
+  if(!name){alert('Inserisci un nome');return}
+  if(!prefix||prefix.length<2){alert('Sigla di almeno 2 lettere');return}
+  if(categories[name]){alert('Categoria già esistente');return}
+  if(Object.values(categories).some(c=>c.prefix===prefix)){alert('Sigla già utilizzata');return}
   const pal=PALETTE[selectedColorIdx];
   const data={prefix,label:name,icon,color:pal.color,bg:pal.bg};
-  categories[name]=data; catOrder.push(name);
-  await saveCategory(name, data);
-  closeForm(); renderMateriali(); renderDashboard();
-  showToast('Categoria "'+name+'" aggiunta','toast-info');
+  categories[name]=data;catOrder.push(name);
+  await saveCategory(name,data);
+  closeForm();renderMateriali();renderDashboard();showToast('Categoria "'+name+'" aggiunta','toast-info');
 };
 
-// ══════════════════════════════════════════════
-//  FORM: NUOVO PRODOTTO
-// ══════════════════════════════════════════════
-window.openAddProductForm = function(preCat) {
+window.openAddProductForm=function(preCat){
   closeFab();
   let opts='<option value="">Seleziona categoria...</option>';
   catOrder.forEach(cat=>{const cfg=categories[cat];opts+=`<option value="${cat}" ${cat===preCat?'selected':''}>${cfg.icon} ${cfg.label}</option>`;});
@@ -1242,38 +1062,42 @@ window.openAddProductForm = function(preCat) {
     <div class="form-group"><label>Nome prodotto</label><input id="fp-name" placeholder="es. LAMPADA LED 50W"></div>
     <div class="form-row">
       <div class="form-group"><label>Quantità iniziale</label><input id="fp-qty" type="number" min="0" value="0"></div>
-      <div class="form-group"><label>Unità</label><select id="fp-unit"><option value="pz">Pezzi</option><option value="m">Metri</option><option value="kit">Kit</option></select></div>
+      <div class="form-group"><label>Unità</label><select id="fp-unit"><option value="pz">Pezzi</option><option value="m">Metri</option><option value="kit">Kit</option><option value="mat">Matasse</option><option value="conf">Confezioni</option></select></div>
     </div>
+    <div class="form-group"><label>Prezzo unitario (€) — opzionale</label><input id="fp-price" type="number" min="0" step="0.01" placeholder="0.00"></div>
     <div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" onclick="submitProduct()">Aggiungi</button></div>`;
   document.getElementById('form-backdrop').classList.add('open');
 };
-window.submitProduct = async function() {
+window.submitProduct=async function(){
   const cat=document.getElementById('fp-cat').value;
   const name=document.getElementById('fp-name').value.trim().toUpperCase();
   const qty=parseInt(document.getElementById('fp-qty').value)||0;
   const unit=document.getElementById('fp-unit').value;
-  if(!cat){alert('Seleziona una categoria');return;}
-  if(!name){alert('Inserisci un nome');return;}
+  const priceRaw=parseFloat(document.getElementById('fp-price').value);
+  const prezzo=isNaN(priceRaw)||priceRaw<=0?null:Math.round(priceRaw*100)/100;
+  if(!cat){alert('Seleziona una categoria');return}
+  if(!name){alert('Inserisci un nome');return}
   const cfg=categories[cat];
-  const n=getItemsByCat(cat).length+1;
-  const code=cfg.prefix+'.'+String(n).padStart(2,'0');
+  const code=nextCodeForCat(cat);
   const id=genId();
-  const item={id,name,cat,qty,unit,code};
-  itemsList.push(item);
-  await saveItem(item);
-  closeForm(); openCats[cat]=true;
-  renderMateriali(); renderDashboard();
-  showToast('Prodotto '+code+' aggiunto','toast-info');
+  const item={id,name,cat,qty,unit,code,prezzo};
+  itemsList.push(item);await saveItem(item);closeForm();openCats[cat]=true;
+  renderMateriali();renderDashboard();showToast('Prodotto '+code+' aggiunto','toast-info');
 };
-window.closeForm=(e)=>{if(e&&e.target&&e.target.id!=='form-backdrop') return; document.getElementById('form-backdrop').classList.remove('open')};
+window.closeForm=(e)=>{if(e&&e.target&&e.target.id!=='form-backdrop') return;document.getElementById('form-backdrop').classList.remove('open')};
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  RESPONSABILE
-// ══════════════════════════════════════════════
-function renderResponsabile() {
+// ═══════════════════════════════════════
+function renderResponsabile(){
+  const totalVal=itemsList.reduce((s,it)=>{const p=it.prezzo!=null?it.prezzo:0;return s+p*it.qty;},0);
+  document.getElementById('valore-num').textContent='€ '+totalVal.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const withPrice=itemsList.filter(it=>it.prezzo!=null).length;
+  document.getElementById('valore-sub').textContent=withPrice+'/'+itemsList.length+' prodotti con prezzo impostato';
+
   let html='';
   catOrder.forEach(cat=>{
-    const cfg=categories[cat]; if(!cfg) return;
+    const cfg=categories[cat];if(!cfg) return;
     const ci=getItemsByCat(cat);
     html+=`<div class="resp-cat-item">
       <div class="resp-cat-icon" style="background:${cfg.bg}">${cfg.icon}</div>
@@ -1284,32 +1108,25 @@ function renderResponsabile() {
   });
   document.getElementById('resp-cat-list').innerHTML=html||'<p style="font-size:12px;color:var(--text-light);padding:10px 0">Nessuna categoria</p>';
 }
-window.deleteCategory = async function(cat) {
-  const cfg=categories[cat]; if(!cfg) return;
+window.deleteCategory=async function(cat){
+  const cfg=categories[cat];if(!cfg) return;
   const ci=getItemsByCat(cat);
   if(!confirm('Eliminare "'+cfg.label+'"?\n\nVerranno eliminati anche '+ci.length+' prodotti.\nAzione irreversibile.')) return;
-  // Elimina prodotti
-  for(const it of ci) { await deleteItemFromDB(it.id); }
-  itemsList=itemsList.filter(i=>i.cat!==cat);
-  delete categories[cat];
-  catOrder=catOrder.filter(c=>c!==cat);
-  await deleteCategoryFromDB(cat);
-  renderResponsabile(); renderDashboard();
-  showToast('Categoria eliminata','toast-danger');
+  for(const it of ci) await deleteItemFromDB(it.id);
+  itemsList=itemsList.filter(i=>i.cat!==cat);delete categories[cat];catOrder=catOrder.filter(c=>c!==cat);
+  await deleteCategoryFromDB(cat);renderResponsabile();renderDashboard();showToast('Categoria eliminata','toast-danger');
 };
-window.clearAllLogs = async function() {
-  if(actLog.length===0){alert('Il registro è già vuoto.');return;}
+window.clearAllLogs=async function(){
+  if(actLog.length===0){alert('Il registro è già vuoto.');return}
   if(!confirm('Svuotare il registro?\n\nAzione irreversibile. Le quantità non saranno modificate.')) return;
-  for(const e of actLog) { await deleteMovimento(e.id); }
-  actLog=[];
-  showToast('Registro svuotato','toast-info');
+  for(const e of actLog) await deleteMovimento(e.id);actLog=[];showToast('Registro svuotato','toast-info');
 };
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  EXPORT
-// ══════════════════════════════════════════════
-window.exportExcel = function() {
-  if(actLog.length===0){alert('Nessun movimento da esportare.');return;}
+// ═══════════════════════════════════════
+window.exportExcel=function(){
+  if(actLog.length===0){alert('Nessun movimento da esportare.');return}
   let csv='\uFEFF"Data","Ora","Codice","Prodotto","Categoria","Operazione","Quantità","Operatore"\n';
   actLog.forEach(e=>{
     const d=new Date(e.time);
@@ -1317,37 +1134,31 @@ window.exportExcel = function() {
     const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     const item=itemsList.find(i=>i.id===e.itemId);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
-    const op=e.delta<0?'Prelievo':'Reimmissione';
-    csv+=`"${data}","${ora}","${e.code}","${e.name.replace(/"/g,'""')}","${catLabel}","${op}","${Math.abs(e.delta)}","${e.operator||'N/D'}"\n`;
+    csv+=`"${data}","${ora}","${e.code}","${e.name.replace(/"/g,'""')}","${catLabel}","${e.delta<0?'Prelievo':'Reimmissione'}","${Math.abs(e.delta)}","${e.operator||'N/D'}"\n`;
   });
-  downloadCSV(csv,'Report_Movimentazioni_'+dateStr()+'.csv');
-  showToast('Report scaricato','toast-info');
+  downloadCSV(csv,'Report_Movimentazioni_'+dateStr()+'.csv');showToast('Report scaricato','toast-info');
 };
-window.exportInventory = function() {
-  let csv='\uFEFF"Codice","Prodotto","Categoria","Quantità","Unità"\n';
+window.exportInventory=function(){
+  let csv='\uFEFF"Codice","Prodotto","Categoria","Quantità","Unità","Prezzo €/un.","Valore Totale €"\n';
   catOrder.forEach(cat=>{
-    const cfg=categories[cat]; if(!cfg) return;
+    const cfg=categories[cat];if(!cfg) return;
     getItemsByCat(cat).forEach(it=>{
-      csv+=`"${it.code}","${it.name.replace(/"/g,'""')}","${cfg.label}","${it.qty}","${it.unit}"\n`;
+      const p=it.prezzo!=null?it.prezzo:'';
+      const tot=it.prezzo!=null?it.prezzo*it.qty:'';
+      csv+=`"${it.code}","${it.name.replace(/"/g,'""')}","${cfg.label}","${it.qty}","${it.unit}","${p}","${tot}"\n`;
     });
   });
-  downloadCSV(csv,'Inventario_Magazzino_'+dateStr()+'.csv');
-  showToast('Inventario scaricato','toast-info');
+  downloadCSV(csv,'Inventario_Magazzino_'+dateStr()+'.csv');showToast('Inventario scaricato','toast-info');
 };
-function downloadCSV(content,filename){
-  const blob=new Blob([content],{type:'text/csv;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=filename;
-  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
-}
+function downloadCSV(content,filename){const blob=new Blob([content],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}
 function dateStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  QR
-// ══════════════════════════════════════════════
-window.renderQrPage = function() {
-  const grid=document.getElementById('qr-grid'); if(!grid) return;
-  const sorted=[...itemsList].sort((a,b)=>{if(a.cat!==b.cat)return a.cat.localeCompare(b.cat);return a.code.localeCompare(b.code)});
+// ═══════════════════════════════════════
+window.renderQrPage=function(){
+  const grid=document.getElementById('qr-grid');if(!grid) return;
+  const sorted=[...itemsList].sort((a,b)=>a.code.localeCompare(b.code));
   grid.innerHTML=sorted.map(it=>{
     const cfg=categories[it.cat]||{};
     return `<div class="qr-card"><div class="qr-box" id="qr-${it.code.replace(/[^a-zA-Z0-9]/g,'_')}"></div>
@@ -1356,14 +1167,13 @@ window.renderQrPage = function() {
   }).join('');
   sorted.forEach(it=>{
     const el=document.getElementById('qr-'+it.code.replace(/[^a-zA-Z0-9]/g,'_'));
-    if(el&&window.QRCode){
-      new QRCode(el,{text:productUrlFromCode(it.code),width:118,height:118,correctLevel:QRCode.CorrectLevel.M});
-    }
+    if(el&&window.QRCode) new QRCode(el,{text:productUrlFromCode(it.code),width:118,height:118,correctLevel:QRCode.CorrectLevel.M});
   });
 };
 function productUrlFromCode(code){const base=window.location.href.split('?')[0].split('#')[0];return base+'?code='+encodeURIComponent(code)}
+
 window.startQrScanner=function(){
-  if(!window.Html5Qrcode){showToast('Libreria scanner non caricata','toast-danger');return}
+  if(!window.Html5Qrcode){showToast('Libreria non caricata','toast-danger');return}
   if(html5QrCodeInstance) return;
   html5QrCodeInstance=new Html5Qrcode("reader");
   html5QrCodeInstance.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:250}},
@@ -1375,78 +1185,44 @@ window.stopQrScanner=function(){
   html5QrCodeInstance.stop().then(()=>{html5QrCodeInstance.clear();html5QrCodeInstance=null}).catch(()=>{html5QrCodeInstance=null});
 };
 function extractCodeFromScan(t){try{const u=new URL(t);return u.searchParams.get('code')||t.trim()}catch(e){return t.trim()}}
+
 function openProductByCode(code){
   const clean=String(code||'').trim();
   const product=itemsList.find(i=>i.code.toLowerCase()===clean.toLowerCase());
   const result=document.getElementById('scan-result');
   if(!product){
-    if(result){
-      result.style.display='block';
-      result.innerHTML='<span>⚠️ Codice <strong>'+clean+'</strong> non trovato.</span>';
-    }
-    showToast('Prodotto non trovato','toast-danger');
-    return;
+    if(result){result.style.display='block';result.innerHTML='<span>⚠️ Codice <strong>'+clean+'</strong> non trovato.</span>'}
+    showToast('Prodotto non trovato','toast-danger');return;
   }
   stopQrScanner();
-  // Salva l'id del prodotto trovato globalmente
-  window._scannedProductId = product.id;
-  // Mostra risultato con pulsante
+  window._scannedProductId=product.id;
   if(result){
-    result.style.display='block';
     const cfg=categories[product.cat]||{};
-    result.innerHTML=
-      '<div style="margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;opacity:.7">Prodotto trovato</div>'+
+    result.style.display='block';
+    result.innerHTML='<div style="margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;opacity:.7">Prodotto trovato</div>'+
       '<div style="font-size:15px;font-weight:700;margin-bottom:2px">'+product.code+' — '+product.name+'</div>'+
       '<div style="font-size:12px;font-weight:500;opacity:.75;margin-bottom:12px">'+(cfg.label||product.cat)+'</div>'+
-      '<button class="scan-open-btn" onclick="openScannedProduct()">'+
-        '📦 Apri scheda prodotto →'+
-      '</button>';
+      '<button class="scan-open-btn" onclick="openScannedProduct()">📦 Apri scheda prodotto →</button>';
   }
 }
-
-window.openScannedProduct = function(){
-  const id = window._scannedProductId;
-  if(!id) return;
-  const product = itemsList.find(i=>i.id===id);
-  if(!product) return;
-  openCats[product.cat]=true;
-  showPage('materiali');
-  renderMateriali();
-  setTimeout(()=>{
-    openModal(product.id);
-  }, 350);
+window.openScannedProduct=function(){
+  const id=window._scannedProductId;if(!id) return;
+  const product=itemsList.find(i=>i.id===id);if(!product) return;
+  openCats[product.cat]=true;showPage('materiali');renderMateriali();
+  setTimeout(()=>openModal(product.id),350);
 };
 function handleUrlProductCode(){
   const params=new URLSearchParams(window.location.search);
-  const code=params.get('code')||params.get('product');
-  if(!code) return;
-
-  // Aspetta che Firestore abbia caricato i dati prima di aprire il modal
+  const code=params.get('code')||params.get('product');if(!code) return;
   let attempts=0;
-  const tryOpen=()=>{
-    attempts++;
-    if(itemsList.length>0){
-      const loading=document.getElementById('loading-screen');
-      if(loading) loading.style.display='none';
-      openProductByCode(code);
-    } else if(attempts<20){
-      setTimeout(tryOpen,300);
-    } else {
-      showToast('Timeout caricamento. Riprova.','toast-danger');
-    }
-  };
+  const tryOpen=()=>{attempts++;if(itemsList.length>0){document.getElementById('loading-screen').style.display='none';openProductByCode(code);}else if(attempts<20){setTimeout(tryOpen,300);}else{showToast('Timeout caricamento','toast-danger');}};
   setTimeout(tryOpen,600);
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════
 //  TOAST
-// ══════════════════════════════════════════════
-window.showToast = function(msg,cls){
-  const t=document.getElementById('toast');
-  t.className='toast '+cls;t.textContent=msg;
-  setTimeout(()=>t.classList.add('show'),10);
-  setTimeout(()=>t.classList.remove('show'),2400);
-};
+// ═══════════════════════════════════════
+window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
 </body>
