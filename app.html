@@ -334,22 +334,39 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 
 <!-- QR -->
 <div class="page" id="page-qrcode">
-  <div class="section-label">QR code prodotti</div>
-  <div class="qr-tools">
-    <button class="qr-tool-btn" onclick="renderQrPage()">Genera / aggiorna QR</button>
-    <button class="qr-tool-btn secondary" onclick="window.print()">Stampa bacheca</button>
-  </div>
+  <!-- SCANNER: visibile a tutti -->
+  <div class="section-label">Scanner QR code</div>
   <div class="scanner-box">
-    <div class="section-label" style="margin-top:0">Scanner fotocamera</div>
     <div class="qr-tools">
-      <button class="qr-tool-btn" onclick="startQrScanner()">Avvia scanner</button>
+      <button class="qr-tool-btn" onclick="startQrScanner()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:6px;vertical-align:-2px"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+        Avvia fotocamera
+      </button>
       <button class="qr-tool-btn secondary" onclick="stopQrScanner()">Ferma</button>
     </div>
     <div id="reader"></div>
     <div class="scan-result" id="scan-result"></div>
   </div>
-  <div class="section-label">Bacheca QR</div>
-  <div class="qr-grid" id="qr-grid"></div>
+
+  <!-- BACHECA QR: solo responsabili -->
+  <div id="qr-resp-section" style="display:none">
+    <div class="section-label" style="margin-top:8px">Bacheca QR</div>
+    <div class="qr-tools">
+      <button class="qr-tool-btn" onclick="renderQrPage()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:6px;vertical-align:-2px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+        Aggiorna bacheca
+      </button>
+      <button class="qr-tool-btn secondary" onclick="window.print()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:6px;vertical-align:-2px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Stampa bacheca
+      </button>
+    </div>
+    <!-- Badge nuovi prodotti senza QR stampato -->
+    <div id="qr-new-badge" style="display:none;margin-bottom:12px;padding:10px 14px;background:#FFF3CD;border:1px solid #FFEAA7;border-radius:10px;font-size:13px;color:#856404;font-weight:500">
+      🆕 <span id="qr-new-count"></span> — scorri in fondo alla lista per trovarli.
+    </div>
+    <div class="qr-grid" id="qr-grid"></div>
+  </div>
 </div>
 
 <!-- RESPONSABILE -->
@@ -782,7 +799,12 @@ window.showPage=function(id){
   if(id==='dashboard') renderDashboard();
   if(id==='materiali') renderMateriali();
   if(id==='registro') renderLog();
-  if(id==='qrcode') renderQrPage();
+  if(id==='qrcode'){
+    // Mostra/nascondi sezione bacheca in base al ruolo prima del render
+    const respSec=document.getElementById('qr-resp-section');
+    if(respSec) respSec.style.display=isResp()?'block':'none';
+    renderQrPage();
+  }
   if(id==='responsabile') renderResponsabile();
   closeFab();
 };
@@ -1157,18 +1179,53 @@ function dateStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMon
 //  QR
 // ═══════════════════════════════════════
 window.renderQrPage=function(){
+  // Mostra sezione bacheca solo ai responsabili
+  const respSection=document.getElementById('qr-resp-section');
+  if(!respSection) return;
+  if(!isResp()){respSection.style.display='none';return;}
+  respSection.style.display='block';
+
   const grid=document.getElementById('qr-grid');if(!grid) return;
   const sorted=[...itemsList].sort((a,b)=>a.code.localeCompare(b.code));
+
+  // Prodotti marcati come "nuovo" = aggiunti dopo l'ultimo reset (non hanno qrPrinted flag)
+  // Usiamo il flag qrPrinted su Firestore: se non c'è, il prodotto è nuovo
+  const newItems=sorted.filter(it=>!it.qrPrinted);
+  const newBadge=document.getElementById('qr-new-badge');
+  const newCount=document.getElementById('qr-new-count');
+  if(newItems.length>0){
+    newBadge.style.display='block';
+    newCount.textContent=newItems.length+' nuov'+(newItems.length===1?'o prodotto senza QR stampato':'i prodotti senza QR stampato');
+  } else {
+    newBadge.style.display='none';
+  }
+
   grid.innerHTML=sorted.map(it=>{
     const cfg=categories[it.cat]||{};
-    return `<div class="qr-card"><div class="qr-box" id="qr-${it.code.replace(/[^a-zA-Z0-9]/g,'_')}"></div>
-      <div class="qr-code-label">${it.code}</div><div class="qr-name">${it.name}</div>
-      <div class="qr-cat">${cfg.label||it.cat}</div></div>`;
+    const isNew=!it.qrPrinted;
+    const newBadgeHTML=isNew?'<div style="margin-bottom:6px;display:inline-block;padding:2px 8px;background:#FFF3CD;border:1px solid #FFEAA7;border-radius:99px;font-size:10px;font-weight:700;color:#856404">🆕 Nuovo</div><br>':'';
+    return `<div class="qr-card" style="${isNew?'border:1px solid #FFEAA7;background:#FFFDF0':''}">
+      ${newBadgeHTML}
+      <div class="qr-box" id="qr-${it.code.replace(/[^a-zA-Z0-9]/g,'_')}"></div>
+      <div class="qr-code-label">${it.code}</div>
+      <div class="qr-name">${it.name}</div>
+      <div class="qr-cat">${cfg.label||it.cat}</div>
+      ${isNew?`<button onclick="markQrPrinted('${it.id}')" style="margin-top:8px;width:100%;padding:6px;border:none;background:var(--brand-500);color:#fff;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">✓ Segna come stampato</button>`:''}
+    </div>`;
   }).join('');
+
   sorted.forEach(it=>{
     const el=document.getElementById('qr-'+it.code.replace(/[^a-zA-Z0-9]/g,'_'));
     if(el&&window.QRCode) new QRCode(el,{text:productUrlFromCode(it.code),width:118,height:118,correctLevel:QRCode.CorrectLevel.M});
   });
+};
+
+window.markQrPrinted=async function(id){
+  const item=itemsList.find(i=>i.id===id);if(!item) return;
+  item.qrPrinted=true;
+  await saveItem(item);
+  renderQrPage();
+  showToast('QR segnato come stampato','toast-info');
 };
 function productUrlFromCode(code){const base=window.location.href.split('?')[0].split('#')[0];return base+'?code='+encodeURIComponent(code)}
 
