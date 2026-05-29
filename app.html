@@ -823,24 +823,19 @@ function renderDashboard(){
     <div class="stat-card"><div class="stat-val">${itemsList.length}</div><div class="stat-label">Prodotti</div></div>
     <div class="stat-card"><div class="stat-val">${catOrder.length}</div><div class="stat-label">Categorie</div></div>
     <div class="stat-card"><div class="stat-val">${tq.toLocaleString('it')}</div><div class="stat-label">Totale stock</div></div>`;
-  if(isResp()){
-    const totalVal=itemsList.reduce((s,it)=>{
-      const p=it.prezzo!=null?it.prezzo:0;return s+p*it.qty;
-    },0);
-    statsHTML+=`<div class="stat-card value-card" style="grid-column:1/-1"><div class="stat-val">€ ${totalVal.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})}</div><div class="stat-label">Valore totale magazzino</div></div>`;
-  }
+
   document.getElementById('stats-grid').innerHTML=statsHTML;
 
   let th='';
   catOrder.forEach(cat=>{
     const cfg=categories[cat];if(!cfg) return;
     const ci=getItemsByCat(cat);const cq=ci.reduce((s,it)=>s+it.qty,0);
-    const catVal=ci.reduce((s,it)=>s+(it.prezzo!=null?it.prezzo:0)*it.qty,0);
+
     th+=`<div class="tree-branch" style="background:${cfg.bg};border:1px solid ${cfg.bg}" onclick="showPage('materiali');setTimeout(()=>openCategory('${cat}'),150)">
       <div class="tree-branch-top"><div class="tree-branch-dot" style="background:${cfg.color}"></div><div class="tree-branch-name" style="color:${cfg.color}">${cfg.label}</div></div>
       <div class="tree-branch-qty" style="color:${cfg.color}">${cq.toLocaleString('it')}</div>
       <div class="tree-branch-sub">${ci.length} prodotti</div>
-      ${isResp()?'<div class="tree-branch-val">€ '+catVal.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>':''}
+
     </div>`;
   });
   document.getElementById('tree-branches').innerHTML=th;
