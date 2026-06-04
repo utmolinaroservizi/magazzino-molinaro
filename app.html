@@ -361,9 +361,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
         Stampa bacheca
       </button>
     </div>
-    <!-- Badge nuovi prodotti senza QR stampato -->
-    <div id="qr-new-badge" style="display:none;margin-bottom:12px;padding:10px 14px;background:#FFF3CD;border:1px solid #FFEAA7;border-radius:10px;font-size:13px;color:#856404;font-weight:500">
-      🆕 <span id="qr-new-count"></span> — scorri in fondo alla lista per trovarli.
+    <!-- Prodotti recenti aggiunti -->
+    <div id="qr-new-badge" style="display:none;margin-bottom:16px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;overflow:hidden">
+      <div style="padding:10px 14px 8px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:15px">🆕</span>
+        <span style="font-size:12px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:.08em;flex:1">Prodotti recenti aggiunti</span>
+        <span id="qr-new-count" style="background:#22C55E;color:#fff;border-radius:99px;padding:1px 9px;font-size:11px;font-weight:700"></span>
+      </div>
+      <div id="qr-new-list" style="padding:0 14px 10px"></div>
     </div>
     <div class="qr-grid" id="qr-grid"></div>
   </div>
@@ -372,7 +377,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 <!-- RESPONSABILE -->
 <div class="page" id="page-responsabile">
   <div class="section-label">Area responsabile</div>
-  <div class="valore-card" id="valore-card">
+  <div class="valore-card" id="valore-card" style="display:none">
     <div class="valore-label">Valore totale magazzino</div>
     <div class="valore-num" id="valore-num">—</div>
     <div class="valore-sub" id="valore-sub">Calcolato su prezzi disponibili</div>
@@ -1183,14 +1188,22 @@ window.renderQrPage=function(){
   const grid=document.getElementById('qr-grid');if(!grid) return;
   const sorted=[...itemsList].sort((a,b)=>a.code.localeCompare(b.code));
 
-  // Prodotti marcati come "nuovo" = aggiunti dopo l'ultimo reset (non hanno qrPrinted flag)
-  // Usiamo il flag qrPrinted su Firestore: se non c'è, il prodotto è nuovo
+  // Prodotti recenti aggiunti (senza qrPrinted)
   const newItems=sorted.filter(it=>!it.qrPrinted);
   const newBadge=document.getElementById('qr-new-badge');
   const newCount=document.getElementById('qr-new-count');
+  const newList=document.getElementById('qr-new-list');
   if(newItems.length>0){
     newBadge.style.display='block';
-    newCount.textContent=newItems.length+' nuov'+(newItems.length===1?'o prodotto senza QR stampato':'i prodotti senza QR stampato');
+    newCount.textContent=newItems.length;
+    newList.innerHTML=newItems.map(it=>{
+      const cfg=categories[it.cat]||{};
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #BBF7D0">
+        <span style="font-size:14px;flex-shrink:0">${cfg.icon||'📦'}</span>
+        <span style="font-size:11.5px;font-weight:700;color:#15803D;font-family:'JetBrains Mono',monospace;flex-shrink:0">${it.code}</span>
+        <span style="font-size:12px;color:#166534;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.name}</span>
+      </div>`;
+    }).join('');
   } else {
     newBadge.style.display='none';
   }
@@ -1205,7 +1218,6 @@ window.renderQrPage=function(){
       <div class="qr-code-label">${it.code}</div>
       <div class="qr-name">${it.name}</div>
       <div class="qr-cat">${cfg.label||it.cat}</div>
-      ${isNew?`<button onclick="markQrPrinted('${it.id}')" style="margin-top:8px;width:100%;padding:6px;border:none;background:var(--brand-500);color:#fff;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">✓ Segna come stampato</button>`:''}
     </div>`;
   }).join('');
 
