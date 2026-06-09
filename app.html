@@ -281,13 +281,13 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .qr-tool-btn{padding:12px;border:none;border-radius:var(--radius-sm);background:var(--brand-500);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
 .qr-tool-btn.secondary{background:var(--bg-card);color:var(--brand-600);border:1px solid var(--brand-100)}
 .qr-tool-btn:active{transform:scale(.97)}
-.qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px}
-.qr-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;box-shadow:var(--shadow-xs)}
-.qr-box{display:flex;justify-content:center;align-items:center;min-height:126px;background:#fff;border-radius:10px;margin-bottom:9px}
-.qr-box canvas,.qr-box img{width:118px!important;height:118px!important}
-.qr-code-label{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--brand-600);margin-bottom:4px}
-.qr-name{font-size:11.5px;line-height:1.25;font-weight:600}
-.qr-cat{font-size:10px;margin-top:4px;color:var(--text-light);text-transform:uppercase;letter-spacing:.06em}
+.qr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.qr-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px;box-shadow:var(--shadow-xs)}
+.qr-box{display:flex;justify-content:center;align-items:center;min-height:80px;background:#fff;border-radius:6px;margin-bottom:5px}
+.qr-box canvas,.qr-box img{width:78px!important;height:78px!important}
+.qr-code-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--brand-600);margin-bottom:2px}
+.qr-name{font-size:9px;line-height:1.2;font-weight:600}
+.qr-cat{font-size:8px;margin-top:2px;color:var(--text-light);text-transform:uppercase;letter-spacing:.04em}
 .scanner-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
 #reader{width:100%;overflow:hidden;border-radius:var(--radius-sm)}
 .scan-result{margin-top:12px;padding:14px;border-radius:var(--radius-sm);background:var(--brand-50);color:var(--brand-700);font-size:13px;font-weight:600;display:none;border:1px solid var(--brand-100)}
@@ -317,7 +317,30 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .fuel-take .fa-icon{background:#FFF3D6;color:#9A6C1E}.fuel-take .fa-label{color:#9A6C1E}
 .fuel-return .fa-icon{background:var(--brand-50);color:var(--brand-500)}.fuel-return .fa-label{color:var(--brand-600)}
 
-/* QR PRINT SECTIONS */
+/* CARICA MERCE */
+.carica-cat-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.carica-cat-tabs::-webkit-scrollbar{display:none}
+.carica-tab{padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:var(--bg-card);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;color:var(--text-muted);transition:var(--transition);flex-shrink:0}
+.carica-tab.active{background:var(--brand-500);color:#fff;border-color:var(--brand-500)}
+.carica-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px}
+.carica-item-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.carica-item-code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;flex-shrink:0}
+.carica-item-name{font-size:13px;font-weight:600;flex:1;line-height:1.3}
+.carica-item-qty{font-size:11px;color:var(--text-light);font-weight:500;text-align:right;flex-shrink:0}
+.carica-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.carica-input-wrap{display:flex;flex-direction:column;gap:3px}
+.carica-input-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em}
+.carica-input{padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:14px;font-weight:600;font-family:inherit;background:var(--bg);color:var(--text);outline:none;text-align:center;width:100%;box-sizing:border-box}
+.carica-input:focus{border-color:var(--brand-500)}
+.carica-confirm-btn{width:100%;padding:11px;border:none;border-radius:var(--radius-xs);background:var(--brand-500);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:var(--transition)}
+.carica-confirm-btn:active{transform:scale(.97);background:var(--brand-600)}
+.carica-confirm-btn:disabled{background:var(--border);color:var(--text-light);cursor:default}
+
+/* LOG TYPE badges */
+.log-type-badge{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0;text-transform:uppercase;letter-spacing:.05em}
+.log-type-take{background:#FFF3D6;color:#9A6C1E}
+.log-type-return{background:#EFF6FF;color:#2563EB}
+.log-type-load{background:#F0FDF4;color:#15803D}
 .qr-section-group{margin-bottom:20px}
 .qr-section-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px}
 .qr-section-header-icon{font-size:18px}
@@ -325,7 +348,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .qr-section-header-name{font-size:13px;font-weight:700}
 .qr-section-header-desc{font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:500}
 .qr-sub-header{font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.08em;padding:6px 8px;margin-bottom:6px;border-left:3px solid var(--border)}
-.qr-section-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:12px}
+.qr-section-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
 
 @media(min-width:500px){.page{padding:24px;max-width:540px;margin:0 auto}}
 @page{size:A4 portrait;margin:8mm}
@@ -352,7 +375,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   /* 5 colonne — A4 194mm utili, 4 gap × 1.5mm = 6mm → card ~37.6mm largh */
   .qr-section-grid{
     display:grid!important;
-    grid-template-columns:repeat(5,1fr)!important;
+    grid-template-columns:repeat(4,1fr)!important;
     gap:1.5mm!important;
     margin-bottom:1.5mm!important
   }
@@ -363,7 +386,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     box-shadow:none!important;border:0.4pt solid #bbb!important;
     border-radius:1mm!important;padding:1.5mm!important;
     background:#fff!important;min-height:0!important;
-    height:36mm!important;overflow:hidden!important;
+    height:42mm!important;overflow:hidden!important;
     display:flex!important;flex-direction:column!important;
     align-items:center!important;justify-content:flex-start!important;
     box-sizing:border-box!important
@@ -372,12 +395,12 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 
   /* QR image 23mm × 23mm */
   .qr-card .qr-box{
-    min-height:0!important;height:24mm!important;width:24mm!important;
+    min-height:0!important;height:28mm!important;width:28mm!important;
     margin:0 auto 1mm!important;display:flex!important;
     align-items:center!important;justify-content:center!important;flex-shrink:0!important
   }
   .qr-card .qr-box canvas,.qr-card .qr-box img{
-    width:23mm!important;height:23mm!important;display:block!important
+    width:27mm!important;height:27mm!important;display:block!important
   }
 
   /* Testi */
@@ -425,6 +448,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   <button class="nav-btn" onclick="showPage('carburante')" id="nav-carburante">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M3 22V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17"/><path d="M15 10h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V9l-3-3"/><rect x="6" y="7" width="6" height="5" rx="1"/></svg>
     Carburante
+  </button>
+  <button class="nav-btn hidden" onclick="showPage('carica')" id="nav-carica">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M5 12H3l9-9 9 9h-2"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/><path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/></svg>
+    Carica
   </button>
   <button class="nav-btn hidden" onclick="showPage('responsabile')" id="nav-resp">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -490,17 +517,19 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
         Stampa bacheca
       </button>
     </div>
-    <!-- Prodotti recenti aggiunti -->
-    <div id="qr-new-badge" style="display:none;margin-bottom:16px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;overflow:hidden">
-      <div style="padding:10px 14px 8px;display:flex;align-items:center;gap:8px">
-        <span style="font-size:15px">🆕</span>
-        <span style="font-size:12px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:.08em;flex:1">Prodotti recenti aggiunti</span>
-        <span id="qr-new-count" style="background:#22C55E;color:#fff;border-radius:99px;padding:1px 9px;font-size:11px;font-weight:700"></span>
-      </div>
-      <div id="qr-new-list" style="padding:0 14px 10px"></div>
-    </div>
     <div class="qr-grid" id="qr-grid"></div>
   </div>
+</div>
+
+<!-- CARICA MERCE (solo responsabili) -->
+<div class="page" id="page-carica">
+  <div class="hero">
+    <div class="hero-eyebrow">Responsabile · Magazzino</div>
+    <div class="hero-title" style="font-size:18px">📦 Carica Merce</div>
+    <div class="hero-meta">Nuovo acquisto — aggiorna giacenze e prezzi</div>
+  </div>
+  <div class="carica-cat-tabs" id="carica-tabs"></div>
+  <div id="carica-list"></div>
 </div>
 
 <!-- CARBURANTE -->
@@ -935,6 +964,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   document.getElementById('user-name').textContent=currentUser.nome.split(' ')[0];
   if(isResp()){
     document.getElementById('nav-resp').classList.remove('hidden');
+    document.getElementById('nav-carica').classList.remove('hidden');
   }
   const heroTitle=document.getElementById('hero-title');
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
@@ -1164,6 +1194,7 @@ window.showPage=function(id){
   if(id==='materiali') renderMateriali();
   if(id==='registro') renderLog();
   if(id==='carburante') renderCarburante();
+  if(id==='carica') renderCarica();
   if(id==='qrcode'){
     // Mostra/nascondi sezione bacheca in base al ruolo prima del render
     const respSec=document.getElementById('qr-resp-section');
@@ -1409,7 +1440,8 @@ window.doAdjust=async function(sign){
   const actualDelta=next-currentModalItem.qty;
   currentModalItem.qty=next;
   await saveItem(currentModalItem);
-  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now()};
+  const movType=actualDelta<0?'take':'return';
+  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:movType};
   await saveMovimento(entry);
   document.getElementById('m-qty').textContent=next;
   if(isResp()) renderPriceSection(currentModalItem);
@@ -1558,12 +1590,21 @@ function renderLogItem(entry,isTake,ts,showUndo){
   const amt=Math.abs(entry.delta);
   const item=itemsList.find(i=>i.id===entry.itemId);
   const un=item?item.unit:'';
+  const t=entry.type||( isTake?'take':'return');
+  const typeLabel={take:'Prelievo',return:'Restituzione',load:'Carico merce'}[t]||'Movimento';
+  const typeCls={take:'log-type-take',return:'log-type-return',load:'log-type-load'}[t]||'log-type-return';
+  const icon={take:'📤',return:'↩️',load:'📦'}[t]||'↔️';
+  const iconCls={take:'take',return:'ret',load:'ret'}[t]||'ret';
+  const action={take:'Prelevati',return:'Restituiti',load:'Caricati'}[t]||'Mossi';
   return `<div class="log-item">
-    <div class="log-icon ${isTake?'take':'ret'}">${isTake?'−':'+'}</div>
+    <div class="log-icon ${iconCls}">${icon}</div>
     <div class="log-info">
       <div class="log-text"><strong>${entry.code}</strong> — ${entry.name}</div>
-      <div class="log-operator">👷 ${entry.operator||'N/D'}</div>
-      <div class="log-time">${isTake?'Prelevati':'Rimessi'} ${amt}${un?' '+un:''} · ${ts}</div>
+      <div class="log-operator" style="display:flex;align-items:center;gap:6px">
+        <span>👷 ${entry.operator||'N/D'}</span>
+        <span class="log-type-badge ${typeCls}">${typeLabel}</span>
+      </div>
+      <div class="log-time">${action} ${amt}${un?' '+un:''} · ${ts}</div>
     </div>
     ${showUndo?`<button class="log-undo" onclick="undoLog('${entry.id}')">Annulla</button>`:''}
   </div>`;
@@ -1772,26 +1813,6 @@ window.renderQrPage=function(){
   const grid=document.getElementById('qr-grid');if(!grid) return;
   const sorted=[...itemsList].filter(it=>it.cat!=='Carburante').sort((a,b)=>a.code.localeCompare(b.code));
 
-  // Prodotti recenti aggiunti (senza qrPrinted)
-  const newItems=sorted.filter(it=>!it.qrPrinted);
-  const newBadge=document.getElementById('qr-new-badge');
-  const newCount=document.getElementById('qr-new-count');
-  const newList=document.getElementById('qr-new-list');
-  if(newItems.length>0){
-    newBadge.style.display='block';
-    newCount.textContent=newItems.length;
-    newList.innerHTML=newItems.map(it=>{
-      const cfg=categories[it.cat]||{};
-      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #BBF7D0">
-        <span style="font-size:14px;flex-shrink:0">${cfg.icon||'📦'}</span>
-        <span style="font-size:11.5px;font-weight:700;color:#15803D;font-family:'JetBrains Mono',monospace;flex-shrink:0">${it.code}</span>
-        <span style="font-size:12px;color:#166534;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.name}</span>
-      </div>`;
-    }).join('');
-  } else {
-    newBadge.style.display='none';
-  }
-
   // Category descriptions for QR section headers
   const catDesc={
     'Illuminazione':'Corpi illuminanti, alimentatori, circuiti LED',
@@ -1835,7 +1856,7 @@ window.renderQrPage=function(){
         html+=`<div class="qr-section-grid">`;
         subItems.forEach(it=>{
           const isNew=!it.qrPrinted;
-          html+=renderQrCard(it,cfg,isNew);
+          html+=renderQrCard(it,cfg);
 
         });
         html+=`</div>`;
@@ -1845,7 +1866,7 @@ window.renderQrPage=function(){
       if(unsub.length>0){
         html+=`<div class="qr-section-grid">`;
         unsub.forEach(it=>{
-          html+=renderQrCard(it,cfg,!it.qrPrinted);
+          html+=renderQrCard(it,cfg);
 
         });
         html+=`</div>`;
@@ -1853,7 +1874,7 @@ window.renderQrPage=function(){
     } else {
       html+=`<div class="qr-section-grid">`;
       ci.forEach(it=>{
-        html+=renderQrCard(it,cfg,!it.qrPrinted);
+        html+=renderQrCard(it,cfg);
       });
       html+=`</div>`;
     }
@@ -1868,10 +1889,8 @@ window.renderQrPage=function(){
   });
 };
 
-function renderQrCard(it,cfg,isNew){
-  const newBadgeHTML=isNew?'<div style="margin-bottom:6px;display:inline-block;padding:2px 8px;background:#FFF3CD;border:1px solid #FFEAA7;border-radius:99px;font-size:10px;font-weight:700;color:#856404">🆕 Nuovo</div><br>':'';
-  return `<div class="qr-card" style="${isNew?'border:1px solid #FFEAA7;background:#FFFDF0':''}">
-    ${newBadgeHTML}
+function renderQrCard(it,cfg){
+  return `<div class="qr-card">
     <div class="qr-box" id="qr-${it.code.replace(/[^a-zA-Z0-9]/g,'_')}"></div>
     <div class="qr-code-label">${it.code}</div>
     <div class="qr-name">${it.name}</div>
@@ -2039,7 +2058,7 @@ window.doFuelAdjust=async function(sign){
   const actualDelta=next-currentFuelItem.qty;
   currentFuelItem.qty=next;
   await saveItem(currentFuelItem);
-  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now()};
+  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:actualDelta<0?'take':'return'};
   await saveMovimento(entry);
   document.getElementById('fm-qty').textContent=next;
   if(isResp()){
@@ -2075,6 +2094,100 @@ window.saveFuelPrice=async function(){
   document.getElementById('fuel-price-input-row').classList.remove('visible');
   fuelPriceEditOpen=false;
   showToast('Prezzo carburante aggiornato','toast-info');
+};
+
+// ═══════════════════════════════════════
+//  CARICA MERCE (responsabili)
+// ═══════════════════════════════════════
+let caricaActiveCat='';
+
+function renderCarica(){
+  if(!isResp()) return;
+
+  // Build category tabs (skip Carburante)
+  const tabs=document.getElementById('carica-tabs');
+  const allCats=catOrder.filter(c=>c!=='Carburante'&&categories[c]);
+  if(!caricaActiveCat || !allCats.includes(caricaActiveCat)) caricaActiveCat=allCats[0]||'';
+
+  tabs.innerHTML=allCats.map(c=>{
+    const cfg=categories[c];
+    return `<button class="carica-tab ${c===caricaActiveCat?'active':''}" onclick="setCaricaCat('${c}')">${cfg.icon} ${cfg.label}</button>`;
+  }).join('');
+
+  renderCaricaList();
+}
+
+window.setCaricaCat=function(cat){
+  caricaActiveCat=cat;
+  // Update tab styles
+  document.querySelectorAll('.carica-tab').forEach(btn=>{
+    btn.classList.toggle('active', btn.textContent.trim().includes(categories[cat]?.label||cat));
+  });
+  renderCaricaList();
+};
+
+function renderCaricaList(){
+  const list=document.getElementById('carica-list');
+  if(!caricaActiveCat){list.innerHTML='';return;}
+  const cfg=categories[caricaActiveCat];
+  const items=getItemsByCat(caricaActiveCat);
+  if(items.length===0){
+    list.innerHTML='<div class="empty-state"><p>Nessun prodotto in questa categoria</p></div>';return;
+  }
+  list.innerHTML=items.map(it=>{
+    const priceVal=it.prezzo!=null?it.prezzo:'';
+    return `<div class="carica-item">
+      <div class="carica-item-top">
+        <span class="carica-item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
+        <span class="carica-item-name">${it.name}</span>
+        <span class="carica-item-qty">${it.qty} ${it.unit}</span>
+      </div>
+      <div class="carica-inputs">
+        <div class="carica-input-wrap">
+          <div class="carica-input-label">Quantità da caricare</div>
+          <input class="carica-input" type="number" min="1" placeholder="0"
+            id="cq-${it.id}" value="" inputmode="numeric">
+        </div>
+        <div class="carica-input-wrap">
+          <div class="carica-input-label">Nuovo prezzo (€/${it.unit})</div>
+          <input class="carica-input" type="number" min="0" step="0.01" placeholder="${priceVal||'—'}"
+            id="cp-${it.id}" value="" inputmode="decimal">
+        </div>
+      </div>
+      <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
+    </div>`;
+  }).join('');
+}
+
+window.confirmCarico=async function(itemId){
+  const item=itemsList.find(i=>i.id===itemId);if(!item) return;
+  const qtyEl=document.getElementById('cq-'+itemId);
+  const priceEl=document.getElementById('cp-'+itemId);
+  const qty=parseInt(qtyEl.value);
+  if(isNaN(qty)||qty<=0){showToast('Inserisci una quantità valida','toast-danger');qtyEl.focus();return;}
+
+  const newPrezzo=priceEl.value!==''?Math.round(parseFloat(priceEl.value)*100)/100:null;
+  const prevQty=item.qty;
+  item.qty+=qty;
+  if(newPrezzo!==null&&!isNaN(newPrezzo)) item.prezzo=newPrezzo;
+
+  await saveItem(item);
+
+  const entry={id:genId(),itemId:item.id,code:item.code,name:item.name,
+    delta:qty,prevQty,operator:currentUser.nome,operatorUid:currentUser.uid,
+    time:Date.now(),type:'load'};
+  await saveMovimento(entry);
+
+  qtyEl.value='';
+  priceEl.value='';
+
+  // Feedback visivo
+  const btn=document.querySelector(`button[onclick="confirmCarico('${itemId}')"]`);
+  if(btn){btn.textContent='✓ Caricato!';btn.style.background='#22c55e';
+    setTimeout(()=>{btn.textContent='📦 Conferma carico';btn.style.background='';},1800);}
+
+  showToast('+'+qty+' '+item.unit+' '+item.code+' caricati','toast-return');
+  renderDashboard();
 };
 
 // ═══════════════════════════════════════
