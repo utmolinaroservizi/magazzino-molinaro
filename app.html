@@ -281,7 +281,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .qr-tool-btn{padding:12px;border:none;border-radius:var(--radius-sm);background:var(--brand-500);color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
 .qr-tool-btn.secondary{background:var(--bg-card);color:var(--brand-600);border:1px solid var(--brand-100)}
 .qr-tool-btn:active{transform:scale(.97)}
-.qr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.qr-grid{display:block;width:100%}
 .qr-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px;box-shadow:var(--shadow-xs)}
 .qr-box{display:flex;justify-content:center;align-items:center;min-height:80px;background:#fff;border-radius:6px;margin-bottom:5px}
 .qr-box canvas,.qr-box img{width:78px!important;height:78px!important}
@@ -413,6 +413,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div id="loading-screen"><img src="logo-molinaro.png" alt="Molinaro"><div class="loading-spinner"></div><div class="loading-text">Caricamento...</div></div>
@@ -609,6 +610,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="valore-label">Valore totale magazzino</div>
     <div class="valore-num" id="valore-num">—</div>
     <div class="valore-sub" id="valore-sub">Calcolato su prezzi disponibili</div>
+  </div>
+  <div class="resp-card">
+    <h3>💰 Valore economico magazzino</h3>
+    <p>Scarica un file Excel con due fogli: <strong>Valore Magazzino</strong> (giacenze e prezzi aggiornati ai carichi) e <strong>Carichi Ultimi 12 Mesi</strong> (tutte le operazioni di carica fatte dai responsabili).</p>
+    <button class="resp-btn resp-btn-green" onclick="exportValoreMagazzino()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Scarica Excel (2 fogli)
+    </button>
   </div>
   <div class="resp-card">
     <h3>📊 Report movimentazioni</h3>
@@ -1773,6 +1782,122 @@ window.clearAllLogs=async function(){
 // ═══════════════════════════════════════
 //  EXPORT
 // ═══════════════════════════════════════
+// ─────────────────────────────────────────────
+//  EXCEL VALORE MAGAZZINO (2 fogli)
+// ─────────────────────────────────────────────
+window.exportValoreMagazzino=function(){
+  if(typeof XLSX==='undefined'){
+    showToast('Libreria Excel non ancora caricata, riprova tra un istante','toast-danger');return;
+  }
+
+  const wb=XLSX.utils.book_new();
+
+  // ─── FOGLIO 1: Valore Magazzino ───────────
+  const f1rows=[];
+  f1rows.push(['VALORE MAGAZZINO MOLINARO ESCo']);
+  f1rows.push(['Generato il: '+new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})]);
+  f1rows.push([]); // riga vuota
+  f1rows.push(['Codice','Prodotto','Categoria','Sottocategoria','Giacenza','Unità','Prezzo €/un.','Valore Totale €']);
+
+  let totaleConPrezzi=0;
+  let totaleStimato=0;
+  let itemsNoPrezzi=0;
+
+  catOrder.forEach(cat=>{
+    if(cat==='Carburante') return;
+    const cfg=categories[cat];if(!cfg) return;
+    const items=getItemsByCat(cat);if(items.length===0) return;
+    items.forEach(it=>{
+      const prezzo=it.prezzo!=null?it.prezzo:null;
+      const valore=prezzo!=null?Math.round(prezzo*it.qty*100)/100:'';
+      if(prezzo!=null) totaleConPrezzi+=prezzo*it.qty;
+      else itemsNoPrezzi++;
+      f1rows.push([
+        it.code,
+        it.name,
+        cfg.label,
+        it.sub||'',
+        it.qty,
+        it.unit,
+        prezzo!=null?prezzo:'',
+        valore
+      ]);
+    });
+  });
+
+  f1rows.push([]);
+  f1rows.push(['','','','','','','TOTALE (con prezzi):',Math.round(totaleConPrezzi*100)/100]);
+  if(itemsNoPrezzi>0)
+    f1rows.push(['','','','','','','','⚠ '+itemsNoPrezzi+' prodotti senza prezzo non inclusi']);
+
+  const ws1=XLSX.utils.aoa_to_sheet(f1rows);
+
+  // Larghezze colonne foglio 1
+  ws1['!cols']=[
+    {wch:10},{wch:40},{wch:22},{wch:24},
+    {wch:10},{wch:8},{wch:14},{wch:16}
+  ];
+
+  // Merge cella titolo su 8 colonne
+  ws1['!merges']=[
+    {s:{r:0,c:0},e:{r:0,c:7}},
+    {s:{r:1,c:0},e:{r:1,c:7}},
+  ];
+
+  XLSX.utils.book_append_sheet(wb,ws1,'Valore Magazzino');
+
+  // ─── FOGLIO 2: Carichi Ultimi 12 Mesi ────
+  const f2rows=[];
+  f2rows.push(['OPERAZIONI DI CARICO — ULTIMI 12 MESI']);
+  const oggi=new Date();
+  const unAnnoFa=new Date(oggi);
+  unAnnoFa.setFullYear(unAnnoFa.getFullYear()-1);
+  f2rows.push(['Periodo: '+unAnnoFa.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})
+    +' → '+oggi.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})]);
+  f2rows.push([]);
+  f2rows.push(['Data','Ora','Codice','Prodotto','Categoria','Qty Caricata','Unità','Nuovo Prezzo €','Operatore']);
+
+  const carichi=actLog
+    .filter(e=>e.type==='load' && e.time>=unAnnoFa.getTime())
+    .sort((a,b)=>b.time-a.time);
+
+  if(carichi.length===0){
+    f2rows.push(['Nessun carico effettuato nel periodo']);
+  } else {
+    let totQtaPerCodice={};
+    carichi.forEach(e=>{
+      const d=new Date(e.time);
+      const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+      const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+      const item=itemsList.find(i=>i.id===e.itemId);
+      const catLabel=item?(categories[item.cat]?.label||item.cat):'';
+      const nuovoPrezzo=item?.prezzo!=null?item.prezzo:'';
+      f2rows.push([data,ora,e.code,e.name,catLabel,e.delta,item?.unit||'',nuovoPrezzo,e.operator||'N/D']);
+      totQtaPerCodice[e.code]=(totQtaPerCodice[e.code]||0)+e.delta;
+    });
+    f2rows.push([]);
+    f2rows.push(['','','','','Totale movimenti:',carichi.length]);
+  }
+
+  const ws2=XLSX.utils.aoa_to_sheet(f2rows);
+  ws2['!cols']=[
+    {wch:12},{wch:8},{wch:10},{wch:40},
+    {wch:22},{wch:14},{wch:8},{wch:14},{wch:20}
+  ];
+  ws2['!merges']=[
+    {s:{r:0,c:0},e:{r:0,c:8}},
+    {s:{r:1,c:0},e:{r:1,c:8}},
+  ];
+
+  XLSX.utils.book_append_sheet(wb,ws2,'Carichi Ultimi 12 Mesi');
+
+  // ─── Scarica ─────────────────────────────
+  const month=String(oggi.getMonth()+1).padStart(2,'0');
+  const filename=`Magazzino_Molinaro_${oggi.getFullYear()}-${month}.xlsx`;
+  XLSX.writeFile(wb,filename);
+  showToast('Excel scaricato — 2 fogli','toast-return');
+};
+
 window.exportExcel=function(){
   if(actLog.length===0){alert('Nessun movimento da esportare.');return}
   let csv='\uFEFF"Data","Ora","Codice","Prodotto","Categoria","Operazione","Quantità","Operatore"\n';
