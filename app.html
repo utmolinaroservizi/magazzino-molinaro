@@ -307,24 +307,82 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .qr-section-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:12px}
 
 @media(min-width:500px){.page{padding:24px;max-width:540px;margin:0 auto}}
+@page{size:A4 portrait;margin:8mm}
 @media print{
   .header,.nav,.fab,.fab-menu,.edit-toggle,.qr-tools,.scanner-box,#qr-new-badge{display:none!important}
-  body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .page{display:block!important;padding:0!important;max-width:none!important}
-  .page:not(#page-qrcode){display:none!important}
-  .qr-section-group{break-inside:avoid;margin-bottom:8px}
-  .qr-section-header{background:#f5f5f5!important;margin-bottom:6px;padding:6px 10px}
-  .qr-section-header-name{font-size:11px}
-  .qr-section-header-desc{font-size:8px}
-  .qr-sub-header{font-size:8px;margin-bottom:4px;padding:3px 6px}
-  .qr-section-grid{grid-template-columns:repeat(3,1fr)!important;gap:6px!important;margin-bottom:6px}
-  .qr-card{break-inside:avoid;box-shadow:none;padding:6px;border:1px solid #ccc}
-  .qr-card .qr-box{min-height:auto!important;margin-bottom:4px}
-  .qr-card .qr-box canvas,.qr-card .qr-box img{width:90px!important;height:90px!important}
-  .qr-code-label{font-size:9px!important;margin-bottom:2px}
-  .qr-name{font-size:8px!important}
-  .qr-cat{font-size:7px!important;margin-top:2px}
-  .qr-page-break{break-before:page}
+  body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;margin:0;padding:0}
+  .page{display:none!important;padding:0!important;max-width:none!important}
+  #page-qrcode{display:block!important;padding:0!important}
+
+  /* Sezione: header compatto, nessun break-inside forzato sul gruppo */
+  .qr-section-group{margin-bottom:3mm}
+  .qr-section-header{
+    background:#efefef!important;
+    border:none!important;border-left:3px solid #555!important;
+    padding:1.5mm 2mm!important;margin-bottom:2mm!important;
+    border-radius:0!important;
+    break-inside:avoid;page-break-inside:avoid;
+    display:flex!important;align-items:center!important;gap:2mm
+  }
+  .qr-section-header-icon{font-size:9px!important}
+  .qr-section-header-name{font-size:8px!important;font-weight:700!important}
+  .qr-section-header-desc{font-size:6px!important;margin-top:0!important}
+  .qr-sub-header{font-size:6.5px!important;padding:1mm 2mm!important;margin-bottom:2mm!important;border-left:2px solid #ccc!important}
+
+  /* Griglia: 3 colonne, gap minimale */
+  .qr-section-grid{
+    display:grid!important;
+    grid-template-columns:repeat(3,1fr)!important;
+    gap:2mm!important;
+    margin-bottom:2mm!important
+  }
+
+  /* Card: dimensione fissa, no overflow — 3col × 5file = 15 per pagina A4 */
+  .qr-card{
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+    box-shadow:none!important;
+    border:0.5pt solid #bbb!important;
+    border-radius:1.5mm!important;
+    padding:2mm!important;
+    background:#fff!important;
+    min-height:0!important;
+    height:49mm!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    box-sizing:border-box!important
+  }
+  /* "Nuovo" badge nascosto in stampa */
+  .qr-card div[style*="FFF3CD"]{display:none!important}
+
+  /* QR image: 32mm × 32mm */
+  .qr-card .qr-box{
+    min-height:0!important;
+    height:32mm!important;
+    width:32mm!important;
+    margin:0 auto 1mm!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex-shrink:0!important
+  }
+  .qr-card .qr-box canvas,
+  .qr-card .qr-box img{
+    width:30mm!important;
+    height:30mm!important;
+    display:block!important
+  }
+
+  /* Testi card */
+  .qr-code-label{font-size:6.5pt!important;font-weight:700!important;margin-bottom:0.5mm!important;letter-spacing:.03em!important;text-align:center!important}
+  .qr-name{font-size:5.5pt!important;line-height:1.2!important;font-weight:600!important;text-align:center!important;max-height:10mm!important;overflow:hidden!important;display:-webkit-box!important;-webkit-line-clamp:3!important;-webkit-box-orient:vertical!important}
+  .qr-cat{font-size:5pt!important;margin-top:0.5mm!important;color:#666!important;text-align:center!important}
+
+  /* Salto pagina esplicito */
+  .qr-page-break{break-before:page!important;page-break-before:always!important;height:0!important;display:block!important}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -1598,17 +1656,18 @@ window.renderQrPage=function(){
 
   // Group by category (and subcategory)
   let html='';
-  let totalItems=0;
+  let sectionIdx=0;
   catOrder.forEach(cat=>{
     if(cat==='Carburante') return;
     const cfg=categories[cat];if(!cfg) return;
     const ci=sorted.filter(it=>it.cat===cat);
     if(ci.length===0) return;
 
-    // Page break every 15 items (approx)
-    if(totalItems>0 && totalItems%15<3 && totalItems>12) html+='<div class="qr-page-break"></div>';
+    // Salto pagina prima di sezioni grandi (>9 prodotti), le piccole fluiscono
+    const pageBreak=(sectionIdx>0 && ci.length>9)?'<div class="qr-page-break"></div>':'';
+    sectionIdx++;
 
-    html+=`<div class="qr-section-group">
+    html+=`${pageBreak}<div class="qr-section-group">
       <div class="qr-section-header" style="border-left:4px solid ${cfg.color}">
         <div class="qr-section-header-icon">${cfg.icon}</div>
         <div class="qr-section-header-info">
@@ -1627,7 +1686,7 @@ window.renderQrPage=function(){
         subItems.forEach(it=>{
           const isNew=!it.qrPrinted;
           html+=renderQrCard(it,cfg,isNew);
-          totalItems++;
+
         });
         html+=`</div>`;
       });
@@ -1637,7 +1696,7 @@ window.renderQrPage=function(){
         html+=`<div class="qr-section-grid">`;
         unsub.forEach(it=>{
           html+=renderQrCard(it,cfg,!it.qrPrinted);
-          totalItems++;
+
         });
         html+=`</div>`;
       }
@@ -1645,7 +1704,6 @@ window.renderQrPage=function(){
       html+=`<div class="qr-section-grid">`;
       ci.forEach(it=>{
         html+=renderQrCard(it,cfg,!it.qrPrinted);
-        totalItems++;
       });
       html+=`</div>`;
     }
