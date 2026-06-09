@@ -161,6 +161,18 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .action-btn:active{transform:scale(.97)}
 .action-icon{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
 .action-label{font-size:12px;font-weight:600;line-height:1.3;text-align:center}
+
+/* COUNTER SELECTOR */
+.counter-zone{padding:16px 20px 4px;text-align:center}
+.counter-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-light);font-weight:600;margin-bottom:12px}
+.counter-row{display:flex;align-items:center;justify-content:center;gap:16px}
+.counter-btn{width:52px;height:52px;border-radius:50%;border:2px solid var(--border);background:var(--bg-card);font-size:24px;font-weight:700;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-family:inherit;user-select:none}
+.counter-btn:hover{background:var(--bg-surface);border-color:var(--brand-100)}
+.counter-btn:active{transform:scale(.9);background:var(--brand-50);border-color:var(--brand-500)}
+.counter-display{font-size:48px;font-weight:700;min-width:80px;line-height:1;font-variant-numeric:tabular-nums;color:var(--brand-500);letter-spacing:-2px;transition:transform .15s ease,opacity .15s ease}
+.counter-display.bump{transform:scale(1.12);opacity:.7}
+.counter-unit{font-size:12px;color:var(--text-muted);font-weight:500;margin-top:6px}
+.counter-step-hint{font-size:10px;color:var(--text-light);margin-top:4px;font-weight:500}
 .btn-take .action-icon{background:#FFF3D6;color:#9A6C1E}.btn-take .action-label{color:#9A6C1E}
 .btn-return .action-icon{background:var(--brand-50);color:var(--brand-500)}.btn-return .action-label{color:var(--brand-600)}
 .modal-close{display:block;width:calc(100% - 40px);margin:14px auto 0;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:var(--transition)}
@@ -475,14 +487,24 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Operatore: <strong id="fm-operator-name">—</strong>
     </div>
+    <div class="counter-zone">
+      <div class="counter-label">Litri da movimentare</div>
+      <div class="counter-row">
+        <button class="counter-btn" onclick="adjustFuelCounter(-1)">−</button>
+        <div class="counter-display" id="fm-counter" style="color:#9A6C1E">5</div>
+        <button class="counter-btn" onclick="adjustFuelCounter(+1)">+</button>
+      </div>
+      <div class="counter-unit">litri</div>
+      <div class="counter-step-hint">Passo: 5 litri</div>
+    </div>
     <div class="fuel-actions">
-      <button class="fuel-action-btn fuel-take" onclick="doFuelAdjust(-5)">
-        <div class="fa-icon">−5</div>
-        <div class="fa-label">Prelievo<br>carburante</div>
+      <button class="fuel-action-btn fuel-take" onclick="doFuelAdjust(-1)">
+        <div class="fa-icon">📤</div>
+        <div class="fa-label" id="fm-take-label">Preleva 5 lt</div>
       </button>
-      <button class="fuel-action-btn fuel-return" onclick="doFuelAdjust(+5)">
-        <div class="fa-icon">+5</div>
-        <div class="fa-label">Reinserimento<br>carburante</div>
+      <button class="fuel-action-btn fuel-return" onclick="doFuelAdjust(+1)">
+        <div class="fa-icon">📥</div>
+        <div class="fa-label" id="fm-return-label">Reinserisci 5 lt</div>
       </button>
     </div>
     <button class="modal-close" onclick="closeFuelModal()">Chiudi</button>
@@ -559,14 +581,24 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Operatore: <strong id="modal-operator-name">—</strong>
     </div>
+    <div class="counter-zone">
+      <div class="counter-label">Quantità da movimentare</div>
+      <div class="counter-row">
+        <button class="counter-btn" onclick="adjustCounter(-1)">−</button>
+        <div class="counter-display" id="m-counter">1</div>
+        <button class="counter-btn" onclick="adjustCounter(+1)">+</button>
+      </div>
+      <div class="counter-unit" id="m-counter-unit">pezzi</div>
+      <div class="counter-step-hint" id="m-counter-hint"></div>
+    </div>
     <div class="modal-actions">
       <button class="action-btn btn-take" onclick="doAdjust(-1)">
-        <div class="action-icon">−</div>
-        <div class="action-label">Preso dal<br>magazzino</div>
+        <div class="action-icon">📤</div>
+        <div class="action-label" id="m-take-label">Preleva</div>
       </button>
       <button class="action-btn btn-return" onclick="doAdjust(+1)">
-        <div class="action-icon">+</div>
-        <div class="action-label">Rimesso in<br>magazzino</div>
+        <div class="action-icon">📥</div>
+        <div class="action-label" id="m-return-label">Reinserisci</div>
       </button>
     </div>
     <button class="modal-close" onclick="closeModal()">Chiudi</button>
@@ -611,6 +643,8 @@ let currentModalItem = null;
 let fabOpen        = false;
 let html5QrCodeInstance = null;
 let priceEditOpen  = false;
+let counterVal     = 1;
+let counterStep    = 1;
 
 const PALETTE = [
   {color:'#2c5f87',bg:'#e8f0f7'},{color:'#5e7236',bg:'#eef2e6'},{color:'#a8780a',bg:'#fbf2dc'},
@@ -676,9 +710,9 @@ const DEFAULT_ITEMS = [
   ["ALIMENTATORI MW 40H-48V","Illuminazione",8,"pz","IL.040",22.0,"Alimentatori"],
   ["ALIMENTATORI MW 60H-36V","Illuminazione",3,"pz","IL.041",24.0,"Alimentatori"],
   // === CAVIDOTTI ===
-  ["CAVIDOTTO CORRUGATO \u03c6 63 (50 m)","Cavidotti",17,"mat","SA.001",55.0],
-  ["CAVIDOTTO CORRUGATO \u03c6 40","Cavidotti",4,"mat","SA.002",40.0],
-  ["CAVIDOTTO CORRUGATO \u03c6 50","Cavidotti",1,"mat","SA.003",47.0],
+  ["CAVIDOTTO CORRUGATO \u03c6 63 (50 m)","Cavidotti",850,"m","SA.001",1.1,null,10],
+  ["CAVIDOTTO CORRUGATO \u03c6 40","Cavidotti",200,"m","SA.002",0.8,null,10],
+  ["CAVIDOTTO CORRUGATO \u03c6 50","Cavidotti",50,"m","SA.003",0.94,null,10],
   // === CLS ===
   ["TUBO IN CLS \u03c6 200","CLS",13,"pz","SA.004",8.0],
   ["CHIUSINI IN CLS 30X30","CLS",13,"pz","SA.005",6.0],
@@ -718,30 +752,30 @@ const DEFAULT_ITEMS = [
   ["CAVO FG16(O)R16 4X4","Cavi",0,"m","CV.004",2.97],
   ["CORDA ACCIAIO  ZINCATO 4 MM","Cavi",230,"m","CV.005",0.44],
   ["CORDA ACCIAIO  5 MM","Cavi",200,"m","CV.006",0.52],
-  ["CAVO UNIPOLARE 1X1,5 FS17 GIALLO VERDE","Cavi",5,"mat","CV.007",28.98],
-  ["CAVO UNIPOLARE 1X1,5 FS17 BLU","Cavi",4,"mat","CV.008",19.49],
-  ["CAVO UNIPOLARE 1X1,5 FS17 MARRONE","Cavi",4,"mat","CV.009",19.49],
-  ["CAVO UNIPOLARE 1X1,5 FS17 GRIGIO","Cavi",2,"mat","CV.010",19.49],
-  ["CAVO UNIPOLARE 1X1,5 FS17 NERO","Cavi",3,"mat","CV.011",19.49],
-  ["CAVO UNIPOLARE 1X1,5 FS17 BIANCO","Cavi",2,"mat","CV.012",19.49],
-  ["CAVO UNIPOLARE 1X1,5 FS17 ROSA","Cavi",3,"mat","CV.013",19.49],
-  ["CAVO UNIPOLARE 1X1,5 FS17 ARANCIONE","Cavi",3,"mat","CV.014",19.49],
-  ["CAVO UNIPOLARE 1X1,5 FS17 FUCSIA","Cavi",1,"mat","CV.015",19.49],
-  ["CAVO UNIPOLARE 1X1 FS17 ROSSO","Cavi",1,"mat","CV.016",28.98],
-  ["CAVO UNIPOLARE 1X2,5 FS17 MARRONE","Cavi",4,"mat","CV.017",31.8],
-  ["CAVO UNIPOLARE 1X2,5 FS17 BLU","Cavi",1,"mat","CV.018",31.8],
-  ["CAVO UNIPOLARE 1X2,5 FS17 GRIGIO","Cavi",5,"mat","CV.019",31.8],
-  ["CAVO UNIPOLARE 1X2,5 FS17 BIANCO","Cavi",6,"mat","CV.020",31.8],
-  ["CAVO UNIPOLARE 1X4 FS17 BLU","Cavi",6,"mat","CV.021",50.41],
-  ["CAVO UNIPOLARE 1X4 FS17 GIALLO VERDE","Cavi",2,"mat","CV.022",50.41],
-  ["CAVO UNIPOLARE 1X4 FS17 MARRONE","Cavi",2,"mat","CV.023",50.41],
-  ["CAVO UNIPOLARE 1X4 FS17 NERA","Cavi",1,"mat","CV.024",50.41],
-  ["CAVO VIDEOCITOFONO","Cavi",1,"mat","CV.025",360.0],
-  ["CAVO 2X0,50 \\\"PIATTINA\\\"","Cavi",3,"mat","CV.026",25.09],
-  ["CAVO UNIPOLARE 1X10 FS17 BLU","Cavi",1,"mat","CV.027",148.78],
-  ["CAVO UNIPOLARE 1X10 FS17 GRIGIO","Cavi",1,"mat","CV.028",148.78],
-  ["CAVO UNIPOLARE 1X10 FS17 MARRONE","Cavi",1,"mat","CV.029",148.78],
-  ["CAVO UNIPOLARE 1X10 FS17 GIALLO VERDE","Cavi",1,"mat","CV.030",148.78],
+  ["CAVO UNIPOLARE 1X1,5 FS17 GIALLO VERDE","Cavi",500,"m","CV.007",0.29,null,10],
+  ["CAVO UNIPOLARE 1X1,5 FS17 BLU","Cavi",400,"m","CV.008",0.19,null,10],
+  ["CAVO UNIPOLARE 1X1,5 FS17 MARRONE","Cavi",400,"m","CV.009",0.19,null,10],
+  ["CAVO UNIPOLARE 1X1,5 FS17 GRIGIO","Cavi",200,"m","CV.010",0.19,null,10],
+  ["CAVO UNIPOLARE 1X1,5 FS17 NERO","Cavi",300,"m","CV.011",0.19,null,10],
+  ["CAVO UNIPOLARE 1X1,5 FS17 BIANCO","Cavi",200,"m","CV.012",0.19,null,10],
+  ["CAVO UNIPOLARE 1X1,5 FS17 ROSA","Cavi",300,"m","CV.013",0.19,null,10],
+  ["CAVO UNIPOLARE 1X1,5 FS17 ARANCIONE","Cavi",300,"m","CV.014",0.19,null,10],
+  ["CAVO UNIPOLARE 1X1,5 FS17 FUCSIA","Cavi",100,"m","CV.015",0.19,null,10],
+  ["CAVO UNIPOLARE 1X1 FS17 ROSSO","Cavi",100,"m","CV.016",0.29,null,10],
+  ["CAVO UNIPOLARE 1X2,5 FS17 MARRONE","Cavi",400,"m","CV.017",0.32,null,10],
+  ["CAVO UNIPOLARE 1X2,5 FS17 BLU","Cavi",100,"m","CV.018",0.32,null,10],
+  ["CAVO UNIPOLARE 1X2,5 FS17 GRIGIO","Cavi",500,"m","CV.019",0.32,null,10],
+  ["CAVO UNIPOLARE 1X2,5 FS17 BIANCO","Cavi",600,"m","CV.020",0.32,null,10],
+  ["CAVO UNIPOLARE 1X4 FS17 BLU","Cavi",600,"m","CV.021",0.5,null,10],
+  ["CAVO UNIPOLARE 1X4 FS17 GIALLO VERDE","Cavi",200,"m","CV.022",0.5,null,10],
+  ["CAVO UNIPOLARE 1X4 FS17 MARRONE","Cavi",200,"m","CV.023",0.5,null,10],
+  ["CAVO UNIPOLARE 1X4 FS17 NERA","Cavi",100,"m","CV.024",0.5,null,10],
+  ["CAVO VIDEOCITOFONO","Cavi",100,"m","CV.025",3.6,null,10],
+  ["CAVO 2X0,50 \\\"PIATTINA\\\"","Cavi",300,"m","CV.026",0.25,null,10],
+  ["CAVO UNIPOLARE 1X10 FS17 BLU","Cavi",100,"m","CV.027",1.49,null,10],
+  ["CAVO UNIPOLARE 1X10 FS17 GRIGIO","Cavi",100,"m","CV.028",1.49,null,10],
+  ["CAVO UNIPOLARE 1X10 FS17 MARRONE","Cavi",100,"m","CV.029",1.49,null,10],
+  ["CAVO UNIPOLARE 1X10 FS17 GIALLO VERDE","Cavi",100,"m","CV.030",1.49,null,10],
   ["CAVO 2X4,5 mmq","Cavi",100,"m","CV.031",1.41],
   ["CAVO 3X1,5 MARRONE","Cavi",80,"m","CV.032",0.67],
   ["CAVO 3X1 MARRONE","Cavi",80,"m","CV.033",4.83],
@@ -885,11 +919,11 @@ async function initDefaultData(){
   catOrder=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   for(const [id,data] of Object.entries(categories)) batch.set(doc(db,'categorie',id),data);
   itemsList=[];
-  DEFAULT_ITEMS.forEach(([name,cat,qty,unit,code,prezzo,sub])=>{
+  DEFAULT_ITEMS.forEach(([name,cat,qty,unit,code,prezzo,sub,step])=>{
     const id=genId();
-    const item={id,name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null,sub:sub||null};
+    const item={id,name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null,sub:sub||null,step:step||1};
     itemsList.push(item);
-    batch.set(doc(db,'inventario',id),{name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null,sub:sub||null});
+    batch.set(doc(db,'inventario',id),{name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null,sub:sub||null,step:step||1});
   });
   await batch.commit();actLog=[];
   showToast('Dati iniziali caricati!','toast-return');
@@ -971,7 +1005,30 @@ async function migrateV2(){
     }
   });
 
-  // 5) Crea voci carburante (se non esistono già)
+  // 5) Converti matasse → metri
+  // Cavidotti: 1 matassa = 50 m
+  const mat50=new Set(['SA.001','SA.002','SA.003']);
+  // Cavi unipolari: 1 matassa = 100 m
+  const mat100=new Set();
+  for(let i=7;i<=30;i++) mat100.add('CV.'+String(i).padStart(3,'0'));
+
+  let convertedCount=0;
+  itemsList.forEach(it=>{
+    if(it.unit!=='mat') return;
+    let factor=0;
+    if(mat50.has(it.code)) factor=50;
+    else if(mat100.has(it.code)) factor=100;
+    if(factor===0) return;
+    it.qty=it.qty*factor;
+    if(it.prezzo!=null) it.prezzo=Math.round((it.prezzo/factor)*100)/100;
+    it.unit='m';
+    it.step=10;
+    const{id,...data}=it;
+    batch.set(doc(db,'inventario',id),data);
+    convertedCount++;
+  });
+
+  // 6) Crea voci carburante (se non esistono già)
   if(!itemsList.find(i=>i.code==='CB.001')){
     const id1=genId();
     const nafta={id:id1,name:'NAFTA',cat:'Carburante',qty:0,unit:'lt',code:'CB.001',prezzo:1.93,sub:null};
@@ -989,8 +1046,8 @@ async function migrateV2(){
   catOrder=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
 
   await batch.commit();
-  console.log('[MIGRAZIONE v2] Completata. Spostati '+movedCount+' prodotti.');
-  showToast('Migrazione completata! '+movedCount+' prodotti riorganizzati','toast-return');
+  console.log('[MIGRAZIONE v2] Completata. Spostati '+movedCount+' prodotti, convertite '+convertedCount+' matasse in metri.');
+  showToast('Migrazione completata! '+movedCount+' spostati, '+convertedCount+' convertiti in metri','toast-return');
 }
 
 // ═══════════════════════════════════════
@@ -1207,6 +1264,11 @@ window.openModal=function(id){
   const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili',lt:'litri disponibili'};
   document.getElementById('m-unit').textContent=um[item.unit]||'disponibili';
 
+  // Inizializza contatore
+  counterStep=item.step||1;
+  counterVal=counterStep;
+  updateCounterDisplay();
+
   // Sezione prezzi: solo responsabili
   const priceZone=document.getElementById('modal-price-zone');
   if(isResp()){
@@ -1219,6 +1281,25 @@ window.openModal=function(id){
 
   document.getElementById('modal-backdrop').classList.add('open');
   document.body.style.overflow='hidden';
+};
+
+function updateCounterDisplay(){
+  const el=document.getElementById('m-counter');
+  el.textContent=counterVal;
+  el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
+  const unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
+  const un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
+  document.getElementById('m-counter-unit').textContent=un;
+  document.getElementById('m-counter-hint').textContent=counterStep>1?'Passo: '+counterStep+' '+un:'';
+  document.getElementById('m-take-label').innerHTML='Preleva<br><b>'+counterVal+' '+un+'</b>';
+  document.getElementById('m-return-label').innerHTML='Reinserisci<br><b>'+counterVal+' '+un+'</b>';
+}
+
+window.adjustCounter=function(dir){
+  const newVal=counterVal+(dir*counterStep);
+  if(newVal<counterStep) return;
+  counterVal=newVal;
+  updateCounterDisplay();
 };
 
 function renderPriceSection(item){
@@ -1258,19 +1339,26 @@ window.closeModal=function(e){
   document.getElementById('modal-backdrop').classList.remove('open');
   document.body.style.overflow='';currentModalItem=null;priceEditOpen=false;
 };
-window.doAdjust=async function(delta){
+window.doAdjust=async function(sign){
   if(!currentModalItem) return;
-  const next=Math.max(0,currentModalItem.qty+delta);
-  if(next===currentModalItem.qty&&delta<0) return;
+  const amount=counterVal*sign;
+  const next=Math.max(0,currentModalItem.qty+amount);
+  if(next===currentModalItem.qty&&sign<0) return;
+  const actualDelta=next-currentModalItem.qty;
   currentModalItem.qty=next;
   await saveItem(currentModalItem);
-  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta,prevQty:next-delta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now()};
+  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now()};
   await saveMovimento(entry);
   document.getElementById('m-qty').textContent=next;
   if(isResp()) renderPriceSection(currentModalItem);
   const qe=document.getElementById('m-qty');qe.style.transform='scale(1.15)';setTimeout(()=>qe.style.transform='scale(1)',200);
-  const cls=delta<0?'toast-take':'toast-return';
-  showToast((delta<0?'−1 ':'+ 1 ')+currentModalItem.code+' · '+currentUser.nome,cls);
+  const cls=actualDelta<0?'toast-take':'toast-return';
+  const unitNames={pz:'pz',m:'m',kit:'kit',mat:'mat',conf:'conf',lt:'lt'};
+  const un=unitNames[currentModalItem.unit]||'';
+  showToast((actualDelta<0?'−':'+ ')+Math.abs(actualDelta)+' '+un+' '+currentModalItem.code+' · '+currentUser.nome,cls);
+  // Reset contatore
+  counterVal=counterStep;
+  updateCounterDisplay();
 };
 
 // ═══════════════════════════════════════
@@ -1357,7 +1445,7 @@ window.openAddProductForm=function(preCat){
     <div class="form-group"><label>Nome prodotto</label><input id="fp-name" placeholder="es. LAMPADA LED 50W"></div>
     <div class="form-row">
       <div class="form-group"><label>Quantità iniziale</label><input id="fp-qty" type="number" min="0" value="0"></div>
-      <div class="form-group"><label>Unità</label><select id="fp-unit"><option value="pz">Pezzi</option><option value="m">Metri</option><option value="kit">Kit</option><option value="mat">Matasse</option><option value="conf">Confezioni</option><option value="lt">Litri</option></select></div>
+      <div class="form-group"><label>Unità</label><select id="fp-unit"><option value="pz">Pezzi</option><option value="m">Metri</option><option value="kit">Kit</option><option value="conf">Confezioni</option><option value="lt">Litri</option></select></div>
     </div>
     <div class="form-group"><label>Prezzo unitario (€) — opzionale</label><input id="fp-price" type="number" min="0" step="0.01" placeholder="0.00"></div>
     <div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" onclick="submitProduct()">Aggiungi</button></div>`;
@@ -1385,12 +1473,13 @@ window.submitProduct=async function(){
   const prezzo=isNaN(priceRaw)||priceRaw<=0?null:Math.round(priceRaw*100)/100;
   const subEl=document.getElementById('fp-sub');
   const sub=subEl&&subEl.value?subEl.value:null;
+  const step=unit==='m'?10:1;
   if(!cat){alert('Seleziona una categoria');return}
   if(!name){alert('Inserisci un nome');return}
   const cfg=categories[cat];
   const code=nextCodeForCat(cat);
   const id=genId();
-  const item={id,name,cat,qty,unit,code,prezzo,sub};
+  const item={id,name,cat,qty,unit,code,prezzo,sub,step};
   itemsList.push(item);await saveItem(item);closeForm();openCats[cat]=true;
   renderMateriali();renderDashboard();showToast('Prodotto '+code+' aggiunto','toast-info');
 };
@@ -1643,8 +1732,25 @@ function handleUrlProductCode(){
 // ═══════════════════════════════════════
 let currentFuelItem=null;
 let fuelPriceEditOpen=false;
+let fuelCounterVal=5;
+const FUEL_STEP=5;
 
 function getFuelItems(){return itemsList.filter(i=>i.cat==='Carburante')}
+
+function updateFuelCounterDisplay(){
+  const el=document.getElementById('fm-counter');
+  el.textContent=fuelCounterVal;
+  el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
+  document.getElementById('fm-take-label').innerHTML='Preleva<br><b>'+fuelCounterVal+' lt</b>';
+  document.getElementById('fm-return-label').innerHTML='Reinserisci<br><b>'+fuelCounterVal+' lt</b>';
+}
+
+window.adjustFuelCounter=function(dir){
+  const newVal=fuelCounterVal+(dir*FUEL_STEP);
+  if(newVal<FUEL_STEP) return;
+  fuelCounterVal=newVal;
+  updateFuelCounterDisplay();
+};
 
 function renderCarburante(){
   const fuels=getFuelItems();
@@ -1691,10 +1797,12 @@ function renderCarburante(){
 window.openFuelModal=function(id){
   const item=itemsList.find(i=>i.id===id);if(!item) return;
   currentFuelItem=item;fuelPriceEditOpen=false;
+  fuelCounterVal=FUEL_STEP;
   document.getElementById('fm-code').textContent=item.code;
   document.getElementById('fm-name').textContent=item.name;
   document.getElementById('fm-qty').textContent=item.qty;
   document.getElementById('fm-operator-name').textContent=currentUser.nome;
+  updateFuelCounterDisplay();
   const priceZone=document.getElementById('fuel-price-zone');
   if(isResp()){
     priceZone.classList.add('visible');
@@ -1715,13 +1823,15 @@ window.closeFuelModal=function(e){
   document.body.style.overflow='';currentFuelItem=null;fuelPriceEditOpen=false;
 };
 
-window.doFuelAdjust=async function(delta){
+window.doFuelAdjust=async function(sign){
   if(!currentFuelItem) return;
-  const next=Math.max(0,currentFuelItem.qty+delta);
-  if(next===currentFuelItem.qty&&delta<0) return;
+  const amount=fuelCounterVal*sign;
+  const next=Math.max(0,currentFuelItem.qty+amount);
+  if(next===currentFuelItem.qty&&sign<0) return;
+  const actualDelta=next-currentFuelItem.qty;
   currentFuelItem.qty=next;
   await saveItem(currentFuelItem);
-  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta,prevQty:next-delta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now()};
+  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now()};
   await saveMovimento(entry);
   document.getElementById('fm-qty').textContent=next;
   if(isResp()){
@@ -1730,8 +1840,10 @@ window.doFuelAdjust=async function(delta){
     document.getElementById('fm-price-total').textContent=tot!=null?'Valore: '+fmtPrice(tot):'';
   }
   const qe=document.getElementById('fm-qty');qe.style.transform='scale(1.15)';setTimeout(()=>qe.style.transform='scale(1)',200);
-  const cls=delta<0?'toast-take':'toast-return';
-  showToast((delta<0?'−':'+ ')+Math.abs(delta)+' lt '+currentFuelItem.name+' · '+currentUser.nome,cls);
+  const cls=actualDelta<0?'toast-take':'toast-return';
+  showToast((actualDelta<0?'−':'+ ')+Math.abs(actualDelta)+' lt '+currentFuelItem.name+' · '+currentUser.nome,cls);
+  fuelCounterVal=FUEL_STEP;
+  updateFuelCounterDisplay();
 };
 
 window.toggleFuelPriceEdit=function(){
