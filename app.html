@@ -1969,9 +1969,9 @@ window.downloadPdfQr=async function(){
   const PAGE_W=210,PAGE_H=297,MX=10,MY=10;
   const COLS=4, GAP=3;
   const CARD_W=(PAGE_W-MX*2-GAP*(COLS-1))/COLS;  // ~45.25mm
-  const QR_MM =CARD_W-4;     // ~41mm, con 2mm bordo per lato
-  const NAME_H=16;            // spazio testo sotto QR (codice + nome)
-  const CARD_H=QR_MM+NAME_H; // ~57mm totale
+  const QR_MM =CARD_W-6;     // ~39mm — leggermente più piccolo per dare spazio al testo
+  const NAME_H=22;            // spazio testo sotto QR (aumentato per font più grandi)
+  const CARD_H=QR_MM+NAME_H; // ~61mm totale
   const SEC_H =8;             // altezza header sezione
 
   let curX=MX,curY=MY,col=0;
@@ -2047,18 +2047,18 @@ window.downloadPdfQr=async function(){
       doc.addImage(qrDataUrl,'PNG',qrX,cy+2,QR_MM,QR_MM);
     }
 
-    // Codice (grassetto colorato, più grande)
+    // Codice (grassetto colorato, ben leggibile)
     doc.setFont('helvetica','bold');
-    doc.setFontSize(8.5);
+    doc.setFontSize(10);
     doc.setTextColor(cr,cg,cb);
-    doc.text(it.code,cx+CARD_W/2,cy+QR_MM+5,{align:'center'});
+    doc.text(it.code,cx+CARD_W/2,cy+QR_MM+6,{align:'center'});
 
-    // Nome prodotto (normale, leggibile)
+    // Nome prodotto (grande, chiaro per gli operai)
     doc.setFont('helvetica','normal');
-    doc.setFontSize(6.5);
-    doc.setTextColor(40,40,40);
+    doc.setFontSize(8.5);
+    doc.setTextColor(30,30,30);
     const lines=doc.splitTextToSize(s(it.name),CARD_W-3);
-    doc.text(lines.slice(0,3),cx+CARD_W/2,cy+QR_MM+9,{align:'center',lineHeightFactor:1.3});
+    doc.text(lines.slice(0,3),cx+CARD_W/2,cy+QR_MM+11,{align:'center',lineHeightFactor:1.35});
 
     nextCell();
   }
