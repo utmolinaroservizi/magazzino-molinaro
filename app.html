@@ -261,8 +261,59 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .scan-open-btn{display:block;width:100%;margin-top:10px;padding:13px;background:var(--brand-500);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:var(--shadow-brand)}
 .scan-open-btn:active{transform:scale(.97)}
 
+/* SUBCATEGORY */
+.sub-header{display:flex;align-items:center;gap:8px;padding:10px 14px 6px;margin-top:8px}
+.sub-header-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sub-header-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.sub-header-line{flex:1;height:1px;background:var(--border)}
+
+/* CARBURANTE */
+.fuel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.fuel-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;text-align:center;box-shadow:var(--shadow-sm);cursor:pointer;transition:var(--transition)}
+.fuel-card:active{transform:scale(.97)}
+.fuel-card-icon{font-size:36px;margin-bottom:8px}
+.fuel-card-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.fuel-card-qty{font-size:38px;font-weight:700;line-height:1;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;margin:10px 0 4px}
+.fuel-card-unit{font-size:11px;color:var(--text-light);font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+.fuel-card-price{font-size:11px;color:var(--text-muted);margin-top:6px;font-weight:600}
+.fuel-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 0 0}
+.fuel-action-btn{border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:var(--transition);font-family:inherit;background:var(--bg-card)}
+.fuel-action-btn:active{transform:scale(.97)}
+.fuel-action-btn .fa-icon{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700}
+.fuel-action-btn .fa-label{font-size:12px;font-weight:600;line-height:1.3;text-align:center}
+.fuel-take .fa-icon{background:#FFF3D6;color:#9A6C1E}.fuel-take .fa-label{color:#9A6C1E}
+.fuel-return .fa-icon{background:var(--brand-50);color:var(--brand-500)}.fuel-return .fa-label{color:var(--brand-600)}
+
+/* QR PRINT SECTIONS */
+.qr-section-group{margin-bottom:20px}
+.qr-section-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px}
+.qr-section-header-icon{font-size:18px}
+.qr-section-header-info{flex:1}
+.qr-section-header-name{font-size:13px;font-weight:700}
+.qr-section-header-desc{font-size:10px;color:var(--text-muted);margin-top:2px;font-weight:500}
+.qr-sub-header{font-size:10px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.08em;padding:6px 8px;margin-bottom:6px;border-left:3px solid var(--border)}
+.qr-section-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:12px}
+
 @media(min-width:500px){.page{padding:24px;max-width:540px;margin:0 auto}}
-@media print{.header,.nav,.fab,.fab-menu,.edit-toggle,.qr-tools,.scanner-box{display:none!important}body{background:#fff!important}.page{display:block!important;padding:0!important;max-width:none!important}.page:not(#page-qrcode){display:none!important}.qr-grid{grid-template-columns:repeat(3,1fr);gap:10px}.qr-card{break-inside:avoid;box-shadow:none}}
+@media print{
+  .header,.nav,.fab,.fab-menu,.edit-toggle,.qr-tools,.scanner-box,#qr-new-badge{display:none!important}
+  body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page{display:block!important;padding:0!important;max-width:none!important}
+  .page:not(#page-qrcode){display:none!important}
+  .qr-section-group{break-inside:avoid;margin-bottom:8px}
+  .qr-section-header{background:#f5f5f5!important;margin-bottom:6px;padding:6px 10px}
+  .qr-section-header-name{font-size:11px}
+  .qr-section-header-desc{font-size:8px}
+  .qr-sub-header{font-size:8px;margin-bottom:4px;padding:3px 6px}
+  .qr-section-grid{grid-template-columns:repeat(3,1fr)!important;gap:6px!important;margin-bottom:6px}
+  .qr-card{break-inside:avoid;box-shadow:none;padding:6px;border:1px solid #ccc}
+  .qr-card .qr-box{min-height:auto!important;margin-bottom:4px}
+  .qr-card .qr-box canvas,.qr-card .qr-box img{width:90px!important;height:90px!important}
+  .qr-code-label{font-size:9px!important;margin-bottom:2px}
+  .qr-name{font-size:8px!important}
+  .qr-cat{font-size:7px!important;margin-top:2px}
+  .qr-page-break{break-before:page}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -297,6 +348,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   <button class="nav-btn" onclick="showPage('qrcode')" id="nav-qrcode">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h2v2h-2zM18 14h3M14 18h3M19 18h2v3h-3"/></svg>
     QR
+  </button>
+  <button class="nav-btn" onclick="showPage('carburante')" id="nav-carburante">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M3 22V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17"/><path d="M15 10h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V9l-3-3"/><rect x="6" y="7" width="6" height="5" rx="1"/></svg>
+    Carburante
   </button>
   <button class="nav-btn hidden" onclick="showPage('responsabile')" id="nav-resp">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -371,6 +426,66 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <div id="qr-new-list" style="padding:0 14px 10px"></div>
     </div>
     <div class="qr-grid" id="qr-grid"></div>
+  </div>
+</div>
+
+<!-- CARBURANTE -->
+<div class="page" id="page-carburante">
+  <div class="hero">
+    <div class="hero-eyebrow">Gestione · Carburante</div>
+    <div class="hero-title" style="font-size:18px">⛽ Carburante</div>
+    <div class="hero-meta" id="fuel-hero-meta">Nafta e Benzina</div>
+  </div>
+  <div class="section-label">Scorte attuali</div>
+  <div class="fuel-grid" id="fuel-grid"></div>
+  <div class="section-label">Movimenti recenti carburante</div>
+  <div id="fuel-log-container"></div>
+</div>
+
+<!-- FUEL MODAL -->
+<div class="modal-backdrop" id="fuel-modal-backdrop" onclick="closeFuelModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-top">
+      <span class="modal-cat-badge" id="fm-badge" style="background:#FFF3D6;color:#9A6C1E">Carburante</span>
+      <div class="modal-product-code" id="fm-code"></div>
+      <div class="modal-product-name" id="fm-name"></div>
+    </div>
+    <div class="modal-qty-zone">
+      <div class="modal-qty-label">Litri disponibili</div>
+      <div class="modal-qty-num" id="fm-qty" style="color:#9A6C1E">0</div>
+      <div class="modal-qty-unit-text">litri</div>
+    </div>
+    <div class="modal-price-zone" id="fuel-price-zone">
+      <div class="modal-price-row">
+        <div>
+          <div class="modal-price-label">Prezzo unitario</div>
+          <div class="modal-price-val" id="fm-price-val">—</div>
+          <div class="modal-price-total" id="fm-price-total"></div>
+        </div>
+        <button class="modal-price-edit-btn" onclick="toggleFuelPriceEdit()">✏️ Modifica</button>
+      </div>
+      <div class="modal-price-input-row" id="fuel-price-input-row">
+        <input type="number" class="modal-price-input" id="fuel-price-input" step="0.01" min="0" placeholder="0.00">
+        <button class="modal-price-save" onclick="saveFuelPrice()">Salva</button>
+        <button class="modal-price-cancel" onclick="toggleFuelPriceEdit()">✕</button>
+      </div>
+    </div>
+    <div class="modal-operator-info">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Operatore: <strong id="fm-operator-name">—</strong>
+    </div>
+    <div class="fuel-actions">
+      <button class="fuel-action-btn fuel-take" onclick="doFuelAdjust(-5)">
+        <div class="fa-icon">−5</div>
+        <div class="fa-label">Prelievo<br>carburante</div>
+      </button>
+      <button class="fuel-action-btn fuel-return" onclick="doFuelAdjust(+5)">
+        <div class="fa-icon">+5</div>
+        <div class="fa-label">Reinserimento<br>carburante</div>
+      </button>
+    </div>
+    <button class="modal-close" onclick="closeFuelModal()">Chiudi</button>
   </div>
 </div>
 
@@ -506,49 +621,72 @@ const PALETTE = [
 const ICONS = ['💡','🔩','🔌','⚡','☀️','🏠','🔧','📦','🛠️','🏗️'];
 
 const DEFAULT_CATS = {
-  "Illuminazione":          {prefix:"IL",label:"Illuminazione",          icon:"💡",color:"#2c5f87",bg:"#e8f0f7"},
+  "Illuminazione":          {prefix:"IL",label:"Illuminazione",          icon:"💡",color:"#2c5f87",bg:"#e8f0f7",subs:["Corpi Illuminanti","Alimentatori"]},
   "Sostegni e Accessori":   {prefix:"SA",label:"Sostegni e Accessori",   icon:"🔩",color:"#5e7236",bg:"#eef2e6"},
+  "Cavidotti":              {prefix:"CD",label:"Cavidotti",              icon:"🔧",color:"#6b5e36",bg:"#f5f0e2"},
+  "CLS":                    {prefix:"CL",label:"CLS",                   icon:"🏗️",color:"#4a6b72",bg:"#e4eff2"},
   "Cavi":                   {prefix:"CV",label:"Cavi",                   icon:"🔌",color:"#a8780a",bg:"#fbf2dc"},
   "Materiale Elettrico":    {prefix:"ME",label:"Materiale Elettrico",    icon:"⚡",color:"#823560",bg:"#f7e8f0"},
-  "Fotovoltaico":           {prefix:"FV",label:"Fotovoltaico",           icon:"☀️",color:"#553687",bg:"#ede6f7"},
+  "Fotovoltaico":           {prefix:"FV",label:"Fotovoltaico",           icon:"☀️",color:"#553687",bg:"#ede6f7",subs:["Impiantistica Fotovoltaica","Lampioni Fotovoltaici"]},
   "Accessori e Consumabili":{prefix:"AC",label:"Accessori e Consumabili",icon:"📦",color:"#2f8472",bg:"#e6f3f0"},
+  "Carburante":             {prefix:"CB",label:"Carburante",             icon:"⛽",color:"#8e5c3d",bg:"#f7f0eb"},
 };
 
 const DEFAULT_ITEMS = [
-  ["PHAENOMENA  phLuminaELP2XS57 W","Illuminazione",20,"pz","IL.001",79.85],
-  ["PHAENOMENA PHWOW 120 W PV","Illuminazione",1,"pz","IL.002",599.85],
-  ["EULUX EVION 40 30W","Illuminazione",25,"pz","IL.003",88.55],
-  ["EULUX EVION 40 40W","Illuminazione",8,"pz","IL.004",88.55],
-  ["EULUX EVION 60 60W","Illuminazione",12,"pz","IL.005",94.46],
-  ["EULUX GLADIO 20 20W","Illuminazione",15,"pz","IL.006",106.0],
-  ["PLAYLED PROEITTORE BIGHP 6000 35 W, FASCIO 90\u00b0, LUCE 3000 K","Illuminazione",2,"pz","IL.007",50.44],
-  ["EULUX GLADIO 30 30W","Illuminazione",18,"pz","IL.008",109.0],
-  ["EULUX GLADIO PLUS 30 24W","Illuminazione",32,"pz","IL.009",108.8],
-  ["EVION 20 W 12 V","Illuminazione",0,"pz","IL.010",83.0],
-  ["GMR ENLIGHTS ORN400 78W","Illuminazione",100,"pz","IL.011",92.0],
-  ["PROEITTORE PERFORMANCE INLIGHTING GUELL L+ 125/5 W 840 GR94","Illuminazione",2,"pz","IL.012",180.0],
-  ["EULUX OXANA 40W 3000K","Illuminazione",8,"pz","IL.013",74.0],
-  ["EULUX OXANA 40W 4000K","Illuminazione",94,"pz","IL.014",74.0],
-  ["EULUX OXANA 60W 4000K","Illuminazione",2,"pz","IL.015",72.26],
-  ["EULUX OXANA 20W 4000K","Illuminazione",1,"pz","IL.016",59.0],
-  ["EULUX TRIANON 65 60 W","Illuminazione",26,"pz","IL.017",126.7],
-  ["GMR LA FOGLIA 400 80W","Illuminazione",8,"pz","IL.018",160.8],
-  ["EULUX TRIANON 100W","Illuminazione",6,"pz","IL.019",138.81],
-  ["EULUX GLADIO 100W","Illuminazione",6,"pz","IL.020",144.55],
-  ["EULUX GLADIO  PLUS 30W","Illuminazione",3,"pz","IL.021",108.8],
-  ["GONNELLA EULUX VUOTE","Illuminazione",8,"pz","IL.022",81.39],
-  ["EULUX OXANA PER GONNELLE 60W 4000 K","Illuminazione",4,"pz","IL.023",72.2],
-  ["EULUX OXANA PER GONNELLE 40W","Illuminazione",3,"pz","IL.024",74.0],
-  ["EULUX OXANA PER GONNELLE 30W","Illuminazione",1,"pz","IL.025",59.0],
-  ["CAVIDOTTO CORRUGATO \u03c6 63 (50 m)","Sostegni e Accessori",17,"mat","SA.001",55.0],
-  ["CAVIDOTTO CORRUGATO \u03c6 40","Sostegni e Accessori",4,"mat","SA.002",40.0],
-  ["CAVIDOTTO CORRUGATO \u03c6 50","Sostegni e Accessori",1,"mat","SA.003",47.0],
-  ["TUBO IN CLS \u03c6 200","Sostegni e Accessori",13,"pz","SA.004",8.0],
-  ["CHIUSINI IN CLS 30X30","Sostegni e Accessori",13,"pz","SA.005",6.0],
-  ["PROLUNGA IN CLS 30X30","Sostegni e Accessori",12,"pz","SA.006",6.0],
-  ["CHIUSINI IN CLS 40X40","Sostegni e Accessori",14,"pz","SA.007",6.5],
-  ["PROLUNGA IN CLS 40X40","Sostegni e Accessori",25,"pz","SA.008",7.5],
-  ["PLINTO PREFABBRICATO 100X80 H=75","Sostegni e Accessori",4,"pz","SA.009",150.0],
+  // === ILLUMINAZIONE — Corpi Illuminanti ===
+  ["PHAENOMENA  phLuminaELP2XS57 W","Illuminazione",20,"pz","IL.001",79.85,"Corpi Illuminanti"],
+  ["EULUX EVION 40 30W","Illuminazione",25,"pz","IL.003",88.55,"Corpi Illuminanti"],
+  ["EULUX EVION 40 40W","Illuminazione",8,"pz","IL.004",88.55,"Corpi Illuminanti"],
+  ["EULUX EVION 60 60W","Illuminazione",12,"pz","IL.005",94.46,"Corpi Illuminanti"],
+  ["EULUX GLADIO 20 20W","Illuminazione",15,"pz","IL.006",106.0,"Corpi Illuminanti"],
+  ["PLAYLED PROEITTORE BIGHP 6000 35 W, FASCIO 90\u00b0, LUCE 3000 K","Illuminazione",2,"pz","IL.007",50.44,"Corpi Illuminanti"],
+  ["EULUX GLADIO 30 30W","Illuminazione",18,"pz","IL.008",109.0,"Corpi Illuminanti"],
+  ["EULUX GLADIO PLUS 30 24W","Illuminazione",32,"pz","IL.009",108.8,"Corpi Illuminanti"],
+  ["EVION 20 W 12 V","Illuminazione",0,"pz","IL.010",83.0,"Corpi Illuminanti"],
+  ["GMR ENLIGHTS ORN400 78W","Illuminazione",100,"pz","IL.011",92.0,"Corpi Illuminanti"],
+  ["PROEITTORE PERFORMANCE INLIGHTING GUELL L+ 125/5 W 840 GR94","Illuminazione",2,"pz","IL.012",180.0,"Corpi Illuminanti"],
+  ["EULUX OXANA 40W 3000K","Illuminazione",8,"pz","IL.013",74.0,"Corpi Illuminanti"],
+  ["EULUX OXANA 40W 4000K","Illuminazione",94,"pz","IL.014",74.0,"Corpi Illuminanti"],
+  ["EULUX OXANA 60W 4000K","Illuminazione",2,"pz","IL.015",72.26,"Corpi Illuminanti"],
+  ["EULUX OXANA 20W 4000K","Illuminazione",1,"pz","IL.016",59.0,"Corpi Illuminanti"],
+  ["EULUX TRIANON 65 60 W","Illuminazione",26,"pz","IL.017",126.7,"Corpi Illuminanti"],
+  ["GMR LA FOGLIA 400 80W","Illuminazione",8,"pz","IL.018",160.8,"Corpi Illuminanti"],
+  ["EULUX TRIANON 100W","Illuminazione",6,"pz","IL.019",138.81,"Corpi Illuminanti"],
+  ["EULUX GLADIO 100W","Illuminazione",6,"pz","IL.020",144.55,"Corpi Illuminanti"],
+  ["EULUX GLADIO  PLUS 30W","Illuminazione",3,"pz","IL.021",108.8,"Corpi Illuminanti"],
+  ["GONNELLA EULUX VUOTE","Illuminazione",8,"pz","IL.022",81.39,"Corpi Illuminanti"],
+  ["EULUX OXANA PER GONNELLE 60W 4000 K","Illuminazione",4,"pz","IL.023",72.2,"Corpi Illuminanti"],
+  ["EULUX OXANA PER GONNELLE 40W","Illuminazione",3,"pz","IL.024",74.0,"Corpi Illuminanti"],
+  ["EULUX OXANA PER GONNELLE 30W","Illuminazione",1,"pz","IL.025",59.0,"Corpi Illuminanti"],
+  ["EULUX SCUDO TES STRUTTURA","Illuminazione",4,"pz","IL.026",98.5,"Corpi Illuminanti"],
+  ["EULUX SCUDO_TES 30 W","Illuminazione",1,"pz","IL.027",146.65,"Corpi Illuminanti"],
+  ["EULUX AURA 30 W","Illuminazione",3,"pz","IL.028",110.0,"Corpi Illuminanti"],
+  ["EULUX GLADIO 60W","Illuminazione",10,"pz","IL.029",112.0,"Corpi Illuminanti"],
+  ["THORN BONEA(BONEA) 75 W","Illuminazione",4,"pz","IL.030",300.0,"Corpi Illuminanti"],
+  ["ARMATURA STRADALE LUMEITALIA 80W","Illuminazione",4,"pz","IL.034",150.0,"Corpi Illuminanti"],
+  ["STRUTTURA LANTERNA LIGRA EULUX","Illuminazione",10,"pz","IL.035",85.4,"Corpi Illuminanti"],
+  ["CIRCUITO LED 2X6 5050 3000K mod.4535","Illuminazione",112,"pz","IL.042",8.5,"Corpi Illuminanti"],
+  ["CIRCUITO LED 2X6 5050 4000K mod.4535","Illuminazione",55,"pz","IL.043",8.5,"Corpi Illuminanti"],
+  ["CIRCUITO LED 2X6 5050 5000K mod.4535","Illuminazione",146,"pz","IL.044",8.5,"Corpi Illuminanti"],
+  // === ILLUMINAZIONE — Alimentatori ===
+  ["ALIMENTATORI TCI 15W-40W","Illuminazione",244,"pz","IL.036",19.0,"Alimentatori"],
+  ["ALIMENTATORI TCI 40W-60W","Illuminazione",45,"pz","IL.037",25.0,"Alimentatori"],
+  ["ALIMENTATO TCI 110 W","Illuminazione",0,"pz","IL.038",27.0,"Alimentatori"],
+  ["ALIMENTATORI MW 100H-48V","Illuminazione",3,"pz","IL.039",45.0,"Alimentatori"],
+  ["ALIMENTATORI MW 40H-48V","Illuminazione",8,"pz","IL.040",22.0,"Alimentatori"],
+  ["ALIMENTATORI MW 60H-36V","Illuminazione",3,"pz","IL.041",24.0,"Alimentatori"],
+  // === CAVIDOTTI ===
+  ["CAVIDOTTO CORRUGATO \u03c6 63 (50 m)","Cavidotti",17,"mat","SA.001",55.0],
+  ["CAVIDOTTO CORRUGATO \u03c6 40","Cavidotti",4,"mat","SA.002",40.0],
+  ["CAVIDOTTO CORRUGATO \u03c6 50","Cavidotti",1,"mat","SA.003",47.0],
+  // === CLS ===
+  ["TUBO IN CLS \u03c6 200","CLS",13,"pz","SA.004",8.0],
+  ["CHIUSINI IN CLS 30X30","CLS",13,"pz","SA.005",6.0],
+  ["PROLUNGA IN CLS 30X30","CLS",12,"pz","SA.006",6.0],
+  ["CHIUSINI IN CLS 40X40","CLS",14,"pz","SA.007",6.5],
+  ["PROLUNGA IN CLS 40X40","CLS",25,"pz","SA.008",7.5],
+  ["PLINTO PREFABBRICATO 100X80 H=75","CLS",4,"pz","SA.009",150.0],
+  // === SOSTEGNI E ACCESSORI (remaining) ===
   ["SBRACCIO IN ACCIAIO ZINCATO 1,5X1,5","Sostegni e Accessori",41,"pz","SA.010",35.0],
   ["SBRACCIO IN ACCIAIO ZINCATO 1X1,5","Sostegni e Accessori",32,"pz","SA.011",30.0],
   ["SBRACCIO IN ACCIAIO ZINCATO 1X1,5","Sostegni e Accessori",0,"pz","SA.012",26.5],
@@ -564,65 +702,22 @@ const DEFAULT_ITEMS = [
   ["PALO RASTREMATO R127/7Z","Sostegni e Accessori",2,"pz","SA.022",128.0],
   ["PALO CARPAL MONTECARLO","Sostegni e Accessori",5,"pz","SA.023",null],
   ["PALO \u03c6 100 CLINDRICO 1026Z","Sostegni e Accessori",3,"pz","SA.024",null],
-  ["EULUX SCUDO TES STRUTTURA","Illuminazione",4,"pz","IL.026",98.5],
-  ["EULUX SCUDO_TES 30 W","Illuminazione",1,"pz","IL.027",146.65],
-  ["EULUX AURA 30 W","Illuminazione",3,"pz","IL.028",110.0],
-  ["EULUX GLADIO 60W","Illuminazione",10,"pz","IL.029",112.0],
-  ["THORN BONEA(BONEA) 75 W","Illuminazione",4,"pz","IL.030",300.0],
-  ["KIT FOTOVOLTAICO ENNEGI (PLAFONIERA)","Illuminazione",2,"pz","IL.031",500.0],
-  ["PANNELLI TRINASOLAR VERTEX S+ 445","Fotovoltaico",0,"pz","FV.001",56.0],
-  ["REGOLATORI DI CARICA PV","Fotovoltaico",3,"pz","FV.002",50.0],
   ["ARMADIO VETRORESINA A DOPPIO SCOMPARTO","Sostegni e Accessori",1,"pz","SA.025",288.0],
   ["ZIPPO MORSETTIERA A PALO 4X16","Sostegni e Accessori",237,"pz","SA.026",9.0],
   ["PORTELLA DA PALO","Sostegni e Accessori",50,"pz","SA.027",6.0],
   ["DISPERSORI DI TERRA (1 m)","Sostegni e Accessori",60,"pz","SA.028",8.4],
   ["MORSETTO TERMINALE SINGOLO TERRA","Sostegni e Accessori",50,"pz","SA.029",0.67],
-  ["BATTERIA ZENITH 55Ah 12 V (X FOTOVOLTAICO)","Illuminazione",7,"pz","IL.032",106.4],
-  ["BATTERIA ZENITH 130Ah 12 V (X FOTOVOLTAICO)","Illuminazione",0,"pz","IL.033",167.45],
-  ["ARMATURA STRADALE LUMEITALIA 80W","Illuminazione",4,"pz","IL.034",150.0],
-  ["CASSETTA IN LAMIERA ZINCATA PORTABATTERIA","Materiale Elettrico",12,"pz","ME.001",25.0],
-  ["CASSETTA IN PLASTICA PORTABATTERIA","Materiale Elettrico",3,"pz","ME.002",27.0],
-  ["STRUTTURA LANTERNA LIGRA EULUX","Illuminazione",10,"pz","IL.035",85.4],
-  ["CAVO PRECORDATO 2X16","Cavi",1000,"m","CV.001",2.16],
-  ["CAVO FG16(O)R16 4X6","Cavi",700,"m","CV.002",4.25],
-  ["CAVO FG16(O)R16 3X1,5","Cavi",300,"m","CV.003",1.07],
-  ["CAVO FG16(O)R16 4X4","Cavi",0,"m","CV.004",2.97],
-  ["COMELIT (FOIANO DI VALFORTORE)","Materiale Elettrico",14,"kit","ME.003",84.0],
-  ["KSENIA (FOIANO DI VALFORTORE)","Materiale Elettrico",7,"kit","ME.004",663.0],
   ["PALO RASTREMATO 3 metri VERNICIATO NERO \u03c6127","Sostegni e Accessori",4,"pz","SA.030",387.0],
   ["CHIUSINO GHISA C.250 50X50","Sostegni e Accessori",28,"pz","SA.031",87.5],
   ["CHIUSINO GHISA C.250 40X40","Sostegni e Accessori",32,"pz","SA.032",55.0],
   ["CHIUSINO GHISA C.250 70X70","Sostegni e Accessori",1,"pz","SA.033",100.0],
-  ["NASTRO CARTA 50X50","Accessori e Consumabili",53,"pz","AC.001",2.52],
-  ["NASTRO IMBALLAGGIO 50X50","Accessori e Consumabili",11,"pz","AC.002",1.18],
-  ["NASTRO CARTA 38X50","Accessori e Consumabili",27,"pz","AC.003",1.9],
-  ["NASTRO ISOLANTE","Accessori e Consumabili",68,"pz","AC.004",1.22],
-  ["SCOTCH TRASPARENTE 50X50","Accessori e Consumabili",3,"pz","AC.005",1.18],
-  ["CASSETTA DERIVAZIONE 100X100X50 IP56","Materiale Elettrico",18,"pz","ME.005",2.93],
-  ["CASSETTA DERIVAZIONE 80X80X45 IP55","Materiale Elettrico",26,"pz","ME.006",1.8],
-  ["CASSETTA DERIVAZIONE 240X190X90 IP56","Materiale Elettrico",6,"pz","ME.007",14.41],
-  ["MINIQUADRO PRESE 4 MOD. 3 PRESE","Materiale Elettrico",2,"pz","ME.008",29.89],
-  ["MINIQUADRO PRESE 3 MOD. 2 PRESE","Materiale Elettrico",1,"pz","ME.009",25.24],
-  ["MINIQUADRO IP65 8 MODULI","Materiale Elettrico",4,"pz","ME.010",39.96],
-  ["SCATOLA DERIV. LATI LISCI COP.ALTO 150X110X140 IP56","Materiale Elettrico",3,"pz","ME.011",9.39],
-  ["MINIQUADRO IP65 3 MODULI","Materiale Elettrico",13,"pz","ME.012",10.9],
-  ["QUADRO IP65 2X18 MODULI","Materiale Elettrico",1,"pz","ME.013",79.12],
-  ["QUADRO IP40 550X400X130 54 MOD.","Materiale Elettrico",1,"pz","ME.014",79.12],
-  ["QUADRO","Materiale Elettrico",0,"pz","ME.015",79.12],
-  ["QUADRO IP65 54 MODULI 410X655X140","Materiale Elettrico",1,"pz","ME.016",128.88],
-  ["QUADRO (CON SPORTELLO) IP40 12 MODULI","Materiale Elettrico",2,"pz","ME.017",19.06],
-  ["CASSETTA 240X130X90 COPERCHIO TRASP.","Materiale Elettrico",3,"pz","ME.018",55.47],
-  ["QUADRO IP40 12 MODULI SENZA SPORTELLO","Materiale Elettrico",2,"pz","ME.019",12.05],
-  ["QUADRO X APPARECCHI MODULARI IP65 1R","Materiale Elettrico",18,"pz","ME.020",55.0],
+  // === CAVI ===
+  ["CAVO PRECORDATO 2X16","Cavi",1000,"m","CV.001",2.16],
+  ["CAVO FG16(O)R16 4X6","Cavi",700,"m","CV.002",4.25],
+  ["CAVO FG16(O)R16 3X1,5","Cavi",300,"m","CV.003",1.07],
+  ["CAVO FG16(O)R16 4X4","Cavi",0,"m","CV.004",2.97],
   ["CORDA ACCIAIO  ZINCATO 4 MM","Cavi",230,"m","CV.005",0.44],
   ["CORDA ACCIAIO  5 MM","Cavi",200,"m","CV.006",0.52],
-  ["CENTRALINO DA INCASSO IP40 8 MODULI \\\"HABITA\\\"","Materiale Elettrico",1,"pz","ME.021",13.53],
-  ["CENTRALINO PER EMERGENZA 8 MODULI","Materiale Elettrico",2,"pz","ME.022",46.43],
-  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 25","Materiale Elettrico",22,"pz","ME.023",31.1],
-  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 16","Materiale Elettrico",13,"pz","ME.024",21.59],
-  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 10","Materiale Elettrico",58,"pz","ME.025",19.44],
-  ["NASTRO SEGNALETICO BIANCO/ROSSO","Accessori e Consumabili",9,"pz","AC.006",2.29],
-  ["NASTRO SEGNALETICO ROSSO \\\"ATT. CAVO ELETTRICO\\\"","Accessori e Consumabili",5,"pz","AC.007",3.0],
   ["CAVO UNIPOLARE 1X1,5 FS17 GIALLO VERDE","Cavi",5,"mat","CV.007",28.98],
   ["CAVO UNIPOLARE 1X1,5 FS17 BLU","Cavi",4,"mat","CV.008",19.49],
   ["CAVO UNIPOLARE 1X1,5 FS17 MARRONE","Cavi",4,"mat","CV.009",19.49],
@@ -647,6 +742,53 @@ const DEFAULT_ITEMS = [
   ["CAVO UNIPOLARE 1X10 FS17 GRIGIO","Cavi",1,"mat","CV.028",148.78],
   ["CAVO UNIPOLARE 1X10 FS17 MARRONE","Cavi",1,"mat","CV.029",148.78],
   ["CAVO UNIPOLARE 1X10 FS17 GIALLO VERDE","Cavi",1,"mat","CV.030",148.78],
+  ["CAVO 2X4,5 mmq","Cavi",100,"m","CV.031",1.41],
+  ["CAVO 3X1,5 MARRONE","Cavi",80,"m","CV.032",0.67],
+  ["CAVO 3X1 MARRONE","Cavi",80,"m","CV.033",4.83],
+  ["CAVO 5X1,5 MARRONE","Cavi",30,"m","CV.034",1.11],
+  ["CORDA DI RAME NUDO 35 mmq","Cavi",100,"m","CV.035",4.81],
+  // === MATERIALE ELETTRICO ===
+  ["CASSETTA IN LAMIERA ZINCATA PORTABATTERIA","Materiale Elettrico",12,"pz","ME.001",25.0],
+  ["CASSETTA IN PLASTICA PORTABATTERIA","Materiale Elettrico",3,"pz","ME.002",27.0],
+  ["COMELIT (FOIANO DI VALFORTORE)","Materiale Elettrico",14,"kit","ME.003",84.0],
+  ["KSENIA (FOIANO DI VALFORTORE)","Materiale Elettrico",7,"kit","ME.004",663.0],
+  ["CASSETTA DERIVAZIONE 100X100X50 IP56","Materiale Elettrico",18,"pz","ME.005",2.93],
+  ["CASSETTA DERIVAZIONE 80X80X45 IP55","Materiale Elettrico",26,"pz","ME.006",1.8],
+  ["CASSETTA DERIVAZIONE 240X190X90 IP56","Materiale Elettrico",6,"pz","ME.007",14.41],
+  ["MINIQUADRO PRESE 4 MOD. 3 PRESE","Materiale Elettrico",2,"pz","ME.008",29.89],
+  ["MINIQUADRO PRESE 3 MOD. 2 PRESE","Materiale Elettrico",1,"pz","ME.009",25.24],
+  ["MINIQUADRO IP65 8 MODULI","Materiale Elettrico",4,"pz","ME.010",39.96],
+  ["SCATOLA DERIV. LATI LISCI COP.ALTO 150X110X140 IP56","Materiale Elettrico",3,"pz","ME.011",9.39],
+  ["MINIQUADRO IP65 3 MODULI","Materiale Elettrico",13,"pz","ME.012",10.9],
+  ["QUADRO IP65 2X18 MODULI","Materiale Elettrico",1,"pz","ME.013",79.12],
+  ["QUADRO IP40 550X400X130 54 MOD.","Materiale Elettrico",1,"pz","ME.014",79.12],
+  ["QUADRO","Materiale Elettrico",0,"pz","ME.015",79.12],
+  ["QUADRO IP65 54 MODULI 410X655X140","Materiale Elettrico",1,"pz","ME.016",128.88],
+  ["QUADRO (CON SPORTELLO) IP40 12 MODULI","Materiale Elettrico",2,"pz","ME.017",19.06],
+  ["CASSETTA 240X130X90 COPERCHIO TRASP.","Materiale Elettrico",3,"pz","ME.018",55.47],
+  ["QUADRO IP40 12 MODULI SENZA SPORTELLO","Materiale Elettrico",2,"pz","ME.019",12.05],
+  ["QUADRO X APPARECCHI MODULARI IP65 1R","Materiale Elettrico",18,"pz","ME.020",55.0],
+  ["CENTRALINO DA INCASSO IP40 8 MODULI \\\"HABITA\\\"","Materiale Elettrico",1,"pz","ME.021",13.53],
+  ["CENTRALINO PER EMERGENZA 8 MODULI","Materiale Elettrico",2,"pz","ME.022",46.43],
+  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 25","Materiale Elettrico",22,"pz","ME.023",31.1],
+  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 16","Materiale Elettrico",13,"pz","ME.024",21.59],
+  ["CASSETTA DERIVAZIONE \\\"CONCHIGLIA\\\" UPM 10","Materiale Elettrico",58,"pz","ME.025",19.44],
+  // === FOTOVOLTAICO — Impiantistica Fotovoltaica ===
+  ["PANNELLI TRINASOLAR VERTEX S+ 445","Fotovoltaico",0,"pz","FV.001",56.0,"Impiantistica Fotovoltaica"],
+  ["REGOLATORI DI CARICA PV","Fotovoltaico",3,"pz","FV.002",50.0,"Impiantistica Fotovoltaica"],
+  ["BATTERIA ZENITH 55Ah 12 V (X FOTOVOLTAICO)","Fotovoltaico",7,"pz","IL.032",106.4,"Impiantistica Fotovoltaica"],
+  ["BATTERIA ZENITH 130Ah 12 V (X FOTOVOLTAICO)","Fotovoltaico",0,"pz","IL.033",167.45,"Impiantistica Fotovoltaica"],
+  // === FOTOVOLTAICO — Lampioni Fotovoltaici ===
+  ["PHAENOMENA PHWOW 120 W PV","Fotovoltaico",1,"pz","IL.002",599.85,"Lampioni Fotovoltaici"],
+  ["KIT FOTOVOLTAICO ENNEGI (PLAFONIERA)","Fotovoltaico",2,"pz","IL.031",500.0,"Lampioni Fotovoltaici"],
+  // === ACCESSORI E CONSUMABILI ===
+  ["NASTRO CARTA 50X50","Accessori e Consumabili",53,"pz","AC.001",2.52],
+  ["NASTRO IMBALLAGGIO 50X50","Accessori e Consumabili",11,"pz","AC.002",1.18],
+  ["NASTRO CARTA 38X50","Accessori e Consumabili",27,"pz","AC.003",1.9],
+  ["NASTRO ISOLANTE","Accessori e Consumabili",68,"pz","AC.004",1.22],
+  ["SCOTCH TRASPARENTE 50X50","Accessori e Consumabili",3,"pz","AC.005",1.18],
+  ["NASTRO SEGNALETICO BIANCO/ROSSO","Accessori e Consumabili",9,"pz","AC.006",2.29],
+  ["NASTRO SEGNALETICO ROSSO \\\"ATT. CAVO ELETTRICO\\\"","Accessori e Consumabili",5,"pz","AC.007",3.0],
   ["BOMBOLETTA SMALTO ACRILICO GRIGIO ANTRACITE","Accessori e Consumabili",5,"pz","AC.008",5.0],
   ["BOMBOLETTA SMALTO ACRILICO GRIGIO SEMPLICE","Accessori e Consumabili",9,"pz","AC.009",5.0],
   ["BOMBOLETTA SMALTO ACRILICO GRIGIO TRAFFICO","Accessori e Consumabili",2,"pz","AC.010",5.0],
@@ -655,20 +797,9 @@ const DEFAULT_ITEMS = [
   ["VERNICE SMALTO GRIGIO SCURO 145","Accessori e Consumabili",2,"conf","AC.013",35.9],
   ["DILUENTE NITRO ANTINEBBIA","Accessori e Consumabili",2,"conf","AC.014",13.9],
   ["DILUENTE SINTETICO","Accessori e Consumabili",2,"conf","AC.015",3.5],
-  ["ALIMENTATORI TCI 15W-40W","Illuminazione",244,"pz","IL.036",19.0],
-  ["ALIMENTATORI TCI 40W-60W","Illuminazione",45,"pz","IL.037",25.0],
-  ["ALIMENTATO TCI 110 W","Illuminazione",0,"pz","IL.038",27.0],
-  ["ALIMENTATORI MW 100H-48V","Illuminazione",3,"pz","IL.039",45.0],
-  ["ALIMENTATORI MW 40H-48V","Illuminazione",8,"pz","IL.040",22.0],
-  ["ALIMENTATORI MW 60H-36V","Illuminazione",3,"pz","IL.041",24.0],
-  ["CIRCUITO LED 2X6 5050 3000K mod.4535","Illuminazione",112,"pz","IL.042",8.5],
-  ["CIRCUITO LED 2X6 5050 4000K mod.4535","Illuminazione",55,"pz","IL.043",8.5],
-  ["CIRCUITO LED 2X6 5050 5000K mod.4535","Illuminazione",146,"pz","IL.044",8.5],
-  ["CAVO 2X4,5 mmq","Cavi",100,"m","CV.031",1.41],
-  ["CAVO 3X1,5 MARRONE","Cavi",80,"m","CV.032",0.67],
-  ["CAVO 3X1 MARRONE","Cavi",80,"m","CV.033",4.83],
-  ["CAVO 5X1,5 MARRONE","Cavi",30,"m","CV.034",1.11],
-  ["CORDA DI RAME NUDO 35 mmq","Cavi",100,"m","CV.035",4.81]
+  // === CARBURANTE ===
+  ["NAFTA","Carburante",0,"lt","CB.001",1.93],
+  ["BENZINA","Carburante",0,"lt","CB.002",1.93],
 ];
 
 function genId(){return Math.random().toString(36).substr(2,9)}
@@ -712,6 +843,12 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   const heroTitle=document.getElementById('hero-title');
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
   await loadFromFirestore();
+  await migrateV2();
+  // Normalizza ordine categorie
+  const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
+  const ordered=DESIRED_ORDER.filter(c=>categories[c]);
+  const extra=catOrder.filter(c=>!DESIRED_ORDER.includes(c));
+  catOrder=[...ordered,...extra];
   document.getElementById('loading-screen').style.display='none';
   listenRealtime();
   setTimeout(handleUrlProductCode,300);
@@ -745,17 +882,115 @@ async function initDefaultData(){
   showToast('Prima configurazione...','toast-sync');
   const batch=writeBatch(db);
   categories=JSON.parse(JSON.stringify(DEFAULT_CATS));
-  catOrder=["Illuminazione","Sostegni e Accessori","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili"];
+  catOrder=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   for(const [id,data] of Object.entries(categories)) batch.set(doc(db,'categorie',id),data);
   itemsList=[];
-  DEFAULT_ITEMS.forEach(([name,cat,qty,unit,code,prezzo])=>{
+  DEFAULT_ITEMS.forEach(([name,cat,qty,unit,code,prezzo,sub])=>{
     const id=genId();
-    const item={id,name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null};
+    const item={id,name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null,sub:sub||null};
     itemsList.push(item);
-    batch.set(doc(db,'inventario',id),{name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null});
+    batch.set(doc(db,'inventario',id),{name,cat,qty,unit:unit||'pz',code,prezzo:prezzo!=null?prezzo:null,sub:sub||null});
   });
   await batch.commit();actLog=[];
   showToast('Dati iniziali caricati!','toast-return');
+}
+
+// ═══════════════════════════════════════
+//  MIGRAZIONE v2 — nuove sezioni/sottosezioni
+// ═══════════════════════════════════════
+async function migrateV2(){
+  // Se "Cavidotti" esiste già, migrazione già fatta
+  if(categories['Cavidotti']) return;
+  console.log('[MIGRAZIONE v2] Avvio...');
+  showToast('Migrazione struttura in corso...','toast-sync');
+
+  const batch=writeBatch(db);
+
+  // 1) Nuove categorie
+  const newCats={
+    'Cavidotti':  {prefix:'CD',label:'Cavidotti',  icon:'🔧',color:'#6b5e36',bg:'#f5f0e2'},
+    'CLS':        {prefix:'CL',label:'CLS',        icon:'🏗️',color:'#4a6b72',bg:'#e4eff2'},
+    'Carburante': {prefix:'CB',label:'Carburante',  icon:'⛽',color:'#8e5c3d',bg:'#f7f0eb'},
+  };
+  for(const [name,data] of Object.entries(newCats)){
+    categories[name]=data;
+    batch.set(doc(db,'categorie',name),data);
+  }
+
+  // 2) Aggiorna categorie esistenti con sottosezioni
+  if(categories['Illuminazione']){
+    categories['Illuminazione'].subs=['Corpi Illuminanti','Alimentatori'];
+    batch.set(doc(db,'categorie','Illuminazione'),categories['Illuminazione']);
+  }
+  if(categories['Fotovoltaico']){
+    categories['Fotovoltaico'].subs=['Impiantistica Fotovoltaica','Lampioni Fotovoltaici'];
+    batch.set(doc(db,'categorie','Fotovoltaico'),categories['Fotovoltaico']);
+  }
+
+  // 3) Mappa spostamenti: codice → {cat, sub}
+  const moves={};
+
+  // Cavidotti (da Sostegni e Accessori)
+  ['SA.001','SA.002','SA.003'].forEach(c=>moves[c]={cat:'Cavidotti',sub:null});
+
+  // CLS (da Sostegni e Accessori)
+  ['SA.004','SA.005','SA.006','SA.007','SA.008','SA.009'].forEach(c=>moves[c]={cat:'CLS',sub:null});
+
+  // Batterie → Fotovoltaico / Impiantistica
+  ['IL.032','IL.033'].forEach(c=>moves[c]={cat:'Fotovoltaico',sub:'Impiantistica Fotovoltaica'});
+
+  // Lampioni FV → Fotovoltaico / Lampioni
+  moves['IL.002']={cat:'Fotovoltaico',sub:'Lampioni Fotovoltaici'};
+  moves['IL.031']={cat:'Fotovoltaico',sub:'Lampioni Fotovoltaici'};
+
+  // FV esistenti → sottocategoria Impiantistica
+  ['FV.001','FV.002'].forEach(c=>moves[c]={cat:'Fotovoltaico',sub:'Impiantistica Fotovoltaica'});
+
+  // Alimentatori (restano in Illuminazione, ricevono sub)
+  ['IL.036','IL.037','IL.038','IL.039','IL.040','IL.041'].forEach(c=>moves[c]={cat:'Illuminazione',sub:'Alimentatori'});
+
+  // Tutti gli altri IL → Corpi Illuminanti
+  const alimentatoriCodes=new Set(['IL.036','IL.037','IL.038','IL.039','IL.040','IL.041']);
+  const movedFromIL=new Set(['IL.002','IL.031','IL.032','IL.033']);
+  itemsList.forEach(it=>{
+    if(it.cat==='Illuminazione' && it.code && it.code.startsWith('IL.') && !alimentatoriCodes.has(it.code) && !movedFromIL.has(it.code)){
+      moves[it.code]={cat:'Illuminazione',sub:'Corpi Illuminanti'};
+    }
+  });
+
+  // 4) Applica spostamenti
+  let movedCount=0;
+  itemsList.forEach(it=>{
+    const m=moves[it.code];
+    if(m){
+      it.cat=m.cat;
+      it.sub=m.sub;
+      const{id,...data}=it;
+      batch.set(doc(db,'inventario',id),data);
+      movedCount++;
+    }
+  });
+
+  // 5) Crea voci carburante (se non esistono già)
+  if(!itemsList.find(i=>i.code==='CB.001')){
+    const id1=genId();
+    const nafta={id:id1,name:'NAFTA',cat:'Carburante',qty:0,unit:'lt',code:'CB.001',prezzo:1.93,sub:null};
+    itemsList.push(nafta);
+    batch.set(doc(db,'inventario',id1),{name:'NAFTA',cat:'Carburante',qty:0,unit:'lt',code:'CB.001',prezzo:1.93,sub:null});
+  }
+  if(!itemsList.find(i=>i.code==='CB.002')){
+    const id2=genId();
+    const benzina={id:id2,name:'BENZINA',cat:'Carburante',qty:0,unit:'lt',code:'CB.002',prezzo:1.93,sub:null};
+    itemsList.push(benzina);
+    batch.set(doc(db,'inventario',id2),{name:'BENZINA',cat:'Carburante',qty:0,unit:'lt',code:'CB.002',prezzo:1.93,sub:null});
+  }
+
+  // 6) Aggiorna catOrder
+  catOrder=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
+
+  await batch.commit();
+  console.log('[MIGRAZIONE v2] Completata. Spostati '+movedCount+' prodotti.');
+  showToast('Migrazione completata! '+movedCount+' prodotti riorganizzati','toast-return');
 }
 
 // ═══════════════════════════════════════
@@ -764,14 +999,19 @@ async function initDefaultData(){
 function listenRealtime(){
   onSnapshot(collection(db,'inventario'),snap=>{
     itemsList=[];snap.forEach(d=>itemsList.push({id:d.id,...d.data()}));
-    const modalOpen=document.getElementById('modal-backdrop').classList.contains('open');
+    const modalOpen=document.getElementById('modal-backdrop').classList.contains('open')||document.getElementById('fuel-modal-backdrop').classList.contains('open');
     if(currentModalItem){
       const updated=itemsList.find(i=>i.id===currentModalItem.id);
       if(updated){currentModalItem=updated;document.getElementById('m-qty').textContent=updated.qty;}
     }
+    if(currentFuelItem){
+      const updated=itemsList.find(i=>i.id===currentFuelItem.id);
+      if(updated){currentFuelItem=updated;const el=document.getElementById('fm-qty');if(el)el.textContent=updated.qty;}
+    }
     if(!modalOpen){
       if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
       if(document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
+      if(document.getElementById('page-carburante').classList.contains('active')) renderCarburante();
     }
   });
   onSnapshot(query(collection(db,'movimenti'),orderBy('time','desc'),limit(200)),snap=>{
@@ -804,6 +1044,7 @@ window.showPage=function(id){
   if(id==='dashboard') renderDashboard();
   if(id==='materiali') renderMateriali();
   if(id==='registro') renderLog();
+  if(id==='carburante') renderCarburante();
   if(id==='qrcode'){
     // Mostra/nascondi sezione bacheca in base al ruolo prima del render
     const respSec=document.getElementById('qr-resp-section');
@@ -833,6 +1074,7 @@ function renderDashboard(){
 
   let th='';
   catOrder.forEach(cat=>{
+    if(cat==='Carburante') return;
     const cfg=categories[cat];if(!cfg) return;
     const ci=getItemsByCat(cat);const cq=ci.reduce((s,it)=>s+it.qty,0);
 
@@ -852,9 +1094,11 @@ function renderDashboard(){
 function renderMateriali(){
   let html='';
   catOrder.forEach(cat=>{
+    if(cat==='Carburante') return; // Carburante has its own page
     const cfg=categories[cat];if(!cfg) return;
     const ci=getItemsByCat(cat);const cq=ci.reduce((s,it)=>s+it.qty,0);
     const isOpen=openCats[cat]||false;const ek=cat.replace(/\s/g,'_');
+    const hasSubs=cfg.subs&&cfg.subs.length>0;
     html+=`<div class="cat-group ${editMode?'editing':''}" id="grp-${ek}">
       <div class="cat-header" onclick="toggleCategory('${cat}')">
         <div class="cat-icon-wrap" style="background:${cfg.bg}">${cfg.icon}</div>
@@ -864,15 +1108,43 @@ function renderMateriali(){
         <svg class="cat-arrow ${isOpen?'open':''}" id="arrow-${ek}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="items-container ${isOpen?'open':''}" id="items-${ek}">`;
-    ci.forEach(it=>{
-      const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
-      html+=`<div class="item-card" onclick='openModal("${it.id}")'>
-        <button class="item-delete" onclick="event.stopPropagation();deleteItem('${it.id}')">✕</button>
-        <span class="item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
-        <span class="item-name">${it.name}</span>
-        <div class="item-right"><div class="item-qty-val" style="color:${cfg.color}">${it.qty}</div><div class="item-qty-unit">${it.unit}</div>${priceHTML}</div>
-      </div>`;
-    });
+    if(hasSubs){
+      cfg.subs.forEach(sub=>{
+        const subItems=ci.filter(it=>it.sub===sub);
+        if(subItems.length===0) return;
+        html+=`<div class="sub-header"><div class="sub-header-dot" style="background:${cfg.color}"></div><div class="sub-header-label" style="color:${cfg.color}">${sub}</div><div class="sub-header-line"></div></div>`;
+        subItems.forEach(it=>{
+          const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
+          html+=`<div class="item-card" onclick='openModal("${it.id}")'>
+            <button class="item-delete" onclick="event.stopPropagation();deleteItem('${it.id}')">✕</button>
+            <span class="item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
+            <span class="item-name">${it.name}</span>
+            <div class="item-right"><div class="item-qty-val" style="color:${cfg.color}">${it.qty}</div><div class="item-qty-unit">${it.unit}</div>${priceHTML}</div>
+          </div>`;
+        });
+      });
+      // Items without a sub
+      const unsub=ci.filter(it=>!it.sub);
+      unsub.forEach(it=>{
+        const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
+        html+=`<div class="item-card" onclick='openModal("${it.id}")'>
+          <button class="item-delete" onclick="event.stopPropagation();deleteItem('${it.id}')">✕</button>
+          <span class="item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
+          <span class="item-name">${it.name}</span>
+          <div class="item-right"><div class="item-qty-val" style="color:${cfg.color}">${it.qty}</div><div class="item-qty-unit">${it.unit}</div>${priceHTML}</div>
+        </div>`;
+      });
+    } else {
+      ci.forEach(it=>{
+        const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
+        html+=`<div class="item-card" onclick='openModal("${it.id}")'>
+          <button class="item-delete" onclick="event.stopPropagation();deleteItem('${it.id}')">✕</button>
+          <span class="item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
+          <span class="item-name">${it.name}</span>
+          <div class="item-right"><div class="item-qty-val" style="color:${cfg.color}">${it.qty}</div><div class="item-qty-unit">${it.unit}</div>${priceHTML}</div>
+        </div>`;
+      });
+    }
     html+=`<button class="add-item-btn" onclick="event.stopPropagation();openAddProductForm('${cat}')">+ Aggiungi prodotto</button></div></div>`;
   });
   document.getElementById('categories-container').innerHTML=html;
@@ -932,7 +1204,7 @@ window.openModal=function(id){
   document.getElementById('m-name').textContent=item.name;
   document.getElementById('m-qty').textContent=item.qty;
   document.getElementById('modal-operator-name').textContent=currentUser.nome;
-  const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili'};
+  const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili',lt:'litri disponibili'};
   document.getElementById('m-unit').textContent=um[item.unit]||'disponibili';
 
   // Sezione prezzi: solo responsabili
@@ -1077,18 +1349,32 @@ window.submitCategory=async function(){
 window.openAddProductForm=function(preCat){
   closeFab();
   let opts='<option value="">Seleziona categoria...</option>';
-  catOrder.forEach(cat=>{const cfg=categories[cat];opts+=`<option value="${cat}" ${cat===preCat?'selected':''}>${cfg.icon} ${cfg.label}</option>`;});
+  catOrder.forEach(cat=>{if(cat==='Carburante') return;const cfg=categories[cat];opts+=`<option value="${cat}" ${cat===preCat?'selected':''}>${cfg.icon} ${cfg.label}</option>`;});
   document.getElementById('form-modal').innerHTML=`
     <h2>Nuovo prodotto</h2>
-    <div class="form-group"><label>Categoria</label><select id="fp-cat">${opts}</select></div>
+    <div class="form-group"><label>Categoria</label><select id="fp-cat" onchange="updateSubSelect()">${opts}</select></div>
+    <div class="form-group" id="fp-sub-group" style="display:none"><label>Sottocategoria</label><select id="fp-sub"></select></div>
     <div class="form-group"><label>Nome prodotto</label><input id="fp-name" placeholder="es. LAMPADA LED 50W"></div>
     <div class="form-row">
       <div class="form-group"><label>Quantità iniziale</label><input id="fp-qty" type="number" min="0" value="0"></div>
-      <div class="form-group"><label>Unità</label><select id="fp-unit"><option value="pz">Pezzi</option><option value="m">Metri</option><option value="kit">Kit</option><option value="mat">Matasse</option><option value="conf">Confezioni</option></select></div>
+      <div class="form-group"><label>Unità</label><select id="fp-unit"><option value="pz">Pezzi</option><option value="m">Metri</option><option value="kit">Kit</option><option value="mat">Matasse</option><option value="conf">Confezioni</option><option value="lt">Litri</option></select></div>
     </div>
     <div class="form-group"><label>Prezzo unitario (€) — opzionale</label><input id="fp-price" type="number" min="0" step="0.01" placeholder="0.00"></div>
     <div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" onclick="submitProduct()">Aggiungi</button></div>`;
   document.getElementById('form-backdrop').classList.add('open');
+  if(preCat) updateSubSelect();
+};
+window.updateSubSelect=function(){
+  const cat=document.getElementById('fp-cat').value;
+  const cfg=categories[cat];
+  const grp=document.getElementById('fp-sub-group');
+  const sel=document.getElementById('fp-sub');
+  if(cfg&&cfg.subs&&cfg.subs.length>0){
+    grp.style.display='block';
+    sel.innerHTML='<option value="">Nessuna</option>'+cfg.subs.map(s=>`<option value="${s}">${s}</option>`).join('');
+  } else {
+    grp.style.display='none';sel.innerHTML='';
+  }
 };
 window.submitProduct=async function(){
   const cat=document.getElementById('fp-cat').value;
@@ -1097,12 +1383,14 @@ window.submitProduct=async function(){
   const unit=document.getElementById('fp-unit').value;
   const priceRaw=parseFloat(document.getElementById('fp-price').value);
   const prezzo=isNaN(priceRaw)||priceRaw<=0?null:Math.round(priceRaw*100)/100;
+  const subEl=document.getElementById('fp-sub');
+  const sub=subEl&&subEl.value?subEl.value:null;
   if(!cat){alert('Seleziona una categoria');return}
   if(!name){alert('Inserisci un nome');return}
   const cfg=categories[cat];
   const code=nextCodeForCat(cat);
   const id=genId();
-  const item={id,name,cat,qty,unit,code,prezzo};
+  const item={id,name,cat,qty,unit,code,prezzo,sub};
   itemsList.push(item);await saveItem(item);closeForm();openCats[cat]=true;
   renderMateriali();renderDashboard();showToast('Prodotto '+code+' aggiunto','toast-info');
 };
@@ -1161,13 +1449,13 @@ window.exportExcel=function(){
   downloadCSV(csv,'Report_Movimentazioni_'+dateStr()+'.csv');showToast('Report scaricato','toast-info');
 };
 window.exportInventory=function(){
-  let csv='\uFEFF"Codice","Prodotto","Categoria","Quantità","Unità","Prezzo €/un.","Valore Totale €"\n';
+  let csv='\uFEFF"Codice","Prodotto","Categoria","Sottocategoria","Quantità","Unità","Prezzo €/un.","Valore Totale €"\n';
   catOrder.forEach(cat=>{
     const cfg=categories[cat];if(!cfg) return;
     getItemsByCat(cat).forEach(it=>{
       const p=it.prezzo!=null?it.prezzo:'';
       const tot=it.prezzo!=null?it.prezzo*it.qty:'';
-      csv+=`"${it.code}","${it.name.replace(/"/g,'""')}","${cfg.label}","${it.qty}","${it.unit}","${p}","${tot}"\n`;
+      csv+=`"${it.code}","${it.name.replace(/"/g,'""')}","${cfg.label}","${it.sub||''}","${it.qty}","${it.unit}","${p}","${tot}"\n`;
     });
   });
   downloadCSV(csv,'Inventario_Magazzino_'+dateStr()+'.csv');showToast('Inventario scaricato','toast-info');
@@ -1179,14 +1467,13 @@ function dateStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMon
 //  QR
 // ═══════════════════════════════════════
 window.renderQrPage=function(){
-  // Mostra sezione bacheca solo ai responsabili
   const respSection=document.getElementById('qr-resp-section');
   if(!respSection) return;
   if(!isResp()){respSection.style.display='none';return;}
   respSection.style.display='block';
 
   const grid=document.getElementById('qr-grid');if(!grid) return;
-  const sorted=[...itemsList].sort((a,b)=>a.code.localeCompare(b.code));
+  const sorted=[...itemsList].filter(it=>it.cat!=='Carburante').sort((a,b)=>a.code.localeCompare(b.code));
 
   // Prodotti recenti aggiunti (senza qrPrinted)
   const newItems=sorted.filter(it=>!it.qrPrinted);
@@ -1208,24 +1495,92 @@ window.renderQrPage=function(){
     newBadge.style.display='none';
   }
 
-  grid.innerHTML=sorted.map(it=>{
-    const cfg=categories[it.cat]||{};
-    const isNew=!it.qrPrinted;
-    const newBadgeHTML=isNew?'<div style="margin-bottom:6px;display:inline-block;padding:2px 8px;background:#FFF3CD;border:1px solid #FFEAA7;border-radius:99px;font-size:10px;font-weight:700;color:#856404">🆕 Nuovo</div><br>':'';
-    return `<div class="qr-card" style="${isNew?'border:1px solid #FFEAA7;background:#FFFDF0':''}">
-      ${newBadgeHTML}
-      <div class="qr-box" id="qr-${it.code.replace(/[^a-zA-Z0-9]/g,'_')}"></div>
-      <div class="qr-code-label">${it.code}</div>
-      <div class="qr-name">${it.name}</div>
-      <div class="qr-cat">${cfg.label||it.cat}</div>
-    </div>`;
-  }).join('');
+  // Category descriptions for QR section headers
+  const catDesc={
+    'Illuminazione':'Corpi illuminanti, alimentatori, circuiti LED',
+    'Sostegni e Accessori':'Pali, sbracci, pipette, chiusini ghisa, dispersori',
+    'Cavidotti':'Tubi corrugati per cavidotti',
+    'CLS':'Plinti, prolunghe, chiusini e tubi in CLS, cemento',
+    'Cavi':'Cavi multipolari, unipolari, corde e precordati',
+    'Materiale Elettrico':'Quadri, cassette derivazione, centralini',
+    'Fotovoltaico':'Pannelli, batterie, regolatori, lampioni FV',
+    'Accessori e Consumabili':'Nastri, vernici, bombolette, diluenti'
+  };
+
+  // Group by category (and subcategory)
+  let html='';
+  let totalItems=0;
+  catOrder.forEach(cat=>{
+    if(cat==='Carburante') return;
+    const cfg=categories[cat];if(!cfg) return;
+    const ci=sorted.filter(it=>it.cat===cat);
+    if(ci.length===0) return;
+
+    // Page break every 15 items (approx)
+    if(totalItems>0 && totalItems%15<3 && totalItems>12) html+='<div class="qr-page-break"></div>';
+
+    html+=`<div class="qr-section-group">
+      <div class="qr-section-header" style="border-left:4px solid ${cfg.color}">
+        <div class="qr-section-header-icon">${cfg.icon}</div>
+        <div class="qr-section-header-info">
+          <div class="qr-section-header-name" style="color:${cfg.color}">${cfg.label}</div>
+          <div class="qr-section-header-desc">${catDesc[cat]||ci.length+' prodotti'}</div>
+        </div>
+      </div>`;
+
+    const hasSubs=cfg.subs&&cfg.subs.length>0;
+    if(hasSubs){
+      cfg.subs.forEach(sub=>{
+        const subItems=ci.filter(it=>it.sub===sub);
+        if(subItems.length===0) return;
+        html+=`<div class="qr-sub-header">${sub}</div>`;
+        html+=`<div class="qr-section-grid">`;
+        subItems.forEach(it=>{
+          const isNew=!it.qrPrinted;
+          html+=renderQrCard(it,cfg,isNew);
+          totalItems++;
+        });
+        html+=`</div>`;
+      });
+      // unsub items
+      const unsub=ci.filter(it=>!it.sub);
+      if(unsub.length>0){
+        html+=`<div class="qr-section-grid">`;
+        unsub.forEach(it=>{
+          html+=renderQrCard(it,cfg,!it.qrPrinted);
+          totalItems++;
+        });
+        html+=`</div>`;
+      }
+    } else {
+      html+=`<div class="qr-section-grid">`;
+      ci.forEach(it=>{
+        html+=renderQrCard(it,cfg,!it.qrPrinted);
+        totalItems++;
+      });
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  });
+
+  grid.innerHTML=html;
 
   sorted.forEach(it=>{
     const el=document.getElementById('qr-'+it.code.replace(/[^a-zA-Z0-9]/g,'_'));
     if(el&&window.QRCode) new QRCode(el,{text:productUrlFromCode(it.code),width:118,height:118,correctLevel:QRCode.CorrectLevel.M});
   });
 };
+
+function renderQrCard(it,cfg,isNew){
+  const newBadgeHTML=isNew?'<div style="margin-bottom:6px;display:inline-block;padding:2px 8px;background:#FFF3CD;border:1px solid #FFEAA7;border-radius:99px;font-size:10px;font-weight:700;color:#856404">🆕 Nuovo</div><br>':'';
+  return `<div class="qr-card" style="${isNew?'border:1px solid #FFEAA7;background:#FFFDF0':''}">
+    ${newBadgeHTML}
+    <div class="qr-box" id="qr-${it.code.replace(/[^a-zA-Z0-9]/g,'_')}"></div>
+    <div class="qr-code-label">${it.code}</div>
+    <div class="qr-name">${it.name}</div>
+    <div class="qr-cat">${cfg.label||it.cat}${it.sub?' · '+it.sub:''}</div>
+  </div>`;
+}
 
 window.markQrPrinted=async function(id){
   const item=itemsList.find(i=>i.id===id);if(!item) return;
@@ -1282,6 +1637,125 @@ function handleUrlProductCode(){
   const tryOpen=()=>{attempts++;if(itemsList.length>0){document.getElementById('loading-screen').style.display='none';openProductByCode(code);}else if(attempts<20){setTimeout(tryOpen,300);}else{showToast('Timeout caricamento','toast-danger');}};
   setTimeout(tryOpen,600);
 }
+
+// ═══════════════════════════════════════
+//  CARBURANTE
+// ═══════════════════════════════════════
+let currentFuelItem=null;
+let fuelPriceEditOpen=false;
+
+function getFuelItems(){return itemsList.filter(i=>i.cat==='Carburante')}
+
+function renderCarburante(){
+  const fuels=getFuelItems();
+  const fuelGrid=document.getElementById('fuel-grid');
+  const meta=document.getElementById('fuel-hero-meta');
+  const totalLt=fuels.reduce((s,f)=>s+f.qty,0);
+  if(meta) meta.textContent=totalLt+' litri totali · '+fuels.length+' tipi';
+
+  fuelGrid.innerHTML=fuels.map(f=>{
+    const icon=f.name.toLowerCase().includes('nafta')?'🛢️':'⛽';
+    const color=f.name.toLowerCase().includes('nafta')?'#8e5c3d':'#3d6b8e';
+    const priceHTML=isResp()&&f.prezzo!=null?`<div class="fuel-card-price">€ ${Number(f.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}/lt</div>`:'';
+    return `<div class="fuel-card" style="border-top:3px solid ${color}" onclick="openFuelModal('${f.id}')">
+      <div class="fuel-card-icon">${icon}</div>
+      <div class="fuel-card-name" style="color:${color}">${f.name}</div>
+      <div class="fuel-card-qty" style="color:${color}">${f.qty}</div>
+      <div class="fuel-card-unit">litri</div>
+      ${priceHTML}
+    </div>`;
+  }).join('');
+
+  // Fuel log
+  const fuelCodes=fuels.map(f=>f.code);
+  const fuelLog=actLog.filter(e=>fuelCodes.includes(e.code)).slice(0,30);
+  const logC=document.getElementById('fuel-log-container');
+  if(fuelLog.length===0){
+    logC.innerHTML='<div class="empty-state"><p>Nessun movimento carburante</p></div>';return;
+  }
+  let html='';
+  fuelLog.forEach(entry=>{
+    const isTake=entry.delta<0;
+    const d=new Date(entry.time);
+    const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    html+=`<div class="log-item">
+      <div class="log-icon ${isTake?'take':'ret'}">${isTake?'−':'+'}</div>
+      <div class="log-info"><div class="log-text"><strong>${entry.code}</strong> — ${entry.name}</div>
+      <div class="log-operator">👷 ${entry.operator||'N/D'}</div>
+      <div class="log-time">${isTake?'Prelevati':'Reinseriti'} ${Math.abs(entry.delta)} lt · ${ts}</div></div>
+    </div>`;
+  });
+  logC.innerHTML=html;
+}
+
+window.openFuelModal=function(id){
+  const item=itemsList.find(i=>i.id===id);if(!item) return;
+  currentFuelItem=item;fuelPriceEditOpen=false;
+  document.getElementById('fm-code').textContent=item.code;
+  document.getElementById('fm-name').textContent=item.name;
+  document.getElementById('fm-qty').textContent=item.qty;
+  document.getElementById('fm-operator-name').textContent=currentUser.nome;
+  const priceZone=document.getElementById('fuel-price-zone');
+  if(isResp()){
+    priceZone.classList.add('visible');
+    document.getElementById('fm-price-val').textContent=fmtPrice(item.prezzo);
+    const tot=item.prezzo!=null?item.prezzo*item.qty:null;
+    document.getElementById('fm-price-total').textContent=tot!=null?'Valore: '+fmtPrice(tot):'';
+    document.getElementById('fuel-price-input-row').classList.remove('visible');
+  } else {
+    priceZone.classList.remove('visible');
+  }
+  document.getElementById('fuel-modal-backdrop').classList.add('open');
+  document.body.style.overflow='hidden';
+};
+
+window.closeFuelModal=function(e){
+  if(e&&e.target&&e.target.id!=='fuel-modal-backdrop') return;
+  document.getElementById('fuel-modal-backdrop').classList.remove('open');
+  document.body.style.overflow='';currentFuelItem=null;fuelPriceEditOpen=false;
+};
+
+window.doFuelAdjust=async function(delta){
+  if(!currentFuelItem) return;
+  const next=Math.max(0,currentFuelItem.qty+delta);
+  if(next===currentFuelItem.qty&&delta<0) return;
+  currentFuelItem.qty=next;
+  await saveItem(currentFuelItem);
+  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta,prevQty:next-delta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now()};
+  await saveMovimento(entry);
+  document.getElementById('fm-qty').textContent=next;
+  if(isResp()){
+    document.getElementById('fm-price-val').textContent=fmtPrice(currentFuelItem.prezzo);
+    const tot=currentFuelItem.prezzo!=null?currentFuelItem.prezzo*next:null;
+    document.getElementById('fm-price-total').textContent=tot!=null?'Valore: '+fmtPrice(tot):'';
+  }
+  const qe=document.getElementById('fm-qty');qe.style.transform='scale(1.15)';setTimeout(()=>qe.style.transform='scale(1)',200);
+  const cls=delta<0?'toast-take':'toast-return';
+  showToast((delta<0?'−':'+ ')+Math.abs(delta)+' lt '+currentFuelItem.name+' · '+currentUser.nome,cls);
+};
+
+window.toggleFuelPriceEdit=function(){
+  fuelPriceEditOpen=!fuelPriceEditOpen;
+  const row=document.getElementById('fuel-price-input-row');
+  row.classList.toggle('visible',fuelPriceEditOpen);
+  if(fuelPriceEditOpen){
+    const inp=document.getElementById('fuel-price-input');
+    inp.value=currentFuelItem.prezzo!=null?currentFuelItem.prezzo:'';
+    inp.focus();
+  }
+};
+window.saveFuelPrice=async function(){
+  const val=parseFloat(document.getElementById('fuel-price-input').value);
+  if(isNaN(val)||val<0){showToast('Prezzo non valido','toast-danger');return}
+  currentFuelItem.prezzo=Math.round(val*100)/100;
+  await saveItem(currentFuelItem);
+  document.getElementById('fm-price-val').textContent=fmtPrice(currentFuelItem.prezzo);
+  const tot=currentFuelItem.prezzo*currentFuelItem.qty;
+  document.getElementById('fm-price-total').textContent='Valore: '+fmtPrice(tot);
+  document.getElementById('fuel-price-input-row').classList.remove('visible');
+  fuelPriceEditOpen=false;
+  showToast('Prezzo carburante aggiornato','toast-info');
+};
 
 // ═══════════════════════════════════════
 //  TOAST
