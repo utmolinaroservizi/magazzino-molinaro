@@ -318,10 +318,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .fuel-return .fa-icon{background:var(--brand-50);color:var(--brand-500)}.fuel-return .fa-label{color:var(--brand-600)}
 
 /* CARICA MERCE */
-.carica-cat-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
-.carica-cat-tabs::-webkit-scrollbar{display:none}
-.carica-tab{padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:var(--bg-card);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;color:var(--text-muted);transition:var(--transition);flex-shrink:0}
-.carica-tab.active{background:var(--brand-500);color:#fff;border-color:var(--brand-500)}
+/* CARICA MERCE — selettore categoria */
+.carica-cat-select-wrap{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.carica-cat-select{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;background:var(--bg-card);color:var(--text);outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.carica-cat-select:focus{border-color:var(--brand-500)}
 .carica-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px}
 .carica-item-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .carica-item-code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;flex-shrink:0}
@@ -332,7 +332,15 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .carica-input-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em}
 .carica-input{padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:14px;font-weight:600;font-family:inherit;background:var(--bg);color:var(--text);outline:none;text-align:center;width:100%;box-sizing:border-box}
 .carica-input:focus{border-color:var(--brand-500)}
+.carica-add-section{border:1.5px dashed var(--brand-200);border-radius:var(--radius-sm);padding:14px;margin-top:16px;background:var(--brand-50)}
+.carica-add-title{font-size:12px;font-weight:700;color:var(--brand-600);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.carica-add-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.carica-add-full{grid-column:1/-1}
+.carica-add-btn{width:100%;padding:11px;border:none;border-radius:var(--radius-xs);background:var(--brand-600);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:var(--transition)}
+.carica-add-btn:active{transform:scale(.97)}
 .carica-confirm-btn{width:100%;padding:11px;border:none;border-radius:var(--radius-xs);background:var(--brand-500);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:var(--transition)}
+.carica-confirm-btn:active{transform:scale(.97);background:var(--brand-600)}
+.carica-confirm-btn:disabled{background:var(--border);color:var(--text-light);cursor:default}
 .carica-confirm-btn:active{transform:scale(.97);background:var(--brand-600)}
 .carica-confirm-btn:disabled{background:var(--border);color:var(--text-light);cursor:default}
 
@@ -534,7 +542,9 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="hero-title" style="font-size:18px">📦 Carica Merce</div>
     <div class="hero-meta">Nuovo acquisto — aggiorna giacenze e prezzi</div>
   </div>
-  <div class="carica-cat-tabs" id="carica-tabs"></div>
+  <div class="carica-cat-select-wrap">
+    <select class="carica-cat-select" id="carica-cat-sel" onchange="setCaricaCat(this.value)"></select>
+  </div>
   <div id="carica-list"></div>
 </div>
 
@@ -2432,15 +2442,19 @@ let caricaActiveCat='';
 
 function renderCarica(){
   if(!isResp()) return;
+  const sel=document.getElementById('carica-cat-sel');
 
-  // Build category tabs (skip Carburante)
-  const tabs=document.getElementById('carica-tabs');
-  const allCats=catOrder.filter(c=>c!=='Carburante'&&categories[c]);
-  if(!caricaActiveCat || !allCats.includes(caricaActiveCat)) caricaActiveCat=allCats[0]||'';
+  // Ordina per catOrder ma include TUTTO ciò che è in categories
+  const fromOrder=catOrder.filter(c=>categories[c]);
+  const extra=Object.keys(categories).filter(c=>!catOrder.includes(c));
+  const allCats=[...fromOrder,...extra];
 
-  tabs.innerHTML=allCats.map(c=>{
+  if(!caricaActiveCat||!allCats.includes(caricaActiveCat)) caricaActiveCat=allCats[0]||'';
+
+  sel.innerHTML=allCats.map(c=>{
     const cfg=categories[c];
-    return `<button class="carica-tab ${c===caricaActiveCat?'active':''}" onclick="setCaricaCat('${c}')">${cfg.icon} ${cfg.label}</button>`;
+    const n=getItemsByCat(c).length;
+    return `<option value="${c}" ${c===caricaActiveCat?'selected':''}>${cfg.icon} ${cfg.label} (${n} prodotti)</option>`;
   }).join('');
 
   renderCaricaList();
@@ -2448,10 +2462,6 @@ function renderCarica(){
 
 window.setCaricaCat=function(cat){
   caricaActiveCat=cat;
-  // Update tab styles
-  document.querySelectorAll('.carica-tab').forEach(btn=>{
-    btn.classList.toggle('active', btn.textContent.trim().includes(categories[cat]?.label||cat));
-  });
   renderCaricaList();
 };
 
@@ -2460,33 +2470,103 @@ function renderCaricaList(){
   if(!caricaActiveCat){list.innerHTML='';return;}
   const cfg=categories[caricaActiveCat];
   const items=getItemsByCat(caricaActiveCat);
-  if(items.length===0){
-    list.innerHTML='<div class="empty-state"><p>Nessun prodotto in questa categoria</p></div>';return;
-  }
-  list.innerHTML=items.map(it=>{
-    const priceVal=it.prezzo!=null?it.prezzo:'';
-    return `<div class="carica-item">
-      <div class="carica-item-top">
-        <span class="carica-item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
-        <span class="carica-item-name">${it.name}</span>
-        <span class="carica-item-qty">${it.qty} ${it.unit}</span>
+
+  // ── Prodotti esistenti ──────────────────────
+  let html=items.length===0
+    ? `<div style="text-align:center;padding:20px 0 10px;color:var(--text-muted);font-size:13px">
+        Nessun prodotto ancora in <strong>${cfg.label}</strong> — aggiungilo con il form qui sotto.
+       </div>`
+    : items.map(it=>{
+        const priceVal=it.prezzo!=null?it.prezzo:'';
+        return `<div class="carica-item">
+          <div class="carica-item-top">
+            <span class="carica-item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
+            <span class="carica-item-name">${it.name}</span>
+            <span class="carica-item-qty">${it.qty} ${it.unit}</span>
+          </div>
+          <div class="carica-inputs">
+            <div class="carica-input-wrap">
+              <div class="carica-input-label">Quantità da caricare</div>
+              <input class="carica-input" type="number" min="1" placeholder="0"
+                id="cq-${it.id}" value="" inputmode="numeric">
+            </div>
+            <div class="carica-input-wrap">
+              <div class="carica-input-label">Nuovo prezzo €/${it.unit}</div>
+              <input class="carica-input" type="number" min="0" step="0.01"
+                placeholder="${priceVal||'—'}" id="cp-${it.id}" value="" inputmode="decimal">
+            </div>
+          </div>
+          <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
+        </div>`;
+      }).join('');
+
+  // ── Form nuovo prodotto ─────────────────────
+  const unitOpts=['pz','m','kit','conf','lt'].map(u=>`<option value="${u}">${u}</option>`).join('');
+  const subOpts=cfg.subs&&cfg.subs.length>0
+    ? '<option value="">Nessuna</option>'+cfg.subs.map(s=>`<option value="${s}">${s}</option>`).join('')
+    : '';
+
+  html+=`<div class="carica-add-section">
+    <div class="carica-add-title">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Aggiungi nuovo prodotto in ${cfg.label}
+    </div>
+    <div class="carica-add-grid">
+      <div class="carica-input-wrap carica-add-full">
+        <div class="carica-input-label">Nome prodotto</div>
+        <input class="carica-input" id="na-name" placeholder="es. PANNELLO 550W" style="text-transform:uppercase">
       </div>
-      <div class="carica-inputs">
-        <div class="carica-input-wrap">
-          <div class="carica-input-label">Quantità da caricare</div>
-          <input class="carica-input" type="number" min="1" placeholder="0"
-            id="cq-${it.id}" value="" inputmode="numeric">
-        </div>
-        <div class="carica-input-wrap">
-          <div class="carica-input-label">Nuovo prezzo (€/${it.unit})</div>
-          <input class="carica-input" type="number" min="0" step="0.01" placeholder="${priceVal||'—'}"
-            id="cp-${it.id}" value="" inputmode="decimal">
-        </div>
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Quantità iniziale</div>
+        <input class="carica-input" type="number" min="0" value="0" id="na-qty" inputmode="numeric">
       </div>
-      <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
-    </div>`;
-  }).join('');
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Unità</div>
+        <select class="carica-input" id="na-unit">${unitOpts}</select>
+      </div>
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Prezzo €/unità</div>
+        <input class="carica-input" type="number" min="0" step="0.01" placeholder="0.00" id="na-price" inputmode="decimal">
+      </div>
+      ${subOpts?`<div class="carica-input-wrap">
+        <div class="carica-input-label">Sottocategoria</div>
+        <select class="carica-input" id="na-sub">${subOpts}</select>
+      </div>`:''}
+    </div>
+    <button class="carica-add-btn" onclick="submitNuovoProdottoCarica()">
+      ✚ Crea prodotto e carica
+    </button>
+  </div>`;
+
+  list.innerHTML=html;
 }
+
+window.submitNuovoProdottoCarica=async function(){
+  const name=(document.getElementById('na-name')?.value||'').trim().toUpperCase();
+  const qty=parseInt(document.getElementById('na-qty')?.value)||0;
+  const unit=document.getElementById('na-unit')?.value||'pz';
+  const priceRaw=parseFloat(document.getElementById('na-price')?.value);
+  const prezzo=isNaN(priceRaw)||priceRaw<=0?null:Math.round(priceRaw*100)/100;
+  const subEl=document.getElementById('na-sub');
+  const sub=subEl&&subEl.value?subEl.value:null;
+  if(!name){showToast('Inserisci il nome del prodotto','toast-danger');document.getElementById('na-name')?.focus();return;}
+  const cat=caricaActiveCat;
+  const code=nextCodeForCat(cat);
+  const step=unit==='m'?10:1;
+  const id=genId();
+  const item={id,name,cat,qty,unit,code,prezzo,sub,step};
+  itemsList.push(item);
+  await saveItem(item);
+  // Log carico iniziale se qty > 0
+  if(qty>0){
+    const entry={id:genId(),itemId:id,code,name,delta:qty,prevQty:0,
+      operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:'load'};
+    await saveMovimento(entry);
+  }
+  renderCarica();
+  renderDashboard();
+  showToast(code+' — '+name+' aggiunto','toast-return');
+};
 
 window.confirmCarico=async function(itemId){
   const item=itemsList.find(i=>i.id===itemId);if(!item) return;
