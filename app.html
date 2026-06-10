@@ -214,6 +214,9 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .log-time{font-size:11px;color:var(--text-light);margin-top:2px;font-weight:500}
 .log-undo{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;flex-shrink:0;transition:var(--transition)}
 .log-undo:hover{background:#FDF5F5;color:#B33A3A;border-color:#F0C0C0}
+.log-load-more-btn{width:100%;margin-top:12px;padding:13px;background:var(--bg-card);border:1.5px dashed var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:var(--transition)}
+.log-load-more-btn:hover{background:var(--bg-surface);color:var(--text)}
+.log-load-more-btn:disabled{opacity:.5;cursor:default}
 
 /* LOG FILTER (responsabile) */
 .log-filter-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow-xs)}
@@ -741,7 +744,7 @@ import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   doc, getDoc, collection, getDocs, setDoc, deleteDoc,
-  onSnapshot, writeBatch, query, orderBy, limit
+  onSnapshot, writeBatch, query, orderBy, limit, startAfter
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ═══════════════════════════════════════
@@ -751,6 +754,9 @@ let currentUser    = null;
 let categories     = {};
 let itemsList      = [];
 let actLog         = [];
+let logLastDoc     = null;   // cursore paginazione Firestore
+let logHasMore     = false;  // ci sono altri movimenti oltre quelli caricati
+const LOG_PAGE     = 100;    // voci per pagina
 let catOrder       = [];
 let openCats       = {};
 let editMode       = false;
@@ -1023,8 +1029,10 @@ async function loadFromFirestore(){
     }
     const itemsSnap=await getDocs(collection(db,'inventario'));
     itemsList=[];itemsSnap.forEach(d=>itemsList.push({id:d.id,...d.data()}));
-    const logSnap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(200)));
+    const logSnap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(LOG_PAGE)));
     actLog=[];logSnap.forEach(d=>actLog.push({id:d.id,...d.data()}));
+    logLastDoc=logSnap.docs[logSnap.docs.length-1]||null;
+    logHasMore=logSnap.docs.length===LOG_PAGE;
   }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
 }
 
@@ -1187,8 +1195,14 @@ function listenRealtime(){
       if(document.getElementById('page-carburante').classList.contains('active')) renderCarburante();
     }
   });
-  onSnapshot(query(collection(db,'movimenti'),orderBy('time','desc'),limit(200)),snap=>{
-    actLog=[];snap.forEach(d=>actLog.push({id:d.id,...d.data()}));
+  onSnapshot(query(collection(db,'movimenti'),orderBy('time','desc'),limit(LOG_PAGE)),snap=>{
+    // Aggiorna solo le voci già caricate (top), non azzera la paginazione
+    const fresh=[];snap.forEach(d=>fresh.push({id:d.id,...d.data()}));
+    // Mantieni le voci extra già caricate con "Carica altri" (più vecchie del cursore)
+    const extraOld=actLog.filter(e=>!fresh.find(f=>f.id===e.id));
+    actLog=[...fresh,...extraOld];
+    logLastDoc=snap.docs[snap.docs.length-1]||logLastDoc;
+    logHasMore=snap.docs.length===LOG_PAGE||extraOld.length>0;
     if(document.getElementById('page-registro').classList.contains('active')) renderLog();
   });
 }
@@ -1482,6 +1496,29 @@ window.doAdjust=async function(sign){
 // ═══════════════════════════════════════
 //  LOG
 // ═══════════════════════════════════════
+window.loadMoreLog=async function(){
+  if(!logLastDoc){showToast('Nessun altro movimento da caricare','toast-info');return;}
+  const btn=document.getElementById('log-load-more-btn');
+  if(btn){btn.textContent='Caricamento...';btn.disabled=true;}
+  try{
+    const snap=await getDocs(query(
+      collection(db,'movimenti'),orderBy('time','desc'),
+      startAfter(logLastDoc),limit(LOG_PAGE)
+    ));
+    snap.forEach(d=>{
+      const entry={id:d.id,...d.data()};
+      if(!actLog.find(e=>e.id===entry.id)) actLog.push(entry);
+    });
+    logLastDoc=snap.docs[snap.docs.length-1]||logLastDoc;
+    logHasMore=snap.docs.length===LOG_PAGE;
+    renderLog();
+    showToast('Caricati altri '+snap.docs.length+' movimenti','toast-info');
+  }catch(e){
+    showToast('Errore nel caricamento','toast-danger');
+    if(btn){btn.textContent='Carica altri 100';btn.disabled=false;}
+  }
+};
+
 // ─── stato filtri registro ───
 let logFilterMonth=''; // 'YYYY-MM'
 let logFilterDay='';   // 'YYYY-MM-DD'
@@ -1507,6 +1544,7 @@ function renderLog(){
       const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
       html+=renderLogItem(entry,isTake,ts,false);
     });
+    if(logHasMore) html+=`<button id="log-load-more-btn" class="log-load-more-btn" onclick="loadMoreLog()">↓ Carica altri 100 movimenti</button>`;
     container.innerHTML=html;
     return;
   }
@@ -1608,6 +1646,16 @@ function renderLog(){
   });
 
   container.innerHTML=html;
+
+  // Bottone "Carica altri" se ci sono movimenti più vecchi non ancora caricati
+  if(logHasMore&&!logFilterDay&&!logFilterMonth){
+    const moreBtn=document.createElement('button');
+    moreBtn.id='log-load-more-btn';
+    moreBtn.className='log-load-more-btn';
+    moreBtn.textContent='↓ Carica altri 100 movimenti';
+    moreBtn.onclick=loadMoreLog;
+    container.appendChild(moreBtn);
+  }
 }
 
 function renderLogItem(entry,isTake,ts,showUndo){
@@ -1862,25 +1910,39 @@ window.exportValoreMagazzino=function(){
   XLSX.utils.book_append_sheet(wb,ws1,'Valore Magazzino');
 
   // ─── FOGLIO 2: Carichi Ultimi 12 Mesi ────
+  // Query diretta a Firestore per avere TUTTI i carichi, non solo quelli in memoria
   const f2rows=[];
   f2rows.push(['OPERAZIONI DI CARICO — ULTIMI 12 MESI']);
   const oggi=new Date();
   const unAnnoFa=new Date(oggi);
   unAnnoFa.setFullYear(unAnnoFa.getFullYear()-1);
   f2rows.push(['Periodo: '+unAnnoFa.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})
-    +' → '+oggi.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})]);
+    +' \u2192 '+oggi.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})]);
   f2rows.push([]);
   f2rows.push(['Data','Ora','Codice','Prodotto','Categoria','Qty Caricata','Unità','Nuovo Prezzo €','Operatore']);
 
-  const carichi=actLog
-    .filter(e=>e.type==='load' && e.time>=unAnnoFa.getTime())
-    .sort((a,b)=>b.time-a.time);
+  // Recupera TUTTI i carichi dell'ultimo anno da Firestore
+  let tuttiCarichi=[];
+  try{
+    const carichiSnap=await getDocs(query(
+      collection(db,'movimenti'),
+      orderBy('time','desc'),
+      limit(2000)
+    ));
+    carichiSnap.forEach(d=>{
+      const e={id:d.id,...d.data()};
+      if(e.type==='load'&&e.time>=unAnnoFa.getTime()) tuttiCarichi.push(e);
+    });
+  }catch(err){
+    // fallback su actLog se la query fallisce
+    tuttiCarichi=actLog.filter(e=>e.type==='load'&&e.time>=unAnnoFa.getTime());
+  }
+  tuttiCarichi.sort((a,b)=>b.time-a.time);
 
-  if(carichi.length===0){
+  if(tuttiCarichi.length===0){
     f2rows.push(['Nessun carico effettuato nel periodo']);
   } else {
-    let totQtaPerCodice={};
-    carichi.forEach(e=>{
+    tuttiCarichi.forEach(e=>{
       const d=new Date(e.time);
       const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
       const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
@@ -1891,7 +1953,7 @@ window.exportValoreMagazzino=function(){
       totQtaPerCodice[e.code]=(totQtaPerCodice[e.code]||0)+e.delta;
     });
     f2rows.push([]);
-    f2rows.push(['','','','','Totale movimenti:',carichi.length]);
+    f2rows.push(['','','','','Totale movimenti:',tuttiCarichi.length]);
   }
 
   const ws2=XLSX.utils.aoa_to_sheet(f2rows);
