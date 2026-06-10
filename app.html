@@ -1848,7 +1848,7 @@ window.clearAllLogs=async function(){
 // ─────────────────────────────────────────────
 //  EXCEL VALORE MAGAZZINO (2 fogli)
 // ─────────────────────────────────────────────
-window.exportValoreMagazzino=function(){
+window.exportValoreMagazzino=async function(){
   if(typeof XLSX==='undefined'){
     showToast('Libreria Excel non ancora caricata, riprova tra un istante','toast-danger');return;
   }
