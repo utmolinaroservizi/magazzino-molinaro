@@ -152,7 +152,7 @@ import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gsta
 
 // Se già loggato → vai direttamente all'app
 onAuthStateChanged(auth, user => {
-  if (user) window.location.href = 'app.html';
+  if (user) window.location.replace('app.html');
 });
 
 window.doLogin = async function() {

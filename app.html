@@ -1058,6 +1058,16 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   catOrder=[...ordered,...extra];
   document.getElementById('loading-screen').style.display='none';
   listenRealtime();
+
+  // Ripristina la pagina dall'hash URL (es. app.html#qrcode dopo tasto indietro)
+  const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile'];
+  const hashPage=window.location.hash.replace('#','');
+  const startPage=(VALID_PAGES.includes(hashPage)&&(hashPage!=='carica'&&hashPage!=='responsabile'||isResp()))
+    ?hashPage:'dashboard';
+  // Sostituisce la voce corrente della history (non aggiunge una nuova)
+  history.replaceState({page:startPage},'','#'+startPage);
+  _showPage(startPage);
+
   setTimeout(handleUrlProductCode,300);
 });
 
@@ -1269,12 +1279,15 @@ async function deleteMovimento(id){await deleteDoc(doc(db,'movimenti',id))}
 //  PAGE NAV
 // ═══════════════════════════════════════
 let currentPage='dashboard';
-window.showPage=function(id){
+// Navigazione interna senza pushState (usata da popstate e da init)
+function _showPage(id){
   if(currentPage==='qrcode'&&id!=='qrcode') stopQrScanner();
   currentPage=id;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
+  const pageEl=document.getElementById('page-'+id);
+  if(!pageEl) return; // pagina non trovata, ignora
+  pageEl.classList.add('active');
   const navEl=document.getElementById('nav-'+id);if(navEl) navEl.classList.add('active');
   const isMat=id==='materiali';
   document.getElementById('edit-toggle').style.display=isMat?'flex':'none';
@@ -1285,14 +1298,25 @@ window.showPage=function(id){
   if(id==='carburante') renderCarburante();
   if(id==='carica') renderCarica();
   if(id==='qrcode'){
-    // Mostra/nascondi sezione bacheca in base al ruolo prima del render
     const respSec=document.getElementById('qr-resp-section');
     if(respSec) respSec.style.display=isResp()?'block':'none';
     renderQrPage();
   }
   if(id==='responsabile') renderResponsabile();
   closeFab();
+}
+
+// Navigazione pubblica: aggiorna anche la history del browser
+window.showPage=function(id){
+  _showPage(id);
+  history.pushState({page:id},'','#'+id);
 };
+
+// Tasto Indietro/Avanti del browser
+window.addEventListener('popstate',e=>{
+  const id=(e.state&&e.state.page)||'dashboard';
+  _showPage(id);
+});
 
 // ═══════════════════════════════════════
 //  DASHBOARD
