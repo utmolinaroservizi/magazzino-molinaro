@@ -162,6 +162,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .action-icon{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
 .action-label{font-size:12px;font-weight:600;line-height:1.3;text-align:center}
 
+/* FUEL — selettore mezzo aziendale (solo nafta) */
+.fuel-vehicle-zone{padding:12px 16px;background:var(--bg-surface);border-radius:var(--radius-sm);margin:8px 0}
+.fuel-vehicle-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-light);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fuel-vehicle-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fuel-vehicle-select{padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;background:var(--bg-card);color:var(--text);outline:none;width:100%;box-sizing:border-box;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:28px}
+.fuel-vehicle-select:focus{border-color:var(--brand-500)}
+.fuel-vehicle-label{font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:3px}
+
 /* COUNTER SELECTOR */
 .counter-zone{padding:16px 20px 4px;text-align:center}
 .counter-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-light);font-weight:600;margin-bottom:12px}
@@ -604,6 +612,24 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Operatore: <strong id="fm-operator-name">—</strong>
     </div>
+    <!-- Selezione mezzo aziendale: solo per Nafta -->
+    <div class="fuel-vehicle-zone" id="fm-vehicle-zone" style="display:none">
+      <div class="fuel-vehicle-title">🚛 Mezzo aziendale</div>
+      <div class="fuel-vehicle-row">
+        <div>
+          <div class="fuel-vehicle-label">Mezzo</div>
+          <select class="fuel-vehicle-select" id="fm-mezzo" onchange="syncVehicle('mezzo')">
+            <option value="">— Seleziona —</option>
+          </select>
+        </div>
+        <div>
+          <div class="fuel-vehicle-label">Targa</div>
+          <select class="fuel-vehicle-select" id="fm-targa" onchange="syncVehicle('targa')">
+            <option value="">— Seleziona —</option>
+          </select>
+        </div>
+      </div>
+    </div>
     <div class="counter-zone">
       <div class="counter-label">Litri da movimentare</div>
       <div class="counter-row">
@@ -764,6 +790,24 @@ let actLog         = [];
 let logLastDoc     = null;   // cursore paginazione Firestore
 let logHasMore     = false;  // ci sono altri movimenti oltre quelli caricati
 const LOG_PAGE     = 100;    // voci per pagina
+
+// ── Mezzi aziendali (per rifornimento nafta) ──
+const MEZZI_AZIENDALI=[
+  {mezzo:'Toyota Hilux',targa:'BN 234409'},
+  {mezzo:'Mitsubishi Fuso Canter (piattaforma aerea)',targa:'GD 122 FY'},
+  {mezzo:'Daily Palfinger (piattaforma aerea)',targa:'GJ 536 GR'},
+  {mezzo:'Mercedes Atego (piattaforma aerea)',targa:'APC457'},
+  {mezzo:'Daily 60C15 (scarrabile)',targa:'FN 264 YT'},
+  {mezzo:'Mercedes Sprinter',targa:'FG 198 YY'},
+  {mezzo:'Iveco Eurocargo 180E28',targa:'GP 934 LF'},
+  {mezzo:'Fiat Panda rossa',targa:'DK 376 VS'},
+  {mezzo:'Fiat Panda bianca',targa:'FH 264 GB'},
+  {mezzo:'Fiat 500L',targa:'EZ 289 MJ'},
+  {mezzo:'Peugeot Partner',targa:'GC 830 WD'},
+  {mezzo:'Peugeot Bipper',targa:'EJ 322 MT'},
+  {mezzo:'Peugeot 107',targa:'DX 447 AZ'},
+  {mezzo:'BMW X6 40D',targa:'GX 785 HB'},
+];
 let catOrder       = [];
 let openCats       = {};
 let editMode       = false;
@@ -1703,6 +1747,9 @@ function renderLogItem(entry,isTake,ts){
     </div>`;
   }
 
+  // Info mezzo (solo per nafta)
+  const vehicleHTML=entry.mezzo?`<div class="log-time" style="color:#555;font-weight:600">🚛 ${entry.mezzo} · ${entry.targa||''}</div>`:'';
+
   return `<div class="log-item">
     <div class="log-icon ${iconCls}">${icon}</div>
     <div class="log-info">
@@ -1711,6 +1758,7 @@ function renderLogItem(entry,isTake,ts){
         <span>👷 ${entry.operator||'N/D'}</span>
         <span class="log-type-badge ${typeCls}">${typeLabel}</span>
       </div>
+      ${vehicleHTML}
       <div class="log-time">${action} ${amt}${un?' '+un:''} · ${ts}</div>
     </div>
     ${actionsHTML}
@@ -2515,10 +2563,12 @@ function renderCarburante(){
     const isTake=entry.delta<0;
     const d=new Date(entry.time);
     const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    const veh=entry.mezzo?`<div class="log-time" style="color:#555;font-weight:600">🚛 ${entry.mezzo} · ${entry.targa||''}</div>`:'';
     html+=`<div class="log-item">
       <div class="log-icon ${isTake?'take':'ret'}">${isTake?'−':'+'}</div>
       <div class="log-info"><div class="log-text"><strong>${entry.code}</strong> — ${entry.name}</div>
       <div class="log-operator">👷 ${entry.operator||'N/D'}</div>
+      ${veh}
       <div class="log-time">${isTake?'Prelevati':'Reinseriti'} ${Math.abs(entry.delta)} lt · ${ts}</div></div>
     </div>`;
   });
@@ -2534,6 +2584,18 @@ window.openFuelModal=function(id){
   document.getElementById('fm-qty').textContent=item.qty;
   document.getElementById('fm-operator-name').textContent=currentUser.nome;
   updateFuelCounterDisplay();
+
+  // ── Mezzo aziendale: solo per Nafta (CB.001) ──
+  const vZone=document.getElementById('fm-vehicle-zone');
+  const isNafta=item.code==='CB.001';
+  vZone.style.display=isNafta?'block':'none';
+  if(isNafta){
+    const mSel=document.getElementById('fm-mezzo');
+    const tSel=document.getElementById('fm-targa');
+    mSel.innerHTML='<option value="">— Seleziona mezzo —</option>'+MEZZI_AZIENDALI.map((v,i)=>`<option value="${i}">${v.mezzo}</option>`).join('');
+    tSel.innerHTML='<option value="">— Seleziona targa —</option>'+MEZZI_AZIENDALI.map((v,i)=>`<option value="${i}">${v.targa}</option>`).join('');
+    mSel.value='';tSel.value='';
+  }
   const priceZone=document.getElementById('fuel-price-zone');
   if(isResp()){
     priceZone.classList.add('visible');
@@ -2554,18 +2616,39 @@ window.closeFuelModal=function(e){
   document.body.style.overflow='';currentFuelItem=null;fuelPriceEditOpen=false;
 };
 
+window.syncVehicle=function(from){
+  const mSel=document.getElementById('fm-mezzo');
+  const tSel=document.getElementById('fm-targa');
+  if(from==='mezzo') tSel.value=mSel.value;
+  else mSel.value=tSel.value;
+};
+
+function getSelectedVehicle(){
+  if(!currentFuelItem||currentFuelItem.code!=='CB.001') return null;
+  const idx=document.getElementById('fm-mezzo')?.value;
+  if(idx===''||idx==null) return null;
+  const v=MEZZI_AZIENDALI[parseInt(idx)];
+  return v?{mezzo:v.mezzo,targa:v.targa}:null;
+}
+
 window.doFuelAdjust=async function(sign){
   if(!currentFuelItem) return;
   if(sign<0){
     if(currentFuelItem.qty<=0){showToast('⛔ Carburante esaurito!','toast-danger');return;}
     if(fuelCounterVal>currentFuelItem.qty){showToast('⚠️ Disponibili solo '+currentFuelItem.qty+' lt!','toast-danger');return;}
+    // Per nafta: mezzo obbligatorio al prelievo
+    if(currentFuelItem.code==='CB.001'&&!getSelectedVehicle()){
+      showToast('⚠️ Seleziona il mezzo aziendale!','toast-danger');return;
+    }
   }
   const amount=fuelCounterVal*sign;
   const next=currentFuelItem.qty+amount;
   const actualDelta=next-currentFuelItem.qty;
   currentFuelItem.qty=next;
   await saveItem(currentFuelItem);
+  const vehicle=getSelectedVehicle();
   const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:actualDelta<0?'take':'return'};
+  if(vehicle){entry.mezzo=vehicle.mezzo;entry.targa=vehicle.targa;}
   await saveMovimento(entry);
   document.getElementById('fm-qty').textContent=next;
   if(isResp()){
@@ -2575,7 +2658,8 @@ window.doFuelAdjust=async function(sign){
   }
   const qe=document.getElementById('fm-qty');qe.style.transform='scale(1.15)';setTimeout(()=>qe.style.transform='scale(1)',200);
   const cls=actualDelta<0?'toast-take':'toast-return';
-  showToast((actualDelta<0?'−':'+ ')+Math.abs(actualDelta)+' lt '+currentFuelItem.name+' · '+currentUser.nome,cls);
+  const vehLabel=vehicle?' · '+vehicle.mezzo:'';
+  showToast((actualDelta<0?'−':'+ ')+Math.abs(actualDelta)+' lt '+currentFuelItem.name+vehLabel+' · '+currentUser.nome,cls);
   fuelCounterVal=FUEL_STEP;
   updateFuelCounterDisplay();
 };
