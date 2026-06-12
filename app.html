@@ -217,6 +217,13 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .log-load-more-btn{width:100%;margin-top:12px;padding:13px;background:var(--bg-card);border:1.5px dashed var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:var(--transition)}
 .log-load-more-btn:hover{background:var(--bg-surface);color:var(--text)}
 .log-load-more-btn:disabled{opacity:.5;cursor:default}
+.log-actions{display:flex;gap:4px;flex-shrink:0;flex-direction:column}
+.log-action-btn{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition);white-space:nowrap}
+.log-action-btn:active{transform:scale(.95)}
+.log-action-edit{color:#2563EB;border-color:#BFDBFE}
+.log-action-edit:hover{background:#EFF6FF}
+.log-action-del{color:#B33A3A;border-color:#F0C0C0}
+.log-action-del:hover{background:#FDF5F5}
 
 /* LOG FILTER (responsabile) */
 .log-filter-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow-xs)}
@@ -1542,7 +1549,7 @@ function renderLog(){
       const isTake=entry.delta<0;
       const d=new Date(entry.time);
       const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-      html+=renderLogItem(entry,isTake,ts,false);
+      html+=renderLogItem(entry,isTake,ts);
     });
     if(logHasMore) html+=`<button id="log-load-more-btn" class="log-load-more-btn" onclick="loadMoreLog()">↓ Carica altri 100 movimenti</button>`;
     container.innerHTML=html;
@@ -1638,7 +1645,7 @@ function renderLog(){
       entries.forEach(entry=>{
         const isTake=entry.delta<0;
         const ts=new Date(entry.time).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-        html+=renderLogItem(entry,isTake,ts,true);
+        html+=renderLogItem(entry,isTake,ts);
       });
     });
 
@@ -1658,16 +1665,32 @@ function renderLog(){
   }
 }
 
-function renderLogItem(entry,isTake,ts,showUndo){
+function renderLogItem(entry,isTake,ts){
   const amt=Math.abs(entry.delta);
   const item=itemsList.find(i=>i.id===entry.itemId);
   const un=item?item.unit:'';
-  const t=entry.type||( isTake?'take':'return');
+  const t=entry.type||(isTake?'take':'return');
   const typeLabel={take:'Prelievo',return:'Restituzione',load:'Carico merce'}[t]||'Movimento';
   const typeCls={take:'log-type-take',return:'log-type-return',load:'log-type-load'}[t]||'log-type-return';
   const icon={take:'📤',return:'↩️',load:'📦'}[t]||'↔️';
   const iconCls={take:'take',return:'ret',load:'ret'}[t]||'ret';
   const action={take:'Prelevati',return:'Restituiti',load:'Caricati'}[t]||'Mossi';
+
+  // Determina quali azioni mostrare
+  let actionsHTML='';
+  const isOwn=entry.operatorUid===currentUser.uid;
+
+  if(isResp()){
+    // Responsabile: annulla qualsiasi movimento
+    actionsHTML=`<button class="log-undo" onclick="undoLog('${entry.id}')">Annulla</button>`;
+  } else if(isOwn){
+    // Operaio: modifica/elimina solo i propri
+    actionsHTML=`<div class="log-actions">
+      <button class="log-action-btn log-action-edit" onclick="editLogEntry('${entry.id}')">✏️ Modifica</button>
+      <button class="log-action-btn log-action-del" onclick="undoLog('${entry.id}')">🗑️ Elimina</button>
+    </div>`;
+  }
+
   return `<div class="log-item">
     <div class="log-icon ${iconCls}">${icon}</div>
     <div class="log-info">
@@ -1678,7 +1701,7 @@ function renderLogItem(entry,isTake,ts,showUndo){
       </div>
       <div class="log-time">${action} ${amt}${un?' '+un:''} · ${ts}</div>
     </div>
-    ${showUndo?`<button class="log-undo" onclick="undoLog('${entry.id}')">Annulla</button>`:''}
+    ${actionsHTML}
   </div>`;
 }
 
@@ -1707,10 +1730,63 @@ window.clearLogFilter=function(){
 
 window.undoLog=async function(logId){
   const entry=actLog.find(e=>e.id===logId);if(!entry) return;
-  if(!confirm('Annullare questo movimento?\n'+entry.code+' — '+(entry.delta<0?'Prelevato':'Rimesso')+' da '+entry.operator)) return;
+  const isTake=entry.delta<0;
+  const amt=Math.abs(entry.delta);
   const item=itemsList.find(i=>i.id===entry.itemId);
+  const un=item?item.unit:'';
+  if(!confirm('Eliminare questo movimento?\n\n'+entry.code+' — '+(isTake?'Prelevato':'Rimesso')+' '+amt+' '+un+'\nda '+entry.operator+'\n\nLa giacenza verrà ripristinata.')) return;
   if(item){item.qty=Math.max(0,item.qty-entry.delta);await saveItem(item);}
-  await deleteMovimento(logId);showToast('Movimento annullato','toast-info');
+  await deleteMovimento(logId);
+  showToast('Movimento eliminato e giacenza ripristinata','toast-info');
+};
+
+window.editLogEntry=async function(logId){
+  const entry=actLog.find(e=>e.id===logId);if(!entry) return;
+  // Solo i propri movimenti
+  if(entry.operatorUid!==currentUser.uid){showToast('Puoi modificare solo i tuoi movimenti','toast-danger');return;}
+
+  const isTake=entry.delta<0;
+  const oldAmt=Math.abs(entry.delta);
+  const item=itemsList.find(i=>i.id===entry.itemId);
+  const un=item?item.unit:'';
+  const action=isTake?'prelevata':'rimessa';
+
+  const input=prompt(
+    'Modifica quantità '+action+' per:\n'+
+    entry.code+' — '+entry.name+'\n\n'+
+    'Quantità attuale: '+oldAmt+' '+un+'\n'+
+    'Inserisci la quantità corretta:',
+    oldAmt
+  );
+  if(input===null) return; // annullato
+
+  const newAmt=parseInt(input);
+  if(isNaN(newAmt)||newAmt<0){showToast('Quantità non valida','toast-danger');return;}
+
+  if(newAmt===0){
+    // Se mette 0, equivale a eliminare il movimento
+    if(!confirm('Quantità 0 = elimina il movimento. Confermi?')) return;
+    if(item){item.qty=Math.max(0,item.qty-entry.delta);await saveItem(item);}
+    await deleteMovimento(logId);
+    showToast('Movimento eliminato','toast-info');
+    return;
+  }
+
+  const newDelta=isTake?-newAmt:newAmt;
+  const diff=newDelta-entry.delta; // differenza da applicare alla giacenza
+
+  // Aggiorna giacenza
+  if(item){
+    item.qty=Math.max(0,item.qty+diff);
+    await saveItem(item);
+  }
+
+  // Aggiorna il movimento in Firestore
+  entry.delta=newDelta;
+  const{id,...data}=entry;
+  await setDoc(doc(db,'movimenti',id),data);
+
+  showToast('Movimento aggiornato: '+oldAmt+' → '+newAmt+' '+un,'toast-return');
 };
 
 // ═══════════════════════════════════════
