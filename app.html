@@ -1479,9 +1479,21 @@ window.closeModal=function(e){
 };
 window.doAdjust=async function(sign){
   if(!currentModalItem) return;
+
+  // ── BLOCCO PRELIEVO SE STOCK INSUFFICIENTE ──
+  if(sign<0){
+    if(currentModalItem.qty<=0){
+      showToast('⛔ Stock esaurito! Impossibile prelevare.','toast-danger');
+      return;
+    }
+    if(counterVal>currentModalItem.qty){
+      showToast('⚠️ Disponibili solo '+currentModalItem.qty+' '+currentModalItem.unit+'! Riduci la quantità.','toast-danger');
+      return;
+    }
+  }
+
   const amount=counterVal*sign;
-  const next=Math.max(0,currentModalItem.qty+amount);
-  if(next===currentModalItem.qty&&sign<0) return;
+  const next=currentModalItem.qty+amount; // niente più Math.max — il blocco sopra garantisce next >= 0
   const actualDelta=next-currentModalItem.qty;
   currentModalItem.qty=next;
   await saveItem(currentModalItem);
@@ -1737,12 +1749,16 @@ window.undoLog=async function(logId){
   if(!confirm('Eliminare questo movimento?\n\n'+entry.code+' — '+(isTake?'Prelevato':'Rimesso')+' '+amt+' '+un+'\nda '+entry.operator+'\n\nLa giacenza verrà ripristinata.')) return;
   if(item){item.qty=Math.max(0,item.qty-entry.delta);await saveItem(item);}
   await deleteMovimento(logId);
+  // ── Aggiorna UI immediatamente ──
+  actLog=actLog.filter(e=>e.id!==logId);
+  renderLog();
+  if(document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
+  if(document.getElementById('page-carburante').classList.contains('active')) renderCarburante();
   showToast('Movimento eliminato e giacenza ripristinata','toast-info');
 };
 
 window.editLogEntry=async function(logId){
   const entry=actLog.find(e=>e.id===logId);if(!entry) return;
-  // Solo i propri movimenti
   if(entry.operatorUid!==currentUser.uid){showToast('Puoi modificare solo i tuoi movimenti','toast-danger');return;}
 
   const isTake=entry.delta<0;
@@ -1758,34 +1774,45 @@ window.editLogEntry=async function(logId){
     'Inserisci la quantità corretta:',
     oldAmt
   );
-  if(input===null) return; // annullato
+  if(input===null) return;
 
   const newAmt=parseInt(input);
   if(isNaN(newAmt)||newAmt<0){showToast('Quantità non valida','toast-danger');return;}
 
   if(newAmt===0){
-    // Se mette 0, equivale a eliminare il movimento
     if(!confirm('Quantità 0 = elimina il movimento. Confermi?')) return;
     if(item){item.qty=Math.max(0,item.qty-entry.delta);await saveItem(item);}
     await deleteMovimento(logId);
+    actLog=actLog.filter(e=>e.id!==logId);
+    renderLog();
     showToast('Movimento eliminato','toast-info');
     return;
   }
 
-  const newDelta=isTake?-newAmt:newAmt;
-  const diff=newDelta-entry.delta; // differenza da applicare alla giacenza
+  // Verifica stock sufficiente per la modifica
+  if(isTake && item){
+    const currentStock=item.qty;
+    const extraTake=newAmt-oldAmt; // >0 = prende di più, <0 = restituisce
+    if(extraTake>0 && extraTake>currentStock){
+      showToast('⚠️ Stock insufficiente! Disponibili: '+currentStock+' '+un,'toast-danger');
+      return;
+    }
+  }
 
-  // Aggiorna giacenza
+  const newDelta=isTake?-newAmt:newAmt;
+  const diff=newDelta-entry.delta;
+
   if(item){
     item.qty=Math.max(0,item.qty+diff);
     await saveItem(item);
   }
 
-  // Aggiorna il movimento in Firestore
   entry.delta=newDelta;
   const{id,...data}=entry;
   await setDoc(doc(db,'movimenti',id),data);
-
+  // ── Aggiorna UI immediatamente ──
+  renderLog();
+  if(document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
   showToast('Movimento aggiornato: '+oldAmt+' → '+newAmt+' '+un,'toast-return');
 };
 
@@ -2529,9 +2556,12 @@ window.closeFuelModal=function(e){
 
 window.doFuelAdjust=async function(sign){
   if(!currentFuelItem) return;
+  if(sign<0){
+    if(currentFuelItem.qty<=0){showToast('⛔ Carburante esaurito!','toast-danger');return;}
+    if(fuelCounterVal>currentFuelItem.qty){showToast('⚠️ Disponibili solo '+currentFuelItem.qty+' lt!','toast-danger');return;}
+  }
   const amount=fuelCounterVal*sign;
-  const next=Math.max(0,currentFuelItem.qty+amount);
-  if(next===currentFuelItem.qty&&sign<0) return;
+  const next=currentFuelItem.qty+amount;
   const actualDelta=next-currentFuelItem.qty;
   currentFuelItem.qty=next;
   await saveItem(currentFuelItem);
