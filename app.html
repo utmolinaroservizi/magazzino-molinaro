@@ -2059,7 +2059,6 @@ window.exportValoreMagazzino=async function(){
   let itemsNoPrezzi=0;
 
   catOrder.forEach(cat=>{
-    if(cat==='Carburante') return;
     const cfg=categories[cat];if(!cfg) return;
     const items=getItemsByCat(cat);if(items.length===0) return;
     items.forEach(it=>{
