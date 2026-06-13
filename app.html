@@ -2142,7 +2142,6 @@ window.exportValoreMagazzino=async function(){
       const catLabel=item?(categories[item.cat]?.label||item.cat):'';
       const nuovoPrezzo=item?.prezzo!=null?item.prezzo:'';
       f2rows.push([data,ora,e.code,e.name,catLabel,e.delta,item?.unit||'',nuovoPrezzo,e.operator||'N/D']);
-      totQtaPerCodice[e.code]=(totQtaPerCodice[e.code]||0)+e.delta;
     });
     f2rows.push([]);
     f2rows.push(['','','','','Totale movimenti:',tuttiCarichi.length]);
