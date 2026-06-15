@@ -33,6 +33,16 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 
 #loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 #loading-screen img{height:44px;object-fit:contain}
+
+/* ROTAZIONE BLOCCATA — overlay quando il telefono è in orizzontale */
+#rotate-overlay{display:none;position:fixed;inset:0;z-index:99999;background:#1a1a1a;color:#fff;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;gap:18px}
+#rotate-overlay .rotate-icon{font-size:56px;animation:rotateHint 1.8s ease-in-out infinite}
+#rotate-overlay .rotate-title{font-size:18px;font-weight:700}
+#rotate-overlay .rotate-text{font-size:14px;color:#aaa;max-width:280px;line-height:1.5}
+@keyframes rotateHint{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-90deg)}}
+@media (orientation: landscape) and (max-width: 900px){
+  #rotate-overlay{display:flex}
+}
 .loading-spinner{width:32px;height:32px;border:3px solid var(--brand-100);border-top-color:var(--brand-500);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:13px;color:var(--text-muted);font-weight:500}
@@ -467,6 +477,11 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+<div id="rotate-overlay">
+  <div class="rotate-icon">📱</div>
+  <div class="rotate-title">Ruota il telefono in verticale</div>
+  <div class="rotate-text">Questa app è ottimizzata per l'uso in modalità verticale. Ruota il dispositivo per continuare.</div>
+</div>
 <div id="loading-screen"><img src="logo-molinaro.png" alt="Molinaro"><div class="loading-spinner"></div><div class="loading-text">Caricamento...</div></div>
 
 <div class="header">
@@ -2980,6 +2995,18 @@ window.showToast=function(msg,cls){const t=document.getElementById('toast');t.cl
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
 <script>
+// ═══════════════════════════════════════
+//  BLOCCO ORIENTAZIONE — tentativo via API
+//  (funziona su Android quando l'app è installata come PWA;
+//   su iOS e nel browser normale interviene l'overlay CSS)
+// ═══════════════════════════════════════
+if(screen.orientation && screen.orientation.lock){
+  screen.orientation.lock('portrait').catch(()=>{
+    // Silenzioso: non disponibile (browser normale, iOS, ecc.)
+    // L'overlay CSS #rotate-overlay gestisce comunque il caso
+  });
+}
+
 // ═══════════════════════════════════════
 //  SERVICE WORKER — registrazione e aggiornamento
 // ═══════════════════════════════════════

@@ -123,9 +123,25 @@ body{
   display:none;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ROTAZIONE BLOCCATA — overlay quando il telefono è in orizzontale */
+#rotate-overlay{display:none;position:fixed;inset:0;z-index:99999;background:#1a1a1a;color:#fff;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;gap:18px}
+#rotate-overlay .rotate-icon{font-size:56px;animation:rotateHint 1.8s ease-in-out infinite}
+#rotate-overlay .rotate-title{font-size:18px;font-weight:700}
+#rotate-overlay .rotate-text{font-size:14px;color:#aaa;max-width:280px;line-height:1.5}
+@keyframes rotateHint{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-90deg)}}
+@media (orientation: landscape) and (max-width: 900px){
+  #rotate-overlay{display:flex}
+}
 </style>
 </head>
 <body>
+
+<div id="rotate-overlay">
+  <div class="rotate-icon">📱</div>
+  <div class="rotate-title">Ruota il telefono in verticale</div>
+  <div class="rotate-text">Questa app è ottimizzata per l'uso in modalità verticale. Ruota il dispositivo per continuare.</div>
+</div>
 
 <div class="login-card">
   <img src="logo-molinaro.png" class="login-logo" alt="Molinaro ESCo">
@@ -215,6 +231,9 @@ document.getElementById('login-email').addEventListener('keydown', e => {
 });
 </script>
 <script>
+if(screen.orientation && screen.orientation.lock){
+  screen.orientation.lock('portrait').catch(()=>{});
+}
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js').then(r=>console.log('[SW] Registrato')).catch(e=>console.warn('[SW] Errore:',e));
 }

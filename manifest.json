@@ -5,7 +5,7 @@
   "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait-primary",
   "background_color": "#F8FAF6",
   "theme_color": "#4DAB3D",
   "categories": ["business", "utilities"],

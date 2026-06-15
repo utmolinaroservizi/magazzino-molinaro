@@ -3,7 +3,7 @@
 //  Cambia APP_VERSION ad ogni deploy per forzare
 //  l'aggiornamento su tutti i dispositivi.
 // ══════════════════════════════════════════════
-const APP_VERSION = '1.2.4';
+const APP_VERSION = '1.2.2';
 const CACHE_NAME  = 'magazzino-v' + APP_VERSION;
 
 // File da mettere in cache per funzionamento offline
