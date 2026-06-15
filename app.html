@@ -1352,10 +1352,12 @@ function listenRealtime(){
   onSnapshot(collection(db,'cantieri'),snap=>{
     cantieriList=[];snap.forEach(d=>cantieriList.push({id:d.id,...d.data()}));
     cantieriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
   });
   onSnapshot(collection(db,'fornitori'),snap=>{
     fornitoriList=[];snap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
     fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
   });
 }
 
@@ -3040,18 +3042,16 @@ window.addCantiere=async function(){
   if(cantieriList.find(c=>c.nome.toLowerCase()===nome.toLowerCase())){showToast('Cantiere già esistente','toast-danger');return;}
   const id=genId();
   await setDoc(doc(db,'cantieri',id),{nome,creato:Date.now()});
-  cantieriList.push({id,nome,creato:Date.now()});
-  cantieriList.sort((a,b)=>a.nome.localeCompare(b.nome));
   input.value='';
-  renderResponsabile();
+  // Il listener onSnapshot aggiornerà cantieriList automaticamente
+  setTimeout(()=>renderResponsabile(),300);
   showToast('Cantiere "'+nome+'" aggiunto','toast-return');
 };
 window.deleteCantiere=async function(id){
   const c=cantieriList.find(x=>x.id===id);
   if(!c||!confirm('Eliminare il cantiere "'+c.nome+'"?')) return;
   await deleteDoc(doc(db,'cantieri',id));
-  cantieriList=cantieriList.filter(x=>x.id!==id);
-  renderResponsabile();
+  setTimeout(()=>renderResponsabile(),300);
   showToast('Cantiere eliminato','toast-info');
 };
 
@@ -3065,18 +3065,15 @@ window.addFornitore=async function(){
   if(fornitoriList.find(f=>f.nome.toLowerCase()===nome.toLowerCase())){showToast('Fornitore già esistente','toast-danger');return;}
   const id=genId();
   await setDoc(doc(db,'fornitori',id),{nome,creato:Date.now()});
-  fornitoriList.push({id,nome,creato:Date.now()});
-  fornitoriList.sort((a,b)=>a.nome.localeCompare(b.nome));
   input.value='';
-  renderResponsabile();
+  setTimeout(()=>renderResponsabile(),300);
   showToast('Fornitore "'+nome+'" aggiunto','toast-return');
 };
 window.deleteFornitore=async function(id){
   const f=fornitoriList.find(x=>x.id===id);
   if(!f||!confirm('Eliminare il fornitore "'+f.nome+'"?')) return;
   await deleteDoc(doc(db,'fornitori',id));
-  fornitoriList=fornitoriList.filter(x=>x.id!==id);
-  renderResponsabile();
+  setTimeout(()=>renderResponsabile(),300);
   showToast('Fornitore eliminato','toast-info');
 };
 
