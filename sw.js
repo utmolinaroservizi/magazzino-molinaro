@@ -3,7 +3,7 @@
 //  Cambia APP_VERSION ad ogni deploy per forzare
 //  l'aggiornamento su tutti i dispositivi.
 // ══════════════════════════════════════════════
-const APP_VERSION = '1.2.2';
+const APP_VERSION = '1.3.0';
 const CACHE_NAME  = 'magazzino-v' + APP_VERSION;
 
 // File da mettere in cache per funzionamento offline
@@ -19,14 +19,12 @@ const CORE_ASSETS = [
 ];
 
 // ── INSTALL: scarica e mette in cache i file core ──
-// NOTA: NON chiamiamo skipWaiting() qui di proposito.
-// Il nuovo SW resta in stato "waiting" finché l'utente non preme
-// "Aggiorna" sul banner — questo è ciò che fa apparire il banner stesso.
 self.addEventListener('install', event => {
   console.log('[SW] Install v' + APP_VERSION);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(CORE_ASSETS))
+      .then(() => self.skipWaiting()) // Attiva subito senza aspettare
   );
 });
 
