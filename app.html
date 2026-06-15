@@ -185,6 +185,17 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .counter-btn:active{transform:scale(.9);background:var(--brand-50);border-color:var(--brand-500)}
 .counter-display{font-size:48px;font-weight:700;min-width:80px;line-height:1;font-variant-numeric:tabular-nums;color:var(--brand-500);letter-spacing:-2px;transition:transform .15s ease,opacity .15s ease}
 .counter-display.bump{transform:scale(1.12);opacity:.7}
+.counter-input{
+  font-size:48px;font-weight:700;min-width:90px;max-width:140px;line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-2px;
+  transition:transform .15s ease,opacity .15s ease,background-color .15s ease;
+  border:none;background:transparent;text-align:center;
+  font-family:inherit;-moz-appearance:textfield;padding:4px 6px;
+  outline:none;border-radius:10px;color:inherit
+}
+.counter-input::-webkit-outer-spin-button,.counter-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.counter-input:focus{background:var(--brand-50)}
+.counter-edit-hint{font-size:9.5px;color:var(--text-light);font-weight:500;margin-top:2px}
 .counter-unit{font-size:12px;color:var(--text-muted);font-weight:500;margin-top:6px}
 .counter-step-hint{font-size:10px;color:var(--text-light);margin-top:4px;font-weight:500}
 .btn-take .action-icon{background:#FFF3D6;color:#9A6C1E}.btn-take .action-label{color:#9A6C1E}
@@ -647,11 +658,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <div class="counter-label">Litri da movimentare</div>
       <div class="counter-row">
         <button class="counter-btn" onclick="adjustFuelCounter(-1)">−</button>
-        <div class="counter-display" id="fm-counter" style="color:#9A6C1E">5</div>
+        <input class="counter-input" id="fm-counter" type="number" inputmode="numeric" min="1" value="5"
+          style="color:#9A6C1E"
+          onfocus="this.select()" oninput="onFuelCounterTyped()" onblur="onFuelCounterBlur()">
         <button class="counter-btn" onclick="adjustFuelCounter(+1)">+</button>
       </div>
       <div class="counter-unit">litri</div>
       <div class="counter-step-hint">Passo: 5 litri</div>
+      <div class="counter-edit-hint">✏️ Tocca il numero per inserirlo a tastiera</div>
     </div>
     <div class="fuel-actions">
       <button class="fuel-action-btn fuel-take" onclick="doFuelAdjust(-1)">
@@ -749,11 +763,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <div class="counter-label">Quantità da movimentare</div>
       <div class="counter-row">
         <button class="counter-btn" onclick="adjustCounter(-1)">−</button>
-        <div class="counter-display" id="m-counter">1</div>
+        <input class="counter-input" id="m-counter" type="number" inputmode="numeric" min="1" value="1"
+          style="color:var(--brand-500)"
+          onfocus="this.select()" oninput="onCounterTyped()" onblur="onCounterBlur()">
         <button class="counter-btn" onclick="adjustCounter(+1)">+</button>
       </div>
       <div class="counter-unit" id="m-counter-unit">pezzi</div>
       <div class="counter-step-hint" id="m-counter-hint"></div>
+      <div class="counter-edit-hint">✏️ Tocca il numero per inserirlo a tastiera</div>
     </div>
     <div class="modal-actions">
       <button class="action-btn btn-take" onclick="doAdjust(-1)">
@@ -1068,6 +1085,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
   await loadFromFirestore();
   await migrateV2();
+  await migrateV3();
   // Normalizza ordine categorie
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
@@ -1250,6 +1268,34 @@ async function migrateV2(){
   await batch.commit();
   console.log('[MIGRAZIONE v2] Completata. Spostati '+movedCount+' prodotti, convertite '+convertedCount+' matasse in metri.');
   showToast('Migrazione completata! '+movedCount+' spostati, '+convertedCount+' convertiti in metri','toast-return');
+}
+
+// ═══════════════════════════════════════
+//  MIGRAZIONE v3 — conversione generica
+//  matasse → metri (1 matassa = 100 m)
+// ═══════════════════════════════════════
+async function migrateV3(){
+  // Trova QUALSIASI prodotto rimasto con unità "mat"
+  // (es. aggiunto manualmente dopo la migrazione v2)
+  const residui=itemsList.filter(it=>it.unit==='mat');
+  if(residui.length===0) return;
+
+  console.log('[MIGRAZIONE v3] Trovati '+residui.length+' prodotti in matasse, conversione a metri (1 matassa = 100 m)...');
+  const batch=writeBatch(db);
+  const FACTOR=100;
+
+  residui.forEach(it=>{
+    it.qty=Math.round(it.qty*FACTOR);
+    if(it.prezzo!=null) it.prezzo=Math.round((it.prezzo/FACTOR)*100)/100;
+    it.unit='m';
+    it.step=10;
+    const{id,...data}=it;
+    batch.set(doc(db,'inventario',id),data);
+  });
+
+  await batch.commit();
+  console.log('[MIGRAZIONE v3] Completata. Convertiti '+residui.length+' prodotti in metri.');
+  showToast(residui.length+' prodotti convertiti da matasse a metri','toast-return');
 }
 
 // ═══════════════════════════════════════
@@ -1508,7 +1554,7 @@ window.openModal=function(id){
 
 function updateCounterDisplay(){
   const el=document.getElementById('m-counter');
-  el.textContent=counterVal;
+  el.value=counterVal;
   el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
   const unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
   const un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
@@ -1520,8 +1566,28 @@ function updateCounterDisplay(){
 
 window.adjustCounter=function(dir){
   const newVal=counterVal+(dir*counterStep);
-  if(newVal<counterStep) return;
+  if(newVal<1) return;
   counterVal=newVal;
+  updateCounterDisplay();
+};
+
+// ── Inserimento manuale quantità da tastiera ──
+window.onCounterTyped=function(){
+  const el=document.getElementById('m-counter');
+  const raw=parseInt(el.value);
+  if(isNaN(raw)||raw<1) return; // attende che l'utente finisca di digitare
+  counterVal=raw;
+  // Aggiorna etichette bottoni senza "rimbalzare" il valore mentre si scrive
+  const unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
+  const un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
+  document.getElementById('m-take-label').innerHTML='Preleva<br><b>'+counterVal+' '+un+'</b>';
+  document.getElementById('m-return-label').innerHTML='Reinserisci<br><b>'+counterVal+' '+un+'</b>';
+};
+window.onCounterBlur=function(){
+  const el=document.getElementById('m-counter');
+  let val=parseInt(el.value);
+  if(isNaN(val)||val<1) val=counterStep||1;
+  counterVal=val;
   updateCounterDisplay();
 };
 
@@ -2557,7 +2623,7 @@ function getFuelItems(){return itemsList.filter(i=>i.cat==='Carburante')}
 
 function updateFuelCounterDisplay(){
   const el=document.getElementById('fm-counter');
-  el.textContent=fuelCounterVal;
+  el.value=fuelCounterVal;
   el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
   document.getElementById('fm-take-label').innerHTML='Preleva<br><b>'+fuelCounterVal+' lt</b>';
   document.getElementById('fm-return-label').innerHTML='Reinserisci<br><b>'+fuelCounterVal+' lt</b>';
@@ -2565,8 +2631,25 @@ function updateFuelCounterDisplay(){
 
 window.adjustFuelCounter=function(dir){
   const newVal=fuelCounterVal+(dir*FUEL_STEP);
-  if(newVal<FUEL_STEP) return;
+  if(newVal<1) return;
   fuelCounterVal=newVal;
+  updateFuelCounterDisplay();
+};
+
+// ── Inserimento manuale litri da tastiera ──
+window.onFuelCounterTyped=function(){
+  const el=document.getElementById('fm-counter');
+  const raw=parseInt(el.value);
+  if(isNaN(raw)||raw<1) return;
+  fuelCounterVal=raw;
+  document.getElementById('fm-take-label').innerHTML='Preleva<br><b>'+fuelCounterVal+' lt</b>';
+  document.getElementById('fm-return-label').innerHTML='Reinserisci<br><b>'+fuelCounterVal+' lt</b>';
+};
+window.onFuelCounterBlur=function(){
+  const el=document.getElementById('fm-counter');
+  let val=parseInt(el.value);
+  if(isNaN(val)||val<1) val=FUEL_STEP;
+  fuelCounterVal=val;
   updateFuelCounterDisplay();
 };
 
