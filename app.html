@@ -1089,15 +1089,13 @@ function getItemsByCat(cat){return itemsList.filter(i=>i.cat===cat)}
 // Garantisce valori corretti anche se Firestore non ha ancora
 // processato le delete della deduplicazione
 function itemsListDeduped(){
+  // Deduplicazione pura: per ogni codice tiene UN solo item (quello con qty maggiore)
+  // NON somma le quantità — la somma causerebbe valori doppi/tripli
   const seen=new Map();
   itemsList.forEach(it=>{
     if(!it.code){seen.set(it.id,it);return;}
-    if(!seen.has(it.code)){seen.set(it.code,it);}
-    else{
-      // Tieni quello con qty maggiore, somma le qty
-      const existing=seen.get(it.code);
-      if(it.qty>existing.qty) seen.set(it.code,{...it,qty:existing.qty+it.qty});
-      else existing.qty+=it.qty;
+    if(!seen.has(it.code)||it.qty>seen.get(it.code).qty){
+      seen.set(it.code,it);
     }
   });
   return [...seen.values()];
@@ -1145,6 +1143,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   await migrateV2();
   await migrateV3();
   await deduplicaInventario();
+  await riparaQtaDopoDedup(); // Ripristina qtà sbagliate dalla dedup che sommava
   // Normalizza ordine categorie
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
@@ -1365,6 +1364,204 @@ async function migrateV3(){
 //  qty nei duplicati, tiene un solo doc.
 //  NON tocca i movimenti.
 // ═══════════════════════════════════════
+
+// ═══════════════════════════════════════
+//  RIPARA QTÀ POST-DEDUP (one-shot)
+//  Ripristina i valori corretti del 15/06
+//  che la deduplicaInventario aveva sommato
+//  per errore. CB.001 (nafta) escluso:
+//  ha movimenti reali da preservare.
+// ═══════════════════════════════════════
+const QTY_CORRETTE_PRIMA = {
+  "AC.001": 53,
+  "AC.002": 11,
+  "AC.003": 27,
+  "AC.004": 68,
+  "AC.005": 3,
+  "AC.006": 9,
+  "AC.007": 5,
+  "AC.008": 5,
+  "AC.009": 9,
+  "AC.010": 2,
+  "AC.011": 8,
+  "AC.012": 4,
+  "AC.013": 2,
+  "AC.014": 2,
+  "AC.015": 2,
+  "CB.002": 0,
+  "CV.001": 1000,
+  "CV.002": 700,
+  "CV.003": 300,
+  "CV.004": 0,
+  "CV.005": 230,
+  "CV.006": 200,
+  "CV.007": 500,
+  "CV.008": 400,
+  "CV.009": 400,
+  "CV.010": 200,
+  "CV.011": 300,
+  "CV.012": 200,
+  "CV.013": 300,
+  "CV.014": 300,
+  "CV.015": 100,
+  "CV.016": 100,
+  "CV.017": 400,
+  "CV.018": 100,
+  "CV.019": 500,
+  "CV.020": 600,
+  "CV.021": 600,
+  "CV.022": 200,
+  "CV.023": 200,
+  "CV.024": 100,
+  "CV.025": 100,
+  "CV.026": 300,
+  "CV.027": 100,
+  "CV.028": 100,
+  "CV.029": 100,
+  "CV.030": 100,
+  "CV.031": 100,
+  "CV.032": 80,
+  "CV.033": 80,
+  "CV.034": 30,
+  "CV.035": 100,
+  "FV.001": 4,
+  "FV.002": 3,
+  "IL.001": 20,
+  "IL.002": 1,
+  "IL.003": 25,
+  "IL.004": 8,
+  "IL.005": 12,
+  "IL.006": 15,
+  "IL.007": 2,
+  "IL.008": 18,
+  "IL.009": 32,
+  "IL.010": 0,
+  "IL.011": 100,
+  "IL.012": 2,
+  "IL.013": 8,
+  "IL.014": 94,
+  "IL.015": 2,
+  "IL.016": 1,
+  "IL.017": 26,
+  "IL.018": 8,
+  "IL.019": 6,
+  "IL.020": 6,
+  "IL.021": 3,
+  "IL.022": 8,
+  "IL.023": 4,
+  "IL.024": 3,
+  "IL.025": 1,
+  "IL.026": 4,
+  "IL.027": 1,
+  "IL.028": 3,
+  "IL.029": 10,
+  "IL.030": 4,
+  "IL.031": 2,
+  "IL.032": 7,
+  "IL.033": 0,
+  "IL.034": 4,
+  "IL.035": 10,
+  "IL.036": 244,
+  "IL.037": 45,
+  "IL.038": 0,
+  "IL.039": 3,
+  "IL.040": 8,
+  "IL.041": 3,
+  "IL.042": 112,
+  "IL.043": 55,
+  "IL.044": 146,
+  "ME.001": 12,
+  "ME.002": 3,
+  "ME.003": 14,
+  "ME.004": 7,
+  "ME.005": 18,
+  "ME.006": 26,
+  "ME.007": 6,
+  "ME.008": 2,
+  "ME.009": 1,
+  "ME.010": 4,
+  "ME.011": 3,
+  "ME.012": 13,
+  "ME.013": 1,
+  "ME.014": 1,
+  "ME.015": 0,
+  "ME.016": 1,
+  "ME.017": 2,
+  "ME.018": 3,
+  "ME.019": 2,
+  "ME.020": 18,
+  "ME.021": 1,
+  "ME.022": 2,
+  "ME.023": 22,
+  "ME.024": 13,
+  "ME.025": 58,
+  "SA.001": 1700,
+  "SA.002": 400,
+  "SA.003": 100,
+  "SA.004": 13,
+  "SA.005": 13,
+  "SA.006": 12,
+  "SA.007": 14,
+  "SA.008": 25,
+  "SA.009": 4,
+  "SA.010": 41,
+  "SA.011": 32,
+  "SA.012": 0,
+  "SA.013": 10,
+  "SA.014": 14,
+  "SA.015": 12,
+  "SA.016": 9,
+  "SA.017": 7,
+  "SA.018": 0,
+  "SA.019": 8,
+  "SA.020": 3,
+  "SA.021": 20,
+  "SA.022": 2,
+  "SA.023": 5,
+  "SA.024": 3,
+  "SA.025": 1,
+  "SA.026": 237,
+  "SA.027": 50,
+  "SA.028": 60,
+  "SA.029": 50,
+  "SA.030": 4,
+  "SA.031": 28,
+  "SA.032": 32,
+  "SA.033": 1,
+};
+
+async function riparaQtaDopoDedup(){
+  // Verifica se già eseguita
+  const flagDoc=await getDoc(doc(db,'meta','riparaQta_v1'));
+  if(flagDoc.exists()) return;
+
+  // Controlla se ci sono effettivamente valori doppiati
+  const campione=itemsList.find(i=>i.code==='IL.001');
+  if(!campione || campione.qty<=20) return; // valori già corretti
+
+  console.log('[RIPARA] Ripristino quantità post-dedup...');
+  showToast('Ripristino quantità in corso...','toast-sync');
+
+  const batch=writeBatch(db);
+  let count=0;
+
+  itemsList.forEach(it=>{
+    if(!it.code || !(it.code in QTY_CORRETTE_PRIMA)) return;
+    const qtaCorretta=QTY_CORRETTE_PRIMA[it.code];
+    if(it.qty===qtaCorretta) return; // già corretto
+    it.qty=qtaCorretta;
+    const{id,...data}=it;
+    batch.set(doc(db,'inventario',id),data);
+    count++;
+  });
+
+  // Segna come eseguita
+  batch.set(doc(db,'meta','riparaQta_v1'),{eseguita:true,data:Date.now()});
+  await batch.commit();
+  console.log('[RIPARA] Corretti '+count+' prodotti');
+  showToast('Quantità ripristinate correttamente ('+count+' prodotti)','toast-return');
+}
+
 async function deduplicaInventario(){
   // Raggruppa per code
   const byCode={};
@@ -1385,16 +1582,10 @@ async function deduplicaInventario(){
 
   codesWithDups.forEach(code=>{
     const group=byCode[code];
-    // Keeper = quello con qty maggiore (o il primo se tutti uguali)
+    // Keeper = quello con qty maggiore (non sommare — la somma duplica il valore!)
     group.sort((a,b)=>b.qty-a.qty);
     const keeper=group[0];
-    // Somma le qty degli altri nel keeper
-    const totalQty=group.reduce((s,it)=>s+it.qty,0);
-    if(keeper.qty!==totalQty){
-      keeper.qty=totalQty;
-      const{id,...data}=keeper;
-      batch.set(doc(db,'inventario',id),data);
-    }
+    // NON sommiamo — la qty del keeper è già quella corretta
     // Elimina i duplicati (tutti tranne il keeper)
     group.slice(1).forEach(dup=>{
       batch.delete(doc(db,'inventario',dup.id));
