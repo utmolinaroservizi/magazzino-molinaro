@@ -3,7 +3,7 @@
 //  Cambia APP_VERSION ad ogni deploy per forzare
 //  l'aggiornamento su tutti i dispositivi.
 // ══════════════════════════════════════════════
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.2';
 const CACHE_NAME  = 'magazzino-v' + APP_VERSION;
 
 // File da mettere in cache per funzionamento offline
@@ -24,7 +24,6 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(CORE_ASSETS))
-      .then(() => self.skipWaiting()) // Attiva subito senza aspettare
   );
 });
 

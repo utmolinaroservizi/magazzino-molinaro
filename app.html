@@ -1125,6 +1125,8 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
   await loadFromFirestore();
   await migrateV2();
+  await migrateV3();
+  await deduplicaInventario();
   // Normalizza ordine categorie
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
@@ -1294,14 +1296,16 @@ async function migrateV2(){
     convertedCount++;
   });
 
-  // 6) Crea voci carburante (se non esistono già)
-  if(!itemsList.find(i=>i.code==='CB.001')){
+  // 6) Crea voci carburante SOLO se non esistono già in Firestore
+  // (controllo sul code per evitare doppioni anche se itemsList non è aggiornato)
+  const codesInList=new Set(itemsList.map(i=>i.code));
+  if(!codesInList.has('CB.001')){
     const id1=genId();
     const nafta={id:id1,name:'NAFTA',cat:'Carburante',qty:0,unit:'lt',code:'CB.001',prezzo:1.93,sub:null};
     itemsList.push(nafta);
     batch.set(doc(db,'inventario',id1),{name:'NAFTA',cat:'Carburante',qty:0,unit:'lt',code:'CB.001',prezzo:1.93,sub:null});
   }
-  if(!itemsList.find(i=>i.code==='CB.002')){
+  if(!codesInList.has('CB.002')){
     const id2=genId();
     const benzina={id:id2,name:'BENZINA',cat:'Carburante',qty:0,unit:'lt',code:'CB.002',prezzo:1.93,sub:null};
     itemsList.push(benzina);
@@ -1313,7 +1317,77 @@ async function migrateV2(){
 
   await batch.commit();
   console.log('[MIGRAZIONE v2] Completata. Spostati '+movedCount+' prodotti, convertite '+convertedCount+' matasse in metri.');
-  showToast('Migrazione completata! '+movedCount+' spostati, '+convertedCount+' convertiti in metri','toast-return');
+  showToast('Migrazione completata!','toast-return');
+}
+
+
+// ═══════════════════════════════════════
+//  MIGRAZIONE v3 — conversione generica
+//  matasse residue → metri (1 mat = 100 m)
+// ═══════════════════════════════════════
+async function migrateV3(){
+  const residui=itemsList.filter(it=>it.unit==="mat");
+  if(residui.length===0) return;
+  console.log("[MIGRAZIONE v3] Conversione "+residui.length+" matasse residue in metri...");
+  const batch=writeBatch(db);
+  residui.forEach(it=>{
+    it.qty=Math.round(it.qty*100);
+    if(it.prezzo!=null) it.prezzo=Math.round((it.prezzo/100)*100)/100;
+    it.unit="m"; it.step=10;
+    const{id,...data}=it;
+    batch.set(doc(db,"inventario",id),data);
+  });
+  await batch.commit();
+  showToast(residui.length+" prodotti convertiti da matasse a metri","toast-return");
+}
+
+// ═══════════════════════════════════════
+//  DEDUPLICAZIONE INVENTARIO
+//  Trova item con stesso codice, somma le
+//  qty nei duplicati, tiene un solo doc.
+//  NON tocca i movimenti.
+// ═══════════════════════════════════════
+async function deduplicaInventario(){
+  // Raggruppa per code
+  const byCode={};
+  itemsList.forEach(it=>{
+    if(!it.code) return;
+    if(!byCode[it.code]) byCode[it.code]=[];
+    byCode[it.code].push(it);
+  });
+
+  const codesWithDups=Object.keys(byCode).filter(c=>byCode[c].length>1);
+  if(codesWithDups.length===0) return; // nessun doppione
+
+  console.log('[DEDUP] Trovati doppioni per:',codesWithDups);
+  showToast('Rimozione doppioni in corso...','toast-sync');
+
+  const batch=writeBatch(db);
+  let fixed=0;
+
+  codesWithDups.forEach(code=>{
+    const group=byCode[code];
+    // Keeper = quello con qty maggiore (o il primo se tutti uguali)
+    group.sort((a,b)=>b.qty-a.qty);
+    const keeper=group[0];
+    // Somma le qty degli altri nel keeper
+    const totalQty=group.reduce((s,it)=>s+it.qty,0);
+    if(keeper.qty!==totalQty){
+      keeper.qty=totalQty;
+      const{id,...data}=keeper;
+      batch.set(doc(db,'inventario',id),data);
+    }
+    // Elimina i duplicati (tutti tranne il keeper)
+    group.slice(1).forEach(dup=>{
+      batch.delete(doc(db,'inventario',dup.id));
+      itemsList.splice(itemsList.findIndex(i=>i.id===dup.id),1);
+      fixed++;
+    });
+  });
+
+  await batch.commit();
+  console.log('[DEDUP] Rimossi '+fixed+' documenti duplicati');
+  showToast('Rimossi '+fixed+' doppioni dall\'inventario','toast-return');
 }
 
 // ═══════════════════════════════════════
