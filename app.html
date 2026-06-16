@@ -1084,6 +1084,24 @@ const DEFAULT_ITEMS = [
 
 function genId(){return Math.random().toString(36).substr(2,9)}
 function getItemsByCat(cat){return itemsList.filter(i=>i.cat===cat)}
+
+// Lista item deduplicata per code — usata negli export Excel
+// Garantisce valori corretti anche se Firestore non ha ancora
+// processato le delete della deduplicazione
+function itemsListDeduped(){
+  const seen=new Map();
+  itemsList.forEach(it=>{
+    if(!it.code){seen.set(it.id,it);return;}
+    if(!seen.has(it.code)){seen.set(it.code,it);}
+    else{
+      // Tieni quello con qty maggiore, somma le qty
+      const existing=seen.get(it.code);
+      if(it.qty>existing.qty) seen.set(it.code,{...it,qty:existing.qty+it.qty});
+      else existing.qty+=it.qty;
+    }
+  });
+  return [...seen.values()];
+}
 function rebuildCodes(cat){
   // I codici sono permanenti — non vengono mai ricalcolati dopo un'eliminazione.
   // Questo garantisce che i QR code stampati restino validi per sempre.
@@ -2248,12 +2266,13 @@ window.exportValoreMagazzino=async function(){
   f1rows.push(['Codice','Prodotto','Categoria','Sottocategoria','Giacenza','Unità','Prezzo €/un.','Valore Totale €']);
 
   let totaleConPrezzi=0;
-  let totaleStimato=0;
   let itemsNoPrezzi=0;
 
+  // Usa lista deduplicata per evitare doppioni nel valore
+  const deduped=itemsListDeduped();
   catOrder.forEach(cat=>{
     const cfg=categories[cat];if(!cfg) return;
-    const items=getItemsByCat(cat);if(items.length===0) return;
+    const items=deduped.filter(i=>i.cat===cat);if(items.length===0) return;
     items.forEach(it=>{
       const prezzo=it.prezzo!=null?it.prezzo:null;
       const valore=prezzo!=null?Math.round(prezzo*it.qty*100)/100:'';
@@ -2322,6 +2341,7 @@ window.exportValoreMagazzino=async function(){
     tuttiCarichi=actLog.filter(e=>e.type==='load'&&e.time>=unAnnoFa.getTime());
   }
   tuttiCarichi.sort((a,b)=>b.time-a.time);
+  const dedupedF2=itemsListDeduped(); // usa lista senza doppioni anche per lookup
 
   if(tuttiCarichi.length===0){
     f2rows.push(['Nessun carico effettuato nel periodo']);
@@ -2330,7 +2350,7 @@ window.exportValoreMagazzino=async function(){
       const d=new Date(e.time);
       const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
       const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-      const item=itemsList.find(i=>i.id===e.itemId);
+      const item=dedupedF2.find(i=>i.id===e.itemId)||dedupedF2.find(i=>i.code===e.code);
       const catLabel=item?(categories[item.cat]?.label||item.cat):'';
       const nuovoPrezzo=item?.prezzo!=null?item.prezzo:'';
       f2rows.push([data,ora,e.code,e.name,catLabel,e.delta,item?.unit||'',nuovoPrezzo,e.operator||'N/D']);
@@ -3181,12 +3201,13 @@ window.exportByCantiere=async function(){
   rows.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Quantità','Unità','Cantiere','Operatore']);
 
   movimenti.sort((a,b)=>b.time-a.time);
+  const dedupedBC=itemsListDeduped();
   let totPrelievi=0, totRestituzioni=0;
   movimenti.forEach(e=>{
     const d=new Date(e.time);
     const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
     const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-    const item=itemsList.find(i=>i.id===e.itemId);
+    const item=dedupedBC.find(i=>i.id===e.itemId)||dedupedBC.find(i=>i.code===e.code);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
     const tipo={take:'Prelievo',return:'Restituzione',load:'Carico'}[e.type]||'Movimento';
     rows.push([data,ora,tipo,e.code,e.name,catLabel,e.delta,item?.unit||'',e.cantiere||'',e.operator||'']);
