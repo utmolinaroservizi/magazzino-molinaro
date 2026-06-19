@@ -69,6 +69,36 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .hero-title{font-size:21px;font-weight:600;line-height:1.2;margin-top:10px;letter-spacing:-.2px}
 .hero-meta{font-size:12px;font-weight:500;color:var(--text-muted);margin-top:8px}
 
+/* PIN CONFIRM MODAL */
+.pin-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px}
+.pin-backdrop.open{display:flex}
+.pin-box{background:var(--bg-card);border-radius:18px;padding:26px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.pin-icon{font-size:36px;margin-bottom:10px}
+.pin-title{font-size:16px;font-weight:700;margin-bottom:6px}
+.pin-subtitle{font-size:12.5px;color:var(--text-muted);margin-bottom:18px;line-height:1.4}
+.pin-input{width:100%;box-sizing:border-box;padding:14px;font-size:24px;font-weight:700;text-align:center;letter-spacing:8px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;outline:none;margin-bottom:6px}
+.pin-input:focus{border-color:#B33A3A}
+.pin-error{font-size:11.5px;color:#B33A3A;font-weight:600;min-height:16px;margin-bottom:10px}
+.pin-btns{display:flex;gap:8px}
+.pin-btn{flex:1;padding:12px;border-radius:10px;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+.pin-btn-cancel{background:var(--bg-surface);color:var(--text-muted)}
+.pin-btn-confirm{background:#B33A3A;color:#fff}
+.pin-btn-confirm:active,.pin-btn-cancel:active{transform:scale(.97)}
+
+/* DASHBOARD ALERTS */
+.dash-alert{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;border-radius:var(--radius-sm);margin-bottom:10px;border:1.5px solid}
+.dash-alert-fuel{background:#FFF3D6;border-color:#F0C76B}
+.dash-alert-volatile{background:#FFE8E0;border-color:#F0A98A}
+.dash-alert-volatile.warn{background:#FFF3D6;border-color:#F0C76B}
+.dash-alert-icon{font-size:20px;flex-shrink:0;line-height:1}
+.dash-alert-body{flex:1}
+.dash-alert-title{font-size:13px;font-weight:700;color:#7A4A0A;margin-bottom:2px}
+.dash-alert-volatile .dash-alert-title{color:#A03A1E}
+.dash-alert-volatile.warn .dash-alert-title{color:#7A4A0A}
+.dash-alert-text{font-size:12px;color:#6B4E1E;line-height:1.4}
+.dash-alert-volatile .dash-alert-text{color:#7A3520}
+.dash-alert-volatile.warn .dash-alert-text{color:#6B4E1E}
+
 .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px}
 .stat-card{background:var(--bg-card);border-radius:var(--radius-sm);padding:14px 10px 13px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
 .stat-val{font-size:24px;font-weight:600;color:var(--brand-500);line-height:1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
@@ -358,6 +388,19 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 /* CANTIERI / FORNITORI gestione */
 .resp-entity-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .resp-entity-item{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg-surface);border-radius:var(--radius-xs);font-size:13px}
+
+/* PRODOTTI VOLATILI */
+.volatile-item{display:flex;flex-direction:column;gap:4px;padding:11px 13px;background:var(--bg-surface);border-radius:var(--radius-xs);margin-bottom:6px;border-left:3px solid var(--border)}
+.volatile-item.due-soon{border-left-color:#E0A030;background:#FFF8EB}
+.volatile-item.overdue{border-left-color:#C0392B;background:#FDF0EE}
+.volatile-top{display:flex;align-items:center;gap:8px}
+.volatile-desc{flex:1;font-size:13px;font-weight:600}
+.volatile-qty{font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap}
+.volatile-deadline{font-size:11px;color:var(--text-light);font-weight:500}
+.volatile-deadline.due-soon{color:#A06A10;font-weight:700}
+.volatile-deadline.overdue{color:#C0392B;font-weight:700}
+.volatile-del{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;flex-shrink:0}
+.volatile-del:hover{background:#FDF5F5;color:#B33A3A;border-color:#F0C0C0}
 .resp-entity-name{flex:1;font-weight:600}
 .resp-entity-del{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit}
 .resp-entity-del:hover{background:#FDF5F5;color:#B33A3A;border-color:#F0C0C0}
@@ -530,6 +573,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="hero-title" id="hero-title">Magazzino Molinaro</div>
     <div class="hero-meta" id="hero-meta"></div>
   </div>
+  <div id="dash-alerts"></div>
   <div class="section-label">Panoramica</div>
   <div class="stats-grid" id="stats-grid"></div>
   <div class="section-label">Struttura magazzino</div>
@@ -595,6 +639,9 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="hero-eyebrow">Responsabile · Magazzino</div>
     <div class="hero-title" style="font-size:18px">📦 Carica Merce</div>
     <div class="hero-meta">Nuovo acquisto — aggiorna giacenze e prezzi</div>
+  </div>
+  <div class="carica-cat-select-wrap" style="margin-bottom:10px">
+    <input type="search" class="carica-cat-select" id="carica-search" placeholder="🔍 Cerca prodotto o codice in tutte le categorie..." oninput="onCaricaSearch()" style="cursor:text">
   </div>
   <div class="carica-cat-select-wrap">
     <select class="carica-cat-select" id="carica-cat-sel" onchange="setCaricaCat(this.value)"></select>
@@ -744,6 +791,26 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     </div>
   </div>
   <div class="resp-card">
+    <h3>🎯 Prodotti volatili (a rimborso)</h3>
+    <p>Materiali non a perdere — es. bobine cavo — che vanno restituiti entro una scadenza, altrimenti vengono fatturati. Riceverai un alert in dashboard quando si avvicina la scadenza.</p>
+    <div class="resp-entity-list" id="resp-volatili-list"></div>
+    <div class="carica-add-grid" style="margin-top:8px">
+      <div class="carica-input-wrap carica-add-full">
+        <div class="carica-input-label">Descrizione materiale</div>
+        <input class="carica-input" id="new-volatile-desc" placeholder="es. Bobina cavo FG16 4x6 - Cliente Rossi" style="text-transform:none">
+      </div>
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Quantità</div>
+        <input class="carica-input" type="number" min="1" value="1" id="new-volatile-qty">
+      </div>
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Scadenza restituzione</div>
+        <input class="carica-input" type="date" id="new-volatile-deadline">
+      </div>
+    </div>
+    <button class="carica-add-btn" onclick="addVolatile()" style="margin-top:8px">+ Aggiungi prodotto volatile</button>
+  </div>
+  <div class="resp-card">
     <h3>🏗️ Excel movimentazioni per cantiere</h3>
     <p>Scarica un Excel con tutte le movimentazioni di materiale associate ad un cantiere specifico (o tutti).</p>
     <select class="modal-cantiere-select" id="resp-cantiere-export" style="margin-bottom:10px">
@@ -773,7 +840,15 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="modal-top">
       <span class="modal-cat-badge" id="m-badge"></span>
       <div class="modal-product-code" id="m-code"></div>
-      <div class="modal-product-name" id="m-name"></div>
+      <div class="modal-product-name" id="m-name" style="display:flex;align-items:flex-start;gap:8px">
+        <span id="m-name-text" style="flex:1"></span>
+        <button id="m-name-edit-btn" onclick="toggleNameEdit()" style="display:none;background:transparent;border:none;cursor:pointer;font-size:15px;padding:2px;flex-shrink:0;opacity:.6" title="Modifica nome">✏️</button>
+      </div>
+      <div id="m-name-edit-row" style="display:none;gap:6px;margin-top:8px">
+        <input type="text" id="m-name-input" class="resp-entity-input" style="flex:1;text-transform:uppercase">
+        <button class="resp-entity-btn" onclick="saveProductName()">Salva</button>
+        <button class="log-action-btn" style="border-color:var(--border)" onclick="toggleNameEdit()">✕</button>
+      </div>
     </div>
     <div class="modal-qty-zone">
       <div class="modal-qty-label">Disponibilità in magazzino</div>
@@ -855,12 +930,27 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- PIN CONFIRM (azioni distruttive responsabile) -->
+<div class="pin-backdrop" id="pin-backdrop">
+  <div class="pin-box">
+    <div class="pin-icon">🔒</div>
+    <div class="pin-title" id="pin-title">Conferma azione</div>
+    <div class="pin-subtitle" id="pin-subtitle">Inserisci il PIN di sicurezza per confermare.</div>
+    <input type="password" inputmode="numeric" maxlength="4" class="pin-input" id="pin-input" placeholder="••••" autocomplete="off">
+    <div class="pin-error" id="pin-error"></div>
+    <div class="pin-btns">
+      <button class="pin-btn pin-btn-cancel" onclick="closePinModal()">Annulla</button>
+      <button class="pin-btn pin-btn-confirm" onclick="confirmPinModal()">Conferma</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   doc, getDoc, collection, getDocs, setDoc, deleteDoc,
-  onSnapshot, writeBatch, query, orderBy, limit, startAfter
+  onSnapshot, writeBatch, query, orderBy, limit, startAfter, where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ═══════════════════════════════════════
@@ -894,6 +984,7 @@ const MEZZI_AZIENDALI=[
 let catOrder       = [];
 let cantieriList   = [];
 let fornitoriList  = [];
+let volatiliList   = [];
 let openCats       = {};
 let editMode       = false;
 let currentModalItem = null;
@@ -1206,6 +1297,10 @@ async function loadFromFirestore(){
     const fornSnap=await getDocs(collection(db,'fornitori'));
     fornitoriList=[];fornSnap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
     fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+    // Prodotti volatili
+    const volSnap=await getDocs(collection(db,'volatili'));
+    volatiliList=[];volSnap.forEach(d=>volatiliList.push({id:d.id,...d.data()}));
+    volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
   }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
 }
 
@@ -1654,6 +1749,12 @@ function listenRealtime(){
     fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
     if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
   });
+  onSnapshot(collection(db,'volatili'),snap=>{
+    volatiliList=[];snap.forEach(d=>volatiliList.push({id:d.id,...d.data()}));
+    volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
+    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
+    if(document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboardAlerts();
+  });
 }
 
 async function saveItem(item){const{id,...data}=item;await setDoc(doc(db,'inventario',id),data)}
@@ -1715,6 +1816,9 @@ function renderDashboard(){
   const heroMeta=document.getElementById('hero-meta');
   if(heroMeta) heroMeta.textContent=day.charAt(0).toUpperCase()+day.slice(1)+' · '+itemsList.length+' prodotti';
 
+  // ── Alert dashboard (solo responsabili) ──
+  renderDashboardAlerts();
+
   // Stats — responsabili vedono valore totale
   let statsHTML=`
     <div class="stat-card"><div class="stat-val">${itemsList.length}</div><div class="stat-label">Prodotti</div></div>
@@ -1737,6 +1841,54 @@ function renderDashboard(){
     </div>`;
   });
   document.getElementById('tree-branches').innerHTML=th;
+}
+
+const FUEL_ALERT_THRESHOLD=200; // litri
+
+function renderDashboardAlerts(){
+  const el=document.getElementById('dash-alerts');
+  if(!el) return;
+  if(!isResp()){el.innerHTML='';return;} // alert solo per responsabili
+
+  let html='';
+
+  // ── Alert gasolio sotto soglia ──
+  const nafta=itemsList.find(i=>i.code==='CB.001');
+  if(nafta && nafta.qty<FUEL_ALERT_THRESHOLD){
+    html+=`<div class="dash-alert dash-alert-fuel">
+      <div class="dash-alert-icon">⛽</div>
+      <div class="dash-alert-body">
+        <div class="dash-alert-title">Scorta nafta in esaurimento</div>
+        <div class="dash-alert-text">Disponibili solo <strong>${nafta.qty} litri</strong> (soglia: ${FUEL_ALERT_THRESHOLD} lt). Pianifica un rifornimento.</div>
+      </div>
+    </div>`;
+  }
+
+  // ── Alert prodotti volatili in scadenza o scaduti ──
+  const oggi=new Date();oggi.setHours(0,0,0,0);
+  volatiliList.forEach(v=>{
+    const dl=new Date(v.deadline+'T00:00:00');
+    const giorni=Math.round((dl-oggi)/86400000);
+    if(giorni<0){
+      html+=`<div class="dash-alert dash-alert-volatile">
+        <div class="dash-alert-icon">⛔</div>
+        <div class="dash-alert-body">
+          <div class="dash-alert-title">Prodotto volatile scaduto</div>
+          <div class="dash-alert-text"><strong>${v.desc}</strong> (×${v.qty}) doveva essere restituito il ${dl.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})} — <strong>${Math.abs(giorni)} giorni di ritardo</strong>.</div>
+        </div>
+      </div>`;
+    } else if(giorni<=14){
+      html+=`<div class="dash-alert dash-alert-volatile warn">
+        <div class="dash-alert-icon">🎯</div>
+        <div class="dash-alert-body">
+          <div class="dash-alert-title">Restituzione in scadenza</div>
+          <div class="dash-alert-text"><strong>${v.desc}</strong> (×${v.qty}) va restituito entro <strong>${giorni} giorni</strong> (${dl.toLocaleDateString('it-IT',{day:'2-digit',month:'long'})}).</div>
+        </div>
+      </div>`;
+    }
+  });
+
+  el.innerHTML=html;
 }
 
 // ═══════════════════════════════════════
@@ -1841,6 +1993,70 @@ window.deleteItem=async function(id){
 };
 
 // ═══════════════════════════════════════
+//  RINOMINA PRODOTTO (responsabili)
+//  Aggiorna l'item E tutti i movimenti
+//  storici collegati, così il registro
+//  mostra sempre il nome corretto.
+// ═══════════════════════════════════════
+window.toggleNameEdit=function(){
+  if(!currentModalItem) return;
+  const row=document.getElementById('m-name-edit-row');
+  const isOpen=row.style.display==='flex';
+  if(isOpen){
+    row.style.display='none';
+  } else {
+    document.getElementById('m-name-input').value=currentModalItem.name;
+    row.style.display='flex';
+    setTimeout(()=>document.getElementById('m-name-input').focus(),50);
+  }
+};
+
+window.saveProductName=async function(){
+  if(!currentModalItem) return;
+  const newName=document.getElementById('m-name-input').value.trim().toUpperCase();
+  if(!newName){showToast('Il nome non può essere vuoto','toast-danger');return;}
+  if(newName===currentModalItem.name){
+    document.getElementById('m-name-edit-row').style.display='none';
+    return;
+  }
+
+  const oldName=currentModalItem.name;
+  const itemId=currentModalItem.id;
+
+  showToast('Aggiornamento in corso...','toast-sync');
+
+  // 1) Aggiorna l'item nell'inventario
+  currentModalItem.name=newName;
+  await saveItem(currentModalItem);
+
+  // 2) Aggiorna il nome in tutti i movimenti storici collegati a questo prodotto
+  //    (così il registro mostra sempre il nome corretto, passato e presente)
+  try{
+    const movSnap=await getDocs(query(collection(db,'movimenti'),where('itemId','==',itemId)));
+    const batch=writeBatch(db);
+    let count=0;
+    movSnap.forEach(d=>{
+      batch.update(doc(db,'movimenti',d.id),{name:newName});
+      // aggiorna anche in memoria se presente nel log caricato
+      const local=actLog.find(e=>e.id===d.id);
+      if(local) local.name=newName;
+      count++;
+    });
+    if(count>0) await batch.commit();
+    console.log('[RINOMINA] Aggiornati '+count+' movimenti storici da "'+oldName+'" a "'+newName+'"');
+  }catch(e){
+    console.error('Errore aggiornamento movimenti storici:',e);
+    showToast('Nome aggiornato, ma alcuni movimenti storici potrebbero non essere sincronizzati','toast-info');
+  }
+
+  document.getElementById('m-name-text').textContent=newName;
+  document.getElementById('m-name-edit-row').style.display='none';
+  renderMateriali();
+  if(document.getElementById('page-registro')?.classList.contains('active')) renderLog();
+  showToast('Prodotto rinominato in "'+newName+'"','toast-return');
+};
+
+// ═══════════════════════════════════════
 //  MODAL PRODOTTO
 // ═══════════════════════════════════════
 window.openModal=function(id){
@@ -1853,7 +2069,9 @@ window.openModal=function(id){
   document.getElementById('m-badge').style.background=cfg.bg;
   document.getElementById('m-badge').style.color=cfg.color;
   document.getElementById('m-code').textContent=item.code;
-  document.getElementById('m-name').textContent=item.name;
+  document.getElementById('m-name-text').textContent=item.name;
+  document.getElementById('m-name-edit-row').style.display='none';
+  document.getElementById('m-name-edit-btn').style.display=isResp()?'block':'none';
   document.getElementById('m-qty').textContent=item.qty;
   document.getElementById('modal-operator-name').textContent=currentUser.nome;
   const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili',lt:'litri disponibili'};
@@ -2037,32 +2255,21 @@ function renderLog(){
   const container=document.getElementById('log-container');
   const filterWrap=document.getElementById('log-filter-wrap');
 
+  // Operai vedono solo i PROPRI movimenti; responsabili vedono tutto
+  const baseLog=isResp()?actLog:actLog.filter(e=>e.operatorUid===currentUser.uid);
+
   if(actLog.length===0){
     if(filterWrap) filterWrap.innerHTML='';
     container.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg><p>Nessun movimento registrato</p></div>';
     return;
   }
 
-  if(!isResp()){
-    // ── Vista operaio: lista semplice ──
-    if(filterWrap) filterWrap.innerHTML='<div class="section-label">Movimenti recenti</div>';
-    let html='';
-    actLog.forEach(entry=>{
-      const isTake=entry.delta<0;
-      const d=new Date(entry.time);
-      const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-      html+=renderLogItem(entry,isTake,ts);
-    });
-    if(logHasMore) html+=`<button id="log-load-more-btn" class="log-load-more-btn" onclick="loadMoreLog()">↓ Carica altri 100 movimenti</button>`;
-    container.innerHTML=html;
-    return;
-  }
-
-  // ── Vista responsabile: raggruppata per mese/giorno con filtri ──
+  // ── Vista unificata: raggruppata per mese/giorno con filtri ──
+  // (operai vedono solo i propri, responsabili vedono tutto)
 
   // Costruisci opzioni mesi disponibili
   const monthSet=new Map();
-  actLog.forEach(e=>{
+  baseLog.forEach(e=>{
     const d=new Date(e.time);
     const mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     const ml=d.toLocaleDateString('it-IT',{month:'long',year:'numeric'});
@@ -2082,7 +2289,7 @@ function renderLog(){
     </div>`;
 
   // Applica filtri
-  let filtered=actLog;
+  let filtered=baseLog;
   if(logFilterDay){
     filtered=filtered.filter(e=>{
       const d=new Date(e.time);
@@ -2448,18 +2655,84 @@ function renderResponsabile(){
       </div>`).join('');
   document.getElementById('resp-fornitori-list').innerHTML=fornHtml;
 
+  // Prodotti volatili
+  const oggi=new Date();oggi.setHours(0,0,0,0);
+  const volHtml=volatiliList.length===0
+    ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun prodotto volatile in carico. Aggiungine uno.</p>'
+    :volatiliList.map(v=>{
+      const dl=new Date(v.deadline+'T00:00:00');
+      const giorni=Math.round((dl-oggi)/86400000);
+      let cls='',badge='';
+      if(giorni<0){cls='overdue';badge='⛔ Scaduto da '+Math.abs(giorni)+' giorni';}
+      else if(giorni<=14){cls='due-soon';badge='⚠️ Scade tra '+giorni+' giorni';}
+      else{badge='Scade il '+dl.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});}
+      return `<div class="volatile-item ${cls}">
+        <div class="volatile-top">
+          <span class="volatile-desc">🎯 ${v.desc}</span>
+          <span class="volatile-qty">×${v.qty}</span>
+          <button class="volatile-del" onclick="deleteVolatile('${v.id}')">✓ Restituito</button>
+        </div>
+        <div class="volatile-deadline ${cls}">${badge}</div>
+      </div>`;
+    }).join('');
+  document.getElementById('resp-volatili-list').innerHTML=volHtml;
+
   // Popola dropdown export cantiere
   const expSel=document.getElementById('resp-cantiere-export');
   if(expSel) expSel.innerHTML='<option value="">Tutti i cantieri</option>'+
     cantieriList.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
 }
+// ═══════════════════════════════════════
+//  PIN CONFERMA — per azioni distruttive
+// ═══════════════════════════════════════
+const DELETE_PIN='4790'; // PIN di sicurezza — modificabile qui dal codice
+let _pinCallback=null;
+
+function askPinConfirm(title,subtitle,onConfirm){
+  document.getElementById('pin-title').textContent=title;
+  document.getElementById('pin-subtitle').textContent=subtitle;
+  document.getElementById('pin-input').value='';
+  document.getElementById('pin-error').textContent='';
+  _pinCallback=onConfirm;
+  document.getElementById('pin-backdrop').classList.add('open');
+  setTimeout(()=>document.getElementById('pin-input').focus(),100);
+}
+window.closePinModal=function(){
+  document.getElementById('pin-backdrop').classList.remove('open');
+  _pinCallback=null;
+};
+window.confirmPinModal=function(){
+  const val=document.getElementById('pin-input').value.trim();
+  if(val!==DELETE_PIN){
+    document.getElementById('pin-error').textContent='PIN errato. Riprova.';
+    document.getElementById('pin-input').value='';
+    document.getElementById('pin-input').focus();
+    return;
+  }
+  const cb=_pinCallback;
+  document.getElementById('pin-backdrop').classList.remove('open');
+  _pinCallback=null;
+  if(cb) cb();
+};
+// Invio con tasto Enter
+document.addEventListener('DOMContentLoaded',()=>{
+  const pinInput=document.getElementById('pin-input');
+  if(pinInput) pinInput.addEventListener('keydown',e=>{if(e.key==='Enter') confirmPinModal();});
+});
+
 window.deleteCategory=async function(cat){
   const cfg=categories[cat];if(!cfg) return;
   const ci=getItemsByCat(cat);
   if(!confirm('Eliminare "'+cfg.label+'"?\n\nVerranno eliminati anche '+ci.length+' prodotti.\nAzione irreversibile.')) return;
-  for(const it of ci) await deleteItemFromDB(it.id);
-  itemsList=itemsList.filter(i=>i.cat!==cat);delete categories[cat];catOrder=catOrder.filter(c=>c!==cat);
-  await deleteCategoryFromDB(cat);renderResponsabile();renderDashboard();showToast('Categoria eliminata','toast-danger');
+  askPinConfirm(
+    '🗑️ Elimina categoria',
+    'Stai per eliminare "'+cfg.label+'" e '+ci.length+' prodotti. Inserisci il PIN per confermare.',
+    async()=>{
+      for(const it of ci) await deleteItemFromDB(it.id);
+      itemsList=itemsList.filter(i=>i.cat!==cat);delete categories[cat];catOrder=catOrder.filter(c=>c!==cat);
+      await deleteCategoryFromDB(cat);renderResponsabile();renderDashboard();showToast('Categoria eliminata','toast-danger');
+    }
+  );
 };
 window.clearAllLogs=async function(){
   if(actLog.length===0){alert('Il registro è già vuoto.');return}
@@ -3226,6 +3499,73 @@ window.setCaricaCat=function(cat){
   renderCaricaList();
 };
 
+function caricaItemCardHTML(it,showCatBadge){
+  const cfg=categories[it.cat]||{};
+  const priceVal=it.prezzo!=null?it.prezzo:'';
+  const catBadge=showCatBadge?`<span style="font-size:9.5px;font-weight:700;color:${cfg.color};background:${cfg.bg};padding:2px 8px;border-radius:99px;margin-left:6px;white-space:nowrap">${cfg.icon||''} ${cfg.label||it.cat}</span>`:'';
+  return `<div class="carica-item">
+    <div class="carica-item-top">
+      <span class="carica-item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
+      <span class="carica-item-name">${it.name}${catBadge}</span>
+      <span class="carica-item-qty">${it.qty} ${it.unit}</span>
+    </div>
+    <div class="carica-inputs">
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Quantità da caricare</div>
+        <input class="carica-input" type="number" min="1" placeholder="0"
+          id="cq-${it.id}" value="" inputmode="numeric">
+      </div>
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Nuovo prezzo €/${it.unit}</div>
+        <input class="carica-input" type="number" min="0" step="0.01"
+          placeholder="${priceVal||'—'}" id="cp-${it.id}" value="" inputmode="decimal">
+      </div>
+      <div class="carica-input-wrap carica-add-full">
+        <div class="carica-input-label">Fornitore</div>
+        <select class="carica-input" id="cf-${it.id}" style="text-align:left">
+          <option value="">— Seleziona fornitore —</option>
+          ${fornitoriList.map(f=>'<option value="'+f.nome+'">'+f.nome+'</option>').join('')}
+        </select>
+      </div>
+    </div>
+    <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
+  </div>`;
+}
+
+window.onCaricaSearch=function(){
+  const q=(document.getElementById('carica-search')?.value||'').trim().toLowerCase();
+  const list=document.getElementById('carica-list');
+  const catSelWrap=document.getElementById('carica-cat-sel')?.parentElement;
+
+  if(!q){
+    // Ricerca vuota: torna alla vista normale per categoria
+    if(catSelWrap) catSelWrap.style.display='';
+    renderCaricaList();
+    return;
+  }
+
+  // Ricerca attiva: nascondi il selettore categoria, mostra risultati cross-categoria
+  if(catSelWrap) catSelWrap.style.display='none';
+
+  const matches=itemsList.filter(it=>
+    it.cat!=='Carburante' && (
+      it.name.toLowerCase().includes(q) ||
+      (it.code||'').toLowerCase().includes(q)
+    )
+  ).sort((a,b)=>a.code.localeCompare(b.code));
+
+  if(matches.length===0){
+    list.innerHTML=`<div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:13px">
+      Nessun prodotto trovato per "<strong>${q}</strong>"
+    </div>`;
+    return;
+  }
+
+  list.innerHTML=`<div style="font-size:11px;color:var(--text-light);font-weight:600;margin-bottom:10px">
+      ${matches.length} risultat${matches.length===1?'o':'i'} trovat${matches.length===1?'o':'i'}
+    </div>`+matches.map(it=>caricaItemCardHTML(it,true)).join('');
+};
+
 function renderCaricaList(){
   const list=document.getElementById('carica-list');
   if(!caricaActiveCat){list.innerHTML='';return;}
@@ -3237,36 +3577,7 @@ function renderCaricaList(){
     ? `<div style="text-align:center;padding:20px 0 10px;color:var(--text-muted);font-size:13px">
         Nessun prodotto ancora in <strong>${cfg.label}</strong> — aggiungilo con il form qui sotto.
        </div>`
-    : items.map(it=>{
-        const priceVal=it.prezzo!=null?it.prezzo:'';
-        return `<div class="carica-item">
-          <div class="carica-item-top">
-            <span class="carica-item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
-            <span class="carica-item-name">${it.name}</span>
-            <span class="carica-item-qty">${it.qty} ${it.unit}</span>
-          </div>
-          <div class="carica-inputs">
-            <div class="carica-input-wrap">
-              <div class="carica-input-label">Quantità da caricare</div>
-              <input class="carica-input" type="number" min="1" placeholder="0"
-                id="cq-${it.id}" value="" inputmode="numeric">
-            </div>
-            <div class="carica-input-wrap">
-              <div class="carica-input-label">Nuovo prezzo €/${it.unit}</div>
-              <input class="carica-input" type="number" min="0" step="0.01"
-                placeholder="${priceVal||'—'}" id="cp-${it.id}" value="" inputmode="decimal">
-            </div>
-            <div class="carica-input-wrap carica-add-full">
-              <div class="carica-input-label">Fornitore</div>
-              <select class="carica-input" id="cf-${it.id}" style="text-align:left">
-                <option value="">— Seleziona fornitore —</option>
-                ${fornitoriList.map(f=>'<option value="'+f.nome+'">'+f.nome+'</option>').join('')}
-              </select>
-            </div>
-          </div>
-          <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
-        </div>`;
-      }).join('');
+    : items.map(it=>caricaItemCardHTML(it,false)).join('');
 
   // ── Form nuovo prodotto ─────────────────────
   const unitOpts=['pz','m','kit','conf','lt'].map(u=>`<option value="${u}">${u}</option>`).join('');
@@ -3424,6 +3735,32 @@ window.deleteFornitore=async function(id){
 };
 
 // ═══════════════════════════════════════
+//  PRODOTTI VOLATILI — CRUD
+// ═══════════════════════════════════════
+window.addVolatile=async function(){
+  const descEl=document.getElementById('new-volatile-desc');
+  const qtyEl=document.getElementById('new-volatile-qty');
+  const deadlineEl=document.getElementById('new-volatile-deadline');
+  const desc=descEl.value.trim();
+  const qty=parseInt(qtyEl.value)||1;
+  const deadline=deadlineEl.value;
+  if(!desc){showToast('Inserisci la descrizione del materiale','toast-danger');descEl.focus();return;}
+  if(!deadline){showToast('Imposta la scadenza di restituzione','toast-danger');deadlineEl.focus();return;}
+  const id=genId();
+  await setDoc(doc(db,'volatili',id),{desc,qty,deadline,creato:Date.now()});
+  descEl.value='';qtyEl.value='1';deadlineEl.value='';
+  setTimeout(()=>{renderResponsabile();renderDashboardAlerts();},300);
+  showToast('Prodotto volatile aggiunto','toast-return');
+};
+window.deleteVolatile=async function(id){
+  const v=volatiliList.find(x=>x.id===id);
+  if(!v||!confirm('Eliminare "'+v.desc+'" dalla lista prodotti volatili?\n\n(Usa questo quando il materiale è stato restituito)')) return;
+  await deleteDoc(doc(db,'volatili',id));
+  setTimeout(()=>{renderResponsabile();renderDashboardAlerts();},300);
+  showToast('Prodotto volatile rimosso','toast-info');
+};
+
+// ═══════════════════════════════════════
 //  EXCEL PER CANTIERE
 // ═══════════════════════════════════════
 window.exportByCantiere=async function(){
@@ -3450,11 +3787,14 @@ window.exportByCantiere=async function(){
   rows.push(['MOVIMENTAZIONI MATERIALE PER CANTIERE']);
   rows.push(['Cantiere: '+label+'  |  Generato il: '+new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})]);
   rows.push([]);
-  rows.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Quantità','Unità','Cantiere','Operatore']);
+  rows.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Quantità','Unità','Prezzo €/un.','Valore €','Cantiere','Operatore']);
 
   movimenti.sort((a,b)=>b.time-a.time);
   const dedupedBC=itemsListDeduped();
   let totPrelievi=0, totRestituzioni=0;
+  // Accumulo netto per prodotto: prelevato - restituito (i carichi non contano nel netto cantiere)
+  const nettoPerCodice={}; // code → {qty, nome, prezzo, unit}
+
   movimenti.forEach(e=>{
     const d=new Date(e.time);
     const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -3462,18 +3802,56 @@ window.exportByCantiere=async function(){
     const item=dedupedBC.find(i=>i.id===e.itemId)||dedupedBC.find(i=>i.code===e.code);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
     const tipo={take:'Prelievo',return:'Restituzione',load:'Carico'}[e.type]||'Movimento';
-    rows.push([data,ora,tipo,e.code,e.name,catLabel,e.delta,item?.unit||'',e.cantiere||'',e.operator||'']);
+    const prezzo=item?.prezzo!=null?item.prezzo:null;
+    const valoreRiga=prezzo!=null?Math.round(prezzo*Math.abs(e.delta)*100)/100:'';
+    rows.push([data,ora,tipo,e.code,e.name,catLabel,e.delta,item?.unit||'',prezzo!=null?prezzo:'',valoreRiga,e.cantiere||'',e.operator||'']);
     if(e.delta<0) totPrelievi+=Math.abs(e.delta);
     else totRestituzioni+=e.delta;
+
+    // Netto solo per prelievi/restituzioni (escludi i carichi merce, che non riguardano il cantiere)
+    if(e.type==='take'||e.type==='return'){
+      if(!nettoPerCodice[e.code]) nettoPerCodice[e.code]={qty:0,nome:e.name,prezzo,unit:item?.unit||''};
+      nettoPerCodice[e.code].qty+=e.delta; // take è negativo, return è positivo → netto = preso non restituito
+    }
   });
 
   rows.push([]);
   rows.push(['','','','','Totale movimenti:',movimenti.length,'Prelievi:',totPrelievi,'Restituzioni:',totRestituzioni]);
 
   const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:12},{wch:8},{wch:14},{wch:10},{wch:40},{wch:22},{wch:10},{wch:8},{wch:28},{wch:20}];
-  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}}];
+  ws['!cols']=[{wch:12},{wch:8},{wch:14},{wch:10},{wch:40},{wch:22},{wch:10},{wch:8},{wch:12},{wch:12},{wch:28},{wch:20}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:11}},{s:{r:1,c:0},e:{r:1,c:11}}];
   XLSX.utils.book_append_sheet(wb,ws,'Movimenti Cantiere');
+
+  // ─── FOGLIO 2: Costo materiale non restituito ───
+  const rows2=[];
+  rows2.push(['MATERIALE PRELEVATO E NON RESTITUITO — '+label]);
+  rows2.push(['Valore economico del materiale ancora in cantiere (preso − restituito) × prezzo unitario']);
+  rows2.push([]);
+  rows2.push(['Codice','Prodotto','Qtà non restituita','Unità','Prezzo €/un.','Valore €']);
+
+  let totaleNonRestituito=0;
+  const nettoRows=Object.entries(nettoPerCodice)
+    .map(([code,v])=>({code,...v}))
+    .filter(v=>v.qty<0) // qty negativa = ancora fuori (preso più di quanto restituito)
+    .sort((a,b)=>a.code.localeCompare(b.code));
+
+  nettoRows.forEach(v=>{
+    const qtyFuori=Math.abs(v.qty);
+    const valore=v.prezzo!=null?Math.round(v.prezzo*qtyFuori*100)/100:'';
+    if(v.prezzo!=null) totaleNonRestituito+=v.prezzo*qtyFuori;
+    rows2.push([v.code,v.nome,qtyFuori,v.unit,v.prezzo!=null?v.prezzo:'',valore]);
+  });
+
+  if(nettoRows.length===0) rows2.push(['Nessun materiale risulta ancora non restituito per questo cantiere']);
+
+  rows2.push([]);
+  rows2.push(['','','','','TOTALE NON RESTITUITO:',Math.round(totaleNonRestituito*100)/100]);
+
+  const ws2=XLSX.utils.aoa_to_sheet(rows2);
+  ws2['!cols']=[{wch:10},{wch:40},{wch:18},{wch:8},{wch:12},{wch:14}];
+  ws2['!merges']=[{s:{r:0,c:0},e:{r:0,c:5}},{s:{r:1,c:0},e:{r:1,c:5}}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Materiale Non Restituito');
 
   const fname='Cantiere_'+(cantFilter||'Tutti').replace(/\s/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.xlsx';
   XLSX.writeFile(wb,fname);
