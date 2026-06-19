@@ -2256,7 +2256,8 @@ function renderLog(){
   const filterWrap=document.getElementById('log-filter-wrap');
 
   // Operai vedono solo i PROPRI movimenti; responsabili vedono tutto
-  const baseLog=isResp()?actLog:actLog.filter(e=>e.operatorUid===currentUser.uid);
+  // Tutti vedono tutti i movimenti; modifica/elimina restano limitati ai propri (vedi renderLogItem)
+  const baseLog=actLog;
 
   if(actLog.length===0){
     if(filterWrap) filterWrap.innerHTML='';
