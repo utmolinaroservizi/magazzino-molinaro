@@ -712,6 +712,12 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
           </select>
         </div>
       </div>
+      <div id="fm-altro-row" style="display:none;margin-top:8px">
+        <div class="fuel-vehicle-label">Descrizione mezzo (libera)</div>
+        <input type="text" class="fuel-vehicle-select" id="fm-altro-input"
+          placeholder="es. Trattore, Generatore, Motosega..."
+          style="width:100%;box-sizing:border-box;margin-top:3px">
+      </div>
     </div>
     <div class="counter-zone">
       <div class="counter-label">Litri da movimentare</div>
@@ -779,6 +785,27 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="resp-entity-add">
       <input class="resp-entity-input" id="new-cantiere-input" placeholder="Nome cantiere...">
       <button class="resp-entity-btn" onclick="addCantiere()">+ Aggiungi</button>
+    </div>
+  </div>
+  <div class="resp-card">
+    <h3>🚛 Gestione mezzi aziendali</h3>
+    <p>Aggiungi o rimuovi mezzi dal parco auto. Appariranno nel selettore di Nafta e AdBlue.</p>
+    <div class="resp-entity-list" id="resp-mezzi-list"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+      <input class="resp-entity-input" id="new-mezzo-input" placeholder="Nome mezzo...">
+      <input class="resp-entity-input" id="new-targa-input" placeholder="Targa...">
+    </div>
+    <div class="resp-entity-add" style="margin-top:6px">
+      <button class="resp-entity-btn" style="width:100%" onclick="addMezzo()">+ Aggiungi mezzo</button>
+    </div>
+  </div>
+  <div class="resp-card">
+    <h3>👷 Gestione operai</h3>
+    <p>Registro degli operai attivi. Aggiorna quando vengono assunti o lasciano l'azienda.</p>
+    <div class="resp-entity-list" id="resp-operatori-list"></div>
+    <div class="resp-entity-add">
+      <input class="resp-entity-input" id="new-operatore-input" placeholder="Nome e cognome...">
+      <button class="resp-entity-btn" onclick="addOperatore()">+ Aggiungi</button>
     </div>
   </div>
   <div class="resp-card">
@@ -965,7 +992,9 @@ let logHasMore     = false;  // ci sono altri movimenti oltre quelli caricati
 const LOG_PAGE     = 100;    // voci per pagina
 
 // ── Mezzi aziendali (per rifornimento nafta) ──
-const MEZZI_AZIENDALI=[
+// I mezzi vengono caricati da Firestore (collezione 'mezzi').
+// La costante originale è usata solo per la migrazione iniziale (una volta sola).
+const MEZZI_DEFAULT=[
   {mezzo:'Toyota Hilux',targa:'BN 234409'},
   {mezzo:'Mitsubishi Fuso Canter (piattaforma aerea)',targa:'GD 122 FY'},
   {mezzo:'Daily Palfinger (piattaforma aerea)',targa:'GJ 536 GR'},
@@ -985,6 +1014,8 @@ let catOrder       = [];
 let cantieriList   = [];
 let fornitoriList  = [];
 let volatiliList   = [];
+let mezziList      = [];
+let operatoriList  = [];
 let openCats       = {};
 let editMode       = false;
 let currentModalItem = null;
@@ -1247,6 +1278,14 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   await deduplicaInventario();
   await riparaQtaDopoDedup(); // Ripristina qtà sbagliate dalla dedup che sommava
   await migrateAdBlue();     // Aggiunge AdBlue se non presente
+
+  // Migra i mezzi da costante a Firestore (una volta sola)
+  if(mezziList.length===0){
+    const batch=writeBatch(db);
+    MEZZI_DEFAULT.forEach(m=>{const id=genId();batch.set(doc(db,'mezzi',id),{mezzo:m.mezzo,targa:m.targa});});
+    await batch.commit();
+    console.log('[INIT] Mezzi aziendali migrati su Firestore');
+  }
   // Normalizza ordine categorie
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
@@ -1301,6 +1340,14 @@ async function loadFromFirestore(){
     const volSnap=await getDocs(collection(db,'volatili'));
     volatiliList=[];volSnap.forEach(d=>volatiliList.push({id:d.id,...d.data()}));
     volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
+    // Mezzi aziendali
+    const mezziSnap=await getDocs(collection(db,'mezzi'));
+    mezziList=[];mezziSnap.forEach(d=>mezziList.push({id:d.id,...d.data()}));
+    mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));
+    // Operatori
+    const opSnap=await getDocs(collection(db,'operatori'));
+    operatoriList=[];opSnap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));
+    operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
   }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
 }
 
@@ -1754,6 +1801,16 @@ function listenRealtime(){
     volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
     if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
     if(document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboardAlerts();
+  });
+  onSnapshot(collection(db,'mezzi'),snap=>{
+    mezziList=[];snap.forEach(d=>mezziList.push({id:d.id,...d.data()}));
+    mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));
+    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
+  });
+  onSnapshot(collection(db,'operatori'),snap=>{
+    operatoriList=[];snap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));
+    operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
   });
 }
 
@@ -2647,6 +2704,25 @@ function renderResponsabile(){
       </div>`).join('');
   document.getElementById('resp-cantieri-list').innerHTML=cantHtml;
 
+  // Mezzi
+  const mezziHtml=mezziList.length===0
+    ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun mezzo. Aggiungine uno.</p>'
+    :mezziList.map(m=>`<div class="resp-entity-item">
+        <span class="resp-entity-name">🚛 ${m.mezzo}</span>
+        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px">${m.targa||''}</span>
+        <button class="resp-entity-del" onclick="deleteMezzo('${m.id}')">✕ Rimuovi</button>
+      </div>`).join('');
+  document.getElementById('resp-mezzi-list').innerHTML=mezziHtml;
+
+  // Operatori
+  const opHtml=operatoriList.length===0
+    ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun operaio registrato. Aggiungine uno.</p>'
+    :operatoriList.map(o=>`<div class="resp-entity-item">
+        <span class="resp-entity-name">👷 ${o.nome}</span>
+        <button class="resp-entity-del" onclick="deleteOperatore('${o.id}')">✕ Rimuovi</button>
+      </div>`).join('');
+  document.getElementById('resp-operatori-list').innerHTML=opHtml;
+
   // Fornitori
   const fornHtml=fornitoriList.length===0
     ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun fornitore. Aggiungine uno.</p>'
@@ -2874,18 +2950,84 @@ window.exportValoreMagazzino=async function(){
   showToast('Excel scaricato — 2 fogli','toast-return');
 };
 
-window.exportExcel=function(){
-  if(actLog.length===0){alert('Nessun movimento da esportare.');return}
-  let csv='\uFEFF"Data","Ora","Codice","Prodotto","Categoria","Operazione","Quantità","Operatore"\n';
-  actLog.forEach(e=>{
+window.exportExcel=async function(){
+  if(!await ensureXLSX()) return;
+  showToast('Generazione report...','toast-sync');
+
+  // Recupera tutti i movimenti da Firestore (fino a 5000)
+  let tuttiMov=[];
+  try{
+    const snap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(5000)));
+    snap.forEach(d=>tuttiMov.push({id:d.id,...d.data()}));
+  }catch(err){
+    tuttiMov=[...actLog]; // fallback su memoria
+  }
+  tuttiMov.sort((a,b)=>b.time-a.time);
+
+  const wb=XLSX.utils.book_new();
+  const oggi=new Date();
+  const dataReport=oggi.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  // ── FOGLIO 1: Tutte le movimentazioni ──────────────────
+  const f1=[];
+  f1.push(['REPORT MOVIMENTAZIONI MAGAZZINO']);
+  f1.push(['Generato il: '+dataReport]);
+  f1.push([]);
+  f1.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Cantiere','Quantità','Unità','Operatore']);
+
+  tuttiMov.forEach(e=>{
     const d=new Date(e.time);
     const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-    const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    const item=itemsList.find(i=>i.id===e.itemId);
+    const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    const item=itemsList.find(i=>i.id===e.itemId)||itemsList.find(i=>i.code===e.code);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
-    csv+=`"${data}","${ora}","${e.code}","${e.name.replace(/"/g,'""')}","${catLabel}","${e.delta<0?'Prelievo':'Reimmissione'}","${Math.abs(e.delta)}","${e.operator||'N/D'}"\n`;
+    const tipo={take:'Prelievo',return:'Restituzione',load:'Carico'}[e.type]||(e.delta<0?'Prelievo':'Reimmissione');
+    f1.push([data,ora,tipo,e.code,e.name,catLabel,e.cantiere||'',Math.abs(e.delta),item?.unit||'',e.operator||'N/D']);
   });
-  downloadCSV(csv,'Report_Movimentazioni_'+dateStr()+'.csv');showToast('Report scaricato','toast-info');
+  f1.push([]);f1.push(['Totale movimenti:',tuttiMov.length]);
+
+  const ws1=XLSX.utils.aoa_to_sheet(f1);
+  ws1['!cols']=[{wch:12},{wch:8},{wch:14},{wch:10},{wch:40},{wch:22},{wch:28},{wch:10},{wch:8},{wch:22}];
+  ws1['!merges']=[{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}}];
+  XLSX.utils.book_append_sheet(wb,ws1,'Movimentazioni');
+
+  // ── FOGLIO 2: Dettaglio Carburante ─────────────────────
+  const FUEL_CODES=new Set(['CB.001','CB.002','CB.003']);
+  const fuelMov=tuttiMov.filter(e=>FUEL_CODES.has(e.code));
+
+  const f2=[];
+  f2.push(['DETTAGLIO MOVIMENTAZIONI CARBURANTE']);
+  f2.push(['Generato il: '+dataReport]);
+  f2.push([]);
+  f2.push(['Data','Ora','Tipo','Prodotto','Litri','Operatore','Mezzo','Targa','Note']);
+
+  let totNafta=0,totBenzina=0,totAdblue=0;
+  fuelMov.forEach(e=>{
+    const d=new Date(e.time);
+    const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    const tipo=e.delta<0?'Prelievo':'Reinserimento';
+    const litri=e.delta; // negativo=prelievo, positivo=reinserimento
+    f2.push([data,ora,tipo,e.name,litri,e.operator||'N/D',e.mezzo||'—',e.targa||'—','']);
+    if(e.code==='CB.001'&&e.delta<0) totNafta+=Math.abs(e.delta);
+    if(e.code==='CB.002'&&e.delta<0) totBenzina+=Math.abs(e.delta);
+    if(e.code==='CB.003'&&e.delta<0) totAdblue+=Math.abs(e.delta);
+  });
+
+  if(fuelMov.length===0) f2.push(['Nessuna movimentazione carburante registrata']);
+
+  f2.push([]);
+  f2.push(['TOTALE PRELIEVI:','','','Nafta:',totNafta,'lt','Benzina:',totBenzina,'lt AdBlue:',totAdblue,'lt']);
+
+  const ws2=XLSX.utils.aoa_to_sheet(f2);
+  ws2['!cols']=[{wch:12},{wch:8},{wch:14},{wch:16},{wch:10},{wch:22},{wch:36},{wch:16},{wch:20}];
+  ws2['!merges']=[{s:{r:0,c:0},e:{r:0,c:8}},{s:{r:1,c:0},e:{r:1,c:8}}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Carburante');
+
+  // Salva
+  const fname='Report_Magazzino_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  XLSX.writeFile(wb,fname);
+  showToast('Report scaricato (2 fogli)','toast-return');
 };
 window.exportInventory=function(){
   let csv='\uFEFF"Codice","Prodotto","Categoria","Sottocategoria","Quantità","Unità","Prezzo €/un.","Valore Totale €"\n';
@@ -3373,9 +3515,19 @@ window.openFuelModal=function(id){
   if(needsVehicle){
     const mSel=document.getElementById('fm-mezzo');
     const tSel=document.getElementById('fm-targa');
-    mSel.innerHTML='<option value="">— Seleziona mezzo —</option>'+MEZZI_AZIENDALI.map((v,i)=>`<option value="${i}">${v.mezzo}</option>`).join('');
-    tSel.innerHTML='<option value="">— Seleziona targa —</option>'+MEZZI_AZIENDALI.map((v,i)=>`<option value="${i}">${v.targa}</option>`).join('');
+    const altroRow=document.getElementById('fm-altro-row');
+    const altroInput=document.getElementById('fm-altro-input');
+    const opts='<option value="">— Seleziona mezzo —</option>'+
+      mezziList.map(v=>`<option value="${v.id}">${v.mezzo}</option>`).join('')+
+      '<option value="altro">✍️ Altro (specificare...)</option>';
+    const targaOpts='<option value="">— Seleziona targa —</option>'+
+      mezziList.map(v=>`<option value="${v.id}">${v.targa}</option>`).join('')+
+      '<option value="altro">N/D (Altro)</option>';
+    mSel.innerHTML=opts;
+    tSel.innerHTML=targaOpts;
     mSel.value='';tSel.value='';
+    altroRow.style.display='none';
+    if(altroInput) altroInput.value='';
   }
   const priceZone=document.getElementById('fuel-price-zone');
   if(isResp()){
@@ -3400,17 +3552,40 @@ window.closeFuelModal=function(e){
 window.syncVehicle=function(from){
   const mSel=document.getElementById('fm-mezzo');
   const tSel=document.getElementById('fm-targa');
-  if(from==='mezzo') tSel.value=mSel.value;
-  else mSel.value=tSel.value;
+  const altroRow=document.getElementById('fm-altro-row');
+  if(from==='mezzo'){
+    if(mSel.value==='altro'){
+      tSel.value='altro';
+      altroRow.style.display='block';
+      document.getElementById('fm-altro-input')?.focus();
+    } else {
+      tSel.value=mSel.value; // stesso id → stessa voce
+      altroRow.style.display='none';
+    }
+  } else {
+    if(tSel.value==='altro'){
+      mSel.value='altro';
+      altroRow.style.display='block';
+      document.getElementById('fm-altro-input')?.focus();
+    } else {
+      mSel.value=tSel.value;
+      altroRow.style.display='none';
+    }
+  }
 };
 
 function getSelectedVehicle(){
   if(!currentFuelItem) return null;
   const needsVehicle=currentFuelItem.code==='CB.001'||currentFuelItem.code==='CB.003';
   if(!needsVehicle) return null;
-  const idx=document.getElementById('fm-mezzo')?.value;
-  if(idx===''||idx==null) return null;
-  const v=MEZZI_AZIENDALI[parseInt(idx)];
+  const val=document.getElementById('fm-mezzo')?.value;
+  if(!val) return null;
+  if(val==='altro'){
+    const desc=(document.getElementById('fm-altro-input')?.value||'').trim();
+    if(!desc) return null; // testo obbligatorio quando "Altro"
+    return {mezzo:desc,targa:'—'};
+  }
+  const v=mezziList.find(m=>m.id===val);
   return v?{mezzo:v.mezzo,targa:v.targa}:null;
 }
 
@@ -3421,7 +3596,10 @@ window.doFuelAdjust=async function(sign){
     if(fuelCounterVal>currentFuelItem.qty){showToast('⚠️ Disponibili solo '+currentFuelItem.qty+' lt!','toast-danger');return;}
     // Per nafta: mezzo obbligatorio al prelievo
     if((currentFuelItem.code==='CB.001'||currentFuelItem.code==='CB.003')&&!getSelectedVehicle()){
-      showToast('⚠️ Seleziona il mezzo aziendale!','toast-danger');return;
+      const val=document.getElementById('fm-mezzo')?.value;
+      if(val==='altro') showToast('⚠️ Descrivi il mezzo nel campo testo!','toast-danger');
+      else showToast('⚠️ Seleziona il mezzo aziendale!','toast-danger');
+      return;
     }
   }
   const amount=fuelCounterVal*sign;
@@ -3733,6 +3911,51 @@ window.deleteFornitore=async function(id){
   await deleteDoc(doc(db,'fornitori',id));
   setTimeout(()=>renderResponsabile(),300);
   showToast('Fornitore eliminato','toast-info');
+};
+
+// ═══════════════════════════════════════
+//  MEZZI AZIENDALI — CRUD
+// ═══════════════════════════════════════
+window.addMezzo=async function(){
+  const mezzoEl=document.getElementById('new-mezzo-input');
+  const targaEl=document.getElementById('new-targa-input');
+  const mezzo=mezzoEl.value.trim();
+  const targa=targaEl.value.trim().toUpperCase();
+  if(!mezzo){showToast('Inserisci il nome del mezzo','toast-danger');mezzoEl.focus();return;}
+  const id=genId();
+  await setDoc(doc(db,'mezzi',id),{mezzo,targa,creato:Date.now()});
+  mezzoEl.value='';targaEl.value='';
+  setTimeout(()=>renderResponsabile(),300);
+  showToast('Mezzo "'+mezzo+'" aggiunto','toast-return');
+};
+window.deleteMezzo=async function(id){
+  const m=mezziList.find(x=>x.id===id);
+  if(!m||!confirm('Rimuovere "'+m.mezzo+'" dall\'elenco mezzi?')) return;
+  await deleteDoc(doc(db,'mezzi',id));
+  setTimeout(()=>renderResponsabile(),300);
+  showToast('Mezzo rimosso','toast-info');
+};
+
+// ═══════════════════════════════════════
+//  OPERATORI — CRUD
+// ═══════════════════════════════════════
+window.addOperatore=async function(){
+  const input=document.getElementById('new-operatore-input');
+  const nome=input.value.trim();
+  if(!nome){showToast('Inserisci nome e cognome','toast-danger');input.focus();return;}
+  if(operatoriList.find(o=>o.nome.toLowerCase()===nome.toLowerCase())){showToast('Operaio già presente','toast-danger');return;}
+  const id=genId();
+  await setDoc(doc(db,'operatori',id),{nome,creato:Date.now()});
+  input.value='';
+  setTimeout(()=>renderResponsabile(),300);
+  showToast('Operaio "'+nome+'" aggiunto','toast-return');
+};
+window.deleteOperatore=async function(id){
+  const o=operatoriList.find(x=>x.id===id);
+  if(!o||!confirm('Rimuovere "'+o.nome+'" dall\'elenco operai?')) return;
+  await deleteDoc(doc(db,'operatori',id));
+  setTimeout(()=>renderResponsabile(),300);
+  showToast('Operaio rimosso','toast-info');
 };
 
 // ═══════════════════════════════════════
