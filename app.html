@@ -1336,13 +1336,6 @@ async function loadFromFirestore(){
     const fornSnap=await getDocs(collection(db,'fornitori'));
     fornitoriList=[];fornSnap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
     fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-    // Cantieri e Fornitori
-    const cantSnap=await getDocs(collection(db,'cantieri'));
-    cantieriList=[];cantSnap.forEach(d=>cantieriList.push({id:d.id,...d.data()}));
-    cantieriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-    const fornSnap=await getDocs(collection(db,'fornitori'));
-    fornitoriList=[];fornSnap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
-    fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
   }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
 
   // Collezioni secondarie — ognuna con il proprio try/catch
