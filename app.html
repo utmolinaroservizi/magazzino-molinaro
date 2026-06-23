@@ -2951,7 +2951,7 @@ window.exportValoreMagazzino=async function(){
 };
 
 window.exportExcel=async function(){
-  if(!await ensureXLSX()) return;
+  if(typeof XLSX==='undefined'){showToast('Libreria Excel non disponibile','toast-danger');return;}
   showToast('Generazione report...','toast-sync');
 
   // Recupera tutti i movimenti da Firestore (fino a 5000)
@@ -3944,18 +3944,34 @@ window.addOperatore=async function(){
   const nome=input.value.trim();
   if(!nome){showToast('Inserisci nome e cognome','toast-danger');input.focus();return;}
   if(operatoriList.find(o=>o.nome.toLowerCase()===nome.toLowerCase())){showToast('Operaio già presente','toast-danger');return;}
-  const id=genId();
-  await setDoc(doc(db,'operatori',id),{nome,creato:Date.now()});
-  input.value='';
-  setTimeout(()=>renderResponsabile(),300);
-  showToast('Operaio "'+nome+'" aggiunto','toast-return');
+  try{
+    const id=genId();
+    await setDoc(doc(db,'operatori',id),{nome,creato:Date.now()});
+    // Aggiorna subito la lista locale — non aspettare l'onSnapshot
+    if(!operatoriList.find(o=>o.id===id)){
+      operatoriList.push({id,nome,creato:Date.now()});
+      operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+    }
+    input.value='';
+    renderResponsabile();
+    showToast('Operaio "'+nome+'" aggiunto','toast-return');
+  }catch(err){
+    console.error('Errore addOperatore:',err);
+    showToast('Errore nel salvataggio: '+err.message,'toast-danger');
+  }
 };
 window.deleteOperatore=async function(id){
   const o=operatoriList.find(x=>x.id===id);
   if(!o||!confirm('Rimuovere "'+o.nome+'" dall\'elenco operai?')) return;
-  await deleteDoc(doc(db,'operatori',id));
-  setTimeout(()=>renderResponsabile(),300);
-  showToast('Operaio rimosso','toast-info');
+  try{
+    await deleteDoc(doc(db,'operatori',id));
+    operatoriList=operatoriList.filter(x=>x.id!==id);
+    renderResponsabile();
+    showToast('Operaio rimosso','toast-info');
+  }catch(err){
+    console.error('Errore deleteOperatore:',err);
+    showToast('Errore nella rimozione: '+err.message,'toast-danger');
+  }
 };
 
 // ═══════════════════════════════════════
