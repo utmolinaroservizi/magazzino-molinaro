@@ -1336,19 +1336,32 @@ async function loadFromFirestore(){
     const fornSnap=await getDocs(collection(db,'fornitori'));
     fornitoriList=[];fornSnap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
     fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-    // Prodotti volatili
+    // Cantieri e Fornitori
+    const cantSnap=await getDocs(collection(db,'cantieri'));
+    cantieriList=[];cantSnap.forEach(d=>cantieriList.push({id:d.id,...d.data()}));
+    cantieriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+    const fornSnap=await getDocs(collection(db,'fornitori'));
+    fornitoriList=[];fornSnap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
+    fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+  }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
+
+  // Collezioni secondarie — ognuna con il proprio try/catch
+  // così un errore su una non blocca le altre
+  try{
     const volSnap=await getDocs(collection(db,'volatili'));
     volatiliList=[];volSnap.forEach(d=>volatiliList.push({id:d.id,...d.data()}));
     volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
-    // Mezzi aziendali
+  }catch(e){console.warn('[load] volatili:',e.message);}
+  try{
     const mezziSnap=await getDocs(collection(db,'mezzi'));
     mezziList=[];mezziSnap.forEach(d=>mezziList.push({id:d.id,...d.data()}));
     mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));
-    // Operatori
+  }catch(e){console.warn('[load] mezzi:',e.message);}
+  try{
     const opSnap=await getDocs(collection(db,'operatori'));
     operatoriList=[];opSnap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));
     operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-  }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
+  }catch(e){console.warn('[load] operatori:',e.message);}
 }
 
 async function initDefaultData(){
@@ -1802,16 +1815,22 @@ function listenRealtime(){
     if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
     if(document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboardAlerts();
   });
-  onSnapshot(collection(db,'mezzi'),snap=>{
-    mezziList=[];snap.forEach(d=>mezziList.push({id:d.id,...d.data()}));
-    mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));
-    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
-  });
-  onSnapshot(collection(db,'operatori'),snap=>{
-    operatoriList=[];snap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));
-    operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
-  });
+  onSnapshot(collection(db,'mezzi'),
+    snap=>{
+      mezziList=[];snap.forEach(d=>mezziList.push({id:d.id,...d.data()}));
+      mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));
+      if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
+    },
+    err=>console.warn('[snapshot] mezzi:',err.message)
+  );
+  onSnapshot(collection(db,'operatori'),
+    snap=>{
+      operatoriList=[];snap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));
+      operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+      if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
+    },
+    err=>console.warn('[snapshot] operatori:',err.message)
+  );
 }
 
 async function saveItem(item){const{id,...data}=item;await setDoc(doc(db,'inventario',id),data)}
