@@ -1322,23 +1322,29 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   }
   const heroTitle=document.getElementById('hero-title');
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
-  await loadFromFirestore();
-  await migrateV2();
-  await migrateV3();
-  await deduplicaInventario();
-  await riparaQtaDopoDedup(); // Ripristina qtà sbagliate dalla dedup che sommava
-  await migrateAdBlue();     // Aggiunge AdBlue se non presente
 
-  // Migrazione sottocategorie (one-shot via flag meta)
-  await migrateSubcategorie();
+  // Ogni errore nelle migrazioni NON deve bloccare l'app —
+  // la loading screen viene nascosta in ogni caso
+  try{
+    await loadFromFirestore();
+    await migrateV2();
+    await migrateV3();
+    await deduplicaInventario();
+    await riparaQtaDopoDedup();
+    await migrateAdBlue();
+    await migrateSubcategorie();
 
-  // Migra i mezzi da costante a Firestore (una volta sola, solo resp)
-  if(isResp() && mezziList.length===0){
-    const batch=writeBatch(db);
-    MEZZI_DEFAULT.forEach(m=>{const id=genId();batch.set(doc(db,'mezzi',id),{mezzo:m.mezzo,targa:m.targa});});
-    await batch.commit();
-    console.log('[INIT] Mezzi aziendali migrati su Firestore');
+    if(isResp() && mezziList.length===0){
+      const batch=writeBatch(db);
+      MEZZI_DEFAULT.forEach(m=>{const id=genId();batch.set(doc(db,'mezzi',id),{mezzo:m.mezzo,targa:m.targa});});
+      await batch.commit();
+      console.log('[INIT] Mezzi migrati su Firestore');
+    }
+  }catch(initErr){
+    console.error('[INIT] Errore durante inizializzazione:',initErr);
+    // L'app si carica comunque con i dati parzialmente disponibili
   }
+
   // Normalizza ordine categorie
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
