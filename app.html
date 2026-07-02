@@ -1027,7 +1027,7 @@ import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   doc, getDoc, collection, getDocs, setDoc, deleteDoc,
-  onSnapshot, writeBatch, query, orderBy, limit, startAfter, where
+  onSnapshot, writeBatch, query, orderBy, limit, startAfter
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ═══════════════════════════════════════
@@ -2160,10 +2160,11 @@ window.saveProductName=async function(){
   // 2) Aggiorna il nome in tutti i movimenti storici collegati a questo prodotto
   //    (così il registro mostra sempre il nome corretto, passato e presente)
   try{
-    const movSnap=await getDocs(query(collection(db,'movimenti'),where('itemId','==',itemId)));
+    const movSnap=await getDocs(collection(db,'movimenti'));
     const batch=writeBatch(db);
     let count=0;
     movSnap.forEach(d=>{
+      if(d.data().itemId!==itemId) return; // filtro lato client
       batch.update(doc(db,'movimenti',d.id),{name:newName});
       // aggiorna anche in memoria se presente nel log caricato
       const local=actLog.find(e=>e.id===d.id);
