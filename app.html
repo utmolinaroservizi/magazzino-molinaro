@@ -1188,6 +1188,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
     await loadFromFirestore();
     await migrateV2();
     if(isResp()) await migrateSubcategorie();
+    if(isResp()) await migrateAssegnaSubcategorie();
     await migrateV3();
     await deduplicaInventario();
   }catch(initErr){console.error('[INIT]',initErr.message||initErr);}
@@ -3405,6 +3406,61 @@ window.renderCantiereStats=function(){
   });
   panel.innerHTML=h;
 };
+
+// ═══════════════════════════════════
+//  MIGRAZIONE ASSEGNAZIONE SOTTOCATEGORIE
+//  Aggiorna SOLO il campo "sub" degli
+//  item esistenti. Quantità, prezzi e
+//  tutti gli altri campi restano intatti.
+// ═══════════════════════════════════
+async function migrateAssegnaSubcategorie(){
+  try{
+    // Mappa codice → sottocategoria corretta
+    var mappa={
+      'CV.001':'Precordati',
+      'CV.002':'Multipolari','CV.003':'Multipolari','CV.004':'Multipolari',
+      // CV.005 e CV.006 (corde acciaio) — nessuna sottocategoria, lasciamo null
+      'CV.007':'Unipolari','CV.008':'Unipolari','CV.009':'Unipolari',
+      'CV.010':'Unipolari','CV.011':'Unipolari','CV.012':'Unipolari',
+      'CV.013':'Unipolari','CV.014':'Unipolari','CV.015':'Unipolari',
+      'CV.016':'Unipolari','CV.017':'Unipolari','CV.018':'Unipolari',
+      'CV.019':'Unipolari','CV.020':'Unipolari','CV.021':'Unipolari',
+      'CV.022':'Unipolari','CV.023':'Unipolari','CV.024':'Unipolari',
+      'CV.025':'Videosorveglianza',
+      'CV.026':'Bipolari',
+      'CV.027':'Unipolari','CV.028':'Unipolari','CV.029':'Unipolari','CV.030':'Unipolari',
+      'AC.001':'Nastro','AC.002':'Nastro','AC.003':'Nastro',
+      'AC.004':'Nastro','AC.005':'Nastro','AC.006':'Nastro','AC.007':'Nastro',
+      'AC.008':'Vernice','AC.009':'Vernice','AC.010':'Vernice',
+      'AC.011':'Vernice','AC.012':'Vernice','AC.013':'Vernice',
+      'AC.014':'Vernice','AC.015':'Vernice'
+    };
+
+    // Controlla flag one-shot
+    var flagDoc=await getDoc(doc(db,'meta','assegnaSubcat_v1'));
+    if(flagDoc.exists()) return;
+
+    var batch=writeBatch(db);
+    var count=0;
+    itemsList.forEach(function(it){
+      var sub=mappa[it.code];
+      if(!sub) return;              // codice non in mappa → lascia invariato
+      if(it.sub===sub) return;      // già assegnato correttamente
+      // Crea una copia dell'item con solo "sub" modificato
+      var updated=Object.assign({},it,{sub:sub});
+      var id=updated.id; delete updated.id;
+      batch.set(doc(db,'inventario',id),updated);
+      it.sub=sub; // aggiorna anche in memoria
+      count++;
+    });
+
+    // Segna come eseguita
+    batch.set(doc(db,'meta','assegnaSubcat_v1'),{eseguita:true,data:Date.now()});
+    if(count>0) await batch.commit();
+    console.log('[SUBCAT-ASSIGN] Assegnate sottocategorie a '+count+' prodotti');
+    if(count>0) showToast(count+' prodotti assegnati alle sottocategorie','toast-return');
+  }catch(e){console.warn('[SUBCAT-ASSIGN]',e.message);}
+}
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
