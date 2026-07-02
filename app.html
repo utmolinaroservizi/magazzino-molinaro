@@ -1159,12 +1159,16 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   }
   const heroTitle=document.getElementById('hero-title');
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
-  await loadFromFirestore();
-  await migrateV2();
-  if(isResp()) await migrateSubcategorie();
-  await migrateV3();
-  await deduplicaInventario();
-  // Normalizza ordine categorie
+  try{
+    await loadFromFirestore();
+    await migrateV2();
+    if(isResp()) await migrateSubcategorie();
+    await migrateV3();
+    await deduplicaInventario();
+  }catch(err){
+    console.error('[INIT] Errore:',err.message||err);
+  }
+  // Normalizza ordine categorie — eseguito SEMPRE anche in caso di errore
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
   const extra=catOrder.filter(c=>!DESIRED_ORDER.includes(c));
