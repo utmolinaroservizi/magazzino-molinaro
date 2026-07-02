@@ -748,26 +748,8 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     </button>
   </div>
   <div class="resp-card">
-    <h3>📊 Analisi costi per cantiere</h3>
-    <p>Seleziona cantiere e periodo per vedere costi e ripartizione materiale.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-      <select class="modal-cantiere-select" id="dash-cant-sel">
-        <option value="">— Tutti i cantieri —</option>
-      </select>
-      <select class="modal-cantiere-select" id="dash-cant-period">
-        <option value="7">Ultimi 7 giorni</option>
-        <option value="30" selected>Ultimo mese</option>
-        <option value="90">Ultimi 3 mesi</option>
-        <option value="365">Ultimo anno</option>
-        <option value="0">Tutto</option>
-      </select>
-    </div>
-    <button class="resp-btn resp-btn-green" onclick="renderCantiereStats()" style="margin-bottom:12px">🔍 Analizza</button>
-    <div id="cantiere-stats-panel"></div>
-  </div>
-  <div class="resp-card">
-    <h3>🗂️ Gestione categorie e sottocategorie</h3>
-    <p>Aggiungi/rimuovi sottocategorie. Elimina una categoria solo se sei sicuro.</p>
+    <h3>🗂️ Gestione categorie</h3>
+    <p>Elimina una categoria. Verranno eliminati anche tutti i prodotti al suo interno.</p>
     <div class="resp-cat-list" id="resp-cat-list"></div>
   </div>
   <div class="resp-card">
@@ -923,10 +905,10 @@ const DEFAULT_CATS = {
   "Sostegni e Accessori":   {prefix:"SA",label:"Sostegni e Accessori",   icon:"🔩",color:"#5e7236",bg:"#eef2e6"},
   "Cavidotti":              {prefix:"CD",label:"Cavidotti",              icon:"🔧",color:"#6b5e36",bg:"#f5f0e2"},
   "CLS":                    {prefix:"CL",label:"CLS",                   icon:"🏗️",color:"#4a6b72",bg:"#e4eff2"},
-  "Cavi":                   {prefix:"CV",label:"Cavi",                   icon:"🔌",color:"#a8780a",bg:"#fbf2dc",subs:["Unipolari","Bipolari","Multipolari","Precordati","Videosorveglianza","Dati / Ethernet"]},
+  "Cavi":                   {prefix:"CV",label:"Cavi",                   icon:"🔌",color:"#a8780a",bg:"#fbf2dc"},
   "Materiale Elettrico":    {prefix:"ME",label:"Materiale Elettrico",    icon:"⚡",color:"#823560",bg:"#f7e8f0"},
   "Fotovoltaico":           {prefix:"FV",label:"Fotovoltaico",           icon:"☀️",color:"#553687",bg:"#ede6f7",subs:["Impiantistica Fotovoltaica","Lampioni Fotovoltaici"]},
-  "Accessori e Consumabili":{prefix:"AC",label:"Accessori e Consumabili",icon:"📦",color:"#2f8472",bg:"#e6f3f0",subs:["Nastro","Vernice"]},
+  "Accessori e Consumabili":{prefix:"AC",label:"Accessori e Consumabili",icon:"📦",color:"#2f8472",bg:"#e6f3f0"},
   "Carburante":             {prefix:"CB",label:"Carburante",             icon:"⛽",color:"#8e5c3d",bg:"#f7f0eb"},
 };
 
@@ -1159,16 +1141,11 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   }
   const heroTitle=document.getElementById('hero-title');
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
-  try{
-    await loadFromFirestore();
-    await migrateV2();
-    if(isResp()) await migrateSubcategorie();
-    await migrateV3();
-    await deduplicaInventario();
-  }catch(err){
-    console.error('[INIT] Errore:',err.message||err);
-  }
-  // Normalizza ordine categorie — eseguito SEMPRE anche in caso di errore
+  await loadFromFirestore();
+  await migrateV2();
+  await migrateV3();
+  await deduplicaInventario();
+  // Normalizza ordine categorie
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
   const extra=catOrder.filter(c=>!DESIRED_ORDER.includes(c));
@@ -2217,43 +2194,19 @@ function renderResponsabile(){
   const withPrice=itemsList.filter(it=>it.prezzo!=null).length;
   document.getElementById('valore-sub').textContent=withPrice+'/'+itemsList.length+' prodotti con prezzo impostato';
 
-  // Categorie + sottocategorie
+  // Categorie
   let html='';
   catOrder.forEach(cat=>{
     const cfg=categories[cat];if(!cfg) return;
     const ci=getItemsByCat(cat);
-    const subs=cfg.subs||[];
-    const chips=subs.map(s=>{
-      const sc=s.replace(/'/g,"\'");
-      const cc=cat.replace(/'/g,"\'");
-      return '<span class="resp-sub-chip">'+s+
-        ' <button class="resp-sub-chip-del" onclick="deleteSubcat(''+cc+'',''+sc+'')" title="Rimuovi">✕</button></span>';
-    }).join('');
-    const catK=cat.replace(/\s/g,'_');
-    html+=`<div class="resp-cat-block">
-      <div class="resp-cat-header">
-        <div class="resp-cat-icon" style="background:${cfg.bg}">${cfg.icon}</div>
-        <div class="resp-cat-info" style="flex:1"><div class="resp-cat-name" style="color:${cfg.color}">${cfg.label}</div>
-        <div class="resp-cat-sub">${cfg.prefix} · ${ci.length} prodotti</div></div>
-        <button class="resp-cat-del" onclick="deleteCategory('${cat}')">✕</button>
-      </div>
-      <div class="resp-cat-subs">${chips||'<span style="font-size:11px;color:var(--text-light)">Nessuna sottocategoria</span>'}</div>
-      <div class="resp-add-sub-row">
-        <input class="resp-add-sub-input" id="nsi-${catK}" placeholder="+ Nuova sottocategoria...">
-        <button class="resp-add-sub-btn" onclick="addSubcat('${cat}')">Aggiungi</button>
-      </div>
+    html+=`<div class="resp-cat-item">
+      <div class="resp-cat-icon" style="background:${cfg.bg}">${cfg.icon}</div>
+      <div class="resp-cat-info"><div class="resp-cat-name" style="color:${cfg.color}">${cfg.label}</div>
+      <div class="resp-cat-sub">${cfg.prefix} · ${ci.length} prodotti</div></div>
+      <button class="resp-cat-del" onclick="deleteCategory('${cat}')">✕</button>
     </div>`;
   });
   document.getElementById('resp-cat-list').innerHTML=html||'<p style="font-size:12px;color:var(--text-light);padding:10px 0">Nessuna categoria</p>';
-
-  // Popola dropdown analisi cantiere
-  const dashCant=document.getElementById('dash-cant-sel');
-  if(dashCant){
-    const pv=dashCant.value;
-    dashCant.innerHTML='<option value="">— Tutti i cantieri —</option>'+
-      cantieriList.map(c=>'<option value="'+c.nome+'">'+c.nome+'</option>').join('');
-    if(pv) dashCant.value=pv;
-  }
 
   // Cantieri
   const cantHtml=cantieriList.length===0
@@ -3278,134 +3231,6 @@ window.exportByCantiere=async function(){
 // ═══════════════════════════════════════
 //  TOAST
 // ═══════════════════════════════════════
-
-async function migrateSubcategorie(){
-  try{
-    const toUpdate=[
-      {cat:'Cavi',subs:['Unipolari','Bipolari','Multipolari','Precordati','Videosorveglianza','Dati / Ethernet']},
-      {cat:'Accessori e Consumabili',subs:['Nastro','Vernice']},
-    ];
-    for(const u of toUpdate){
-      const cfg=categories[u.cat]; if(!cfg) continue;
-      const existing=cfg.subs||[];
-      const toAdd=u.subs.filter(s=>!existing.includes(s));
-      if(toAdd.length===0) continue;
-      cfg.subs=[...existing,...toAdd];
-      await setDoc(doc(db,'categorie',u.cat),cfg);
-      console.log('[SUBCAT]',u.cat,'+',toAdd);
-    }
-  }catch(e){console.warn('[SUBCAT]',e.message);}
-}
-
-
-// ═══════════════════════════
-//  SOTTOCATEGORIE CRUD
-// ═══════════════════════════
-window.addSubcat=async function(cat){
-  const k=cat.replace(/\s/g,'_');
-  const inp=document.getElementById('nsi-'+k);
-  if(!inp) return;
-  const nome=inp.value.trim();
-  if(!nome){showToast('Inserisci il nome','toast-danger');inp.focus();return;}
-  const cfg=categories[cat];if(!cfg) return;
-  cfg.subs=cfg.subs||[];
-  if(cfg.subs.includes(nome)){showToast('Gia presente','toast-danger');return;}
-  cfg.subs.push(nome);
-  try{
-    await setDoc(doc(db,'categorie',cat),cfg);
-    inp.value='';
-    renderResponsabile();
-    showToast('"'+nome+'" aggiunto','toast-return');
-  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
-};
-
-window.deleteSubcat=async function(cat,sub){
-  const cfg=categories[cat];if(!cfg) return;
-  if(!confirm('Eliminare la sottocategoria "'+sub+'"?')) return;
-  cfg.subs=(cfg.subs||[]).filter(function(s){return s!==sub;});
-  try{
-    await setDoc(doc(db,'categorie',cat),cfg);
-    renderResponsabile();
-    showToast('"'+sub+'" rimossa','toast-info');
-  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
-};
-
-// ═══════════════════════════
-//  ANALISI CANTIERE
-// ═══════════════════════════
-const _catColors=['#4DAB3D','#2563EB','#E0A030','#A03A1E','#553687','#2f8472','#823560'];
-window.renderCantiereStats=async function(){
-  const panel=document.getElementById('cantiere-stats-panel');
-  if(!panel) return;
-  panel.innerHTML='<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">Calcolo in corso...</div>';
-  const cantFilter=document.getElementById('dash-cant-sel')&&document.getElementById('dash-cant-sel').value||'';
-  const days=parseInt((document.getElementById('dash-cant-period')&&document.getElementById('dash-cant-period').value)||'30');
-  const cutoff=days>0?Date.now()-days*86400000:0;
-
-  // Usa i movimenti già in memoria (actLog) per non fare query aggiuntive
-  const movimenti=actLog.filter(function(e){
-    if(cantFilter && e.cantiere!==cantFilter) return false;
-    if(!cantFilter && !e.cantiere) return false;
-    if(days>0 && e.time<cutoff) return false;
-    if(e.type==='load') return false;
-    return true;
-  });
-
-  if(movimenti.length===0){
-    panel.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Nessun movimento nel periodo.</div>';
-    return;
-  }
-
-  // Calcola netto per prodotto
-  const netto={};
-  movimenti.forEach(function(e){
-    const item=itemsList.find(function(i){return i.id===e.itemId;})||itemsList.find(function(i){return i.code===e.code;});
-    if(!netto[e.code]) netto[e.code]={nome:e.name,cat:item&&item.cat||'',qty:0,prezzo:item&&item.prezzo!=null?item.prezzo:null,unit:item&&item.unit||''};
-    netto[e.code].qty+=e.delta;
-  });
-  const consumati=Object.keys(netto).map(function(code){const v=netto[code];return Object.assign({code:code},v,{qtaFuori:-v.qty});})
-    .filter(function(v){return v.qtaFuori>0;})
-    .sort(function(a,b){return ((b.prezzo||0)*b.qtaFuori)-((a.prezzo||0)*a.qtaFuori);});
-
-  const totCosto=consumati.reduce(function(s,v){return s+(v.prezzo||0)*v.qtaFuori;},0);
-
-  // Ripartizione per categoria
-  const perCat={};
-  consumati.forEach(function(v){
-    if(!perCat[v.cat]) perCat[v.cat]={costo:0};
-    perCat[v.cat].costo+=(v.prezzo||0)*v.qtaFuori;
-  });
-  const catRank=Object.keys(perCat).map(function(c){return {cat:c,costo:perCat[c].costo};}).sort(function(a,b){return b.costo-a.costo;});
-  const label=cantFilter||'Tutti i cantieri';
-
-  let html='<div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:10px">📍 '+label+(days>0?' — ultimi '+days+' giorni':'')+'</div>';
-  html+='<div class="cs-kpi-row">';
-  html+='<div class="cs-kpi"><div class="cs-kpi-val">€'+Math.round(totCosto).toLocaleString('it-IT')+'</div><div class="cs-kpi-label">Costo netto</div></div>';
-  html+='<div class="cs-kpi"><div class="cs-kpi-val">'+consumati.length+'</div><div class="cs-kpi-label">Prodotti usati</div></div>';
-  html+='<div class="cs-kpi"><div class="cs-kpi-val">'+movimenti.length+'</div><div class="cs-kpi-label">Movimenti</div></div>';
-  html+='</div>';
-
-  if(catRank.length>0){
-    html+='<div class="cs-section-title">Per categoria</div>';
-    catRank.forEach(function(r,i){
-      const cfg=categories[r.cat];
-      const pct=Math.round(r.costo/Math.max(totCosto,1)*100);
-      const color=cfg&&cfg.color||_catColors[i%_catColors.length];
-      html+='<div class="cs-cat-row"><span class="cs-cat-label" style="color:'+color+'">'+(cfg&&cfg.icon||'')+' '+(cfg&&cfg.label||r.cat)+'</span>';
-      html+='<div class="cs-cat-bar-wrap"><div class="cs-cat-bar" style="width:'+pct+'%;background:'+color+'"></div></div>';
-      html+='<span class="cs-cat-val">€'+Math.round(r.costo).toLocaleString('it-IT')+'</span></div>';
-    });
-  }
-
-  html+='<div class="cs-section-title">Top prodotti</div>';
-  consumati.slice(0,8).forEach(function(v){
-    const costo=(v.prezzo||0)*v.qtaFuori;
-    html+='<div class="cs-product-row"><span class="cs-product-name">'+v.code+' — '+v.nome+'</span>';
-    html+='<span class="cs-product-cost">'+(costo>0?'€'+Math.round(costo).toLocaleString('it-IT'):v.qtaFuori+' '+v.unit)+'</span></div>';
-  });
-  panel.innerHTML=html;
-};
-
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
