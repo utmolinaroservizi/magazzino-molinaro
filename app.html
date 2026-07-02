@@ -69,36 +69,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .hero-title{font-size:21px;font-weight:600;line-height:1.2;margin-top:10px;letter-spacing:-.2px}
 .hero-meta{font-size:12px;font-weight:500;color:var(--text-muted);margin-top:8px}
 
-/* PIN CONFIRM MODAL */
-.pin-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px}
-.pin-backdrop.open{display:flex}
-.pin-box{background:var(--bg-card);border-radius:18px;padding:26px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.pin-icon{font-size:36px;margin-bottom:10px}
-.pin-title{font-size:16px;font-weight:700;margin-bottom:6px}
-.pin-subtitle{font-size:12.5px;color:var(--text-muted);margin-bottom:18px;line-height:1.4}
-.pin-input{width:100%;box-sizing:border-box;padding:14px;font-size:24px;font-weight:700;text-align:center;letter-spacing:8px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;outline:none;margin-bottom:6px}
-.pin-input:focus{border-color:#B33A3A}
-.pin-error{font-size:11.5px;color:#B33A3A;font-weight:600;min-height:16px;margin-bottom:10px}
-.pin-btns{display:flex;gap:8px}
-.pin-btn{flex:1;padding:12px;border-radius:10px;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
-.pin-btn-cancel{background:var(--bg-surface);color:var(--text-muted)}
-.pin-btn-confirm{background:#B33A3A;color:#fff}
-.pin-btn-confirm:active,.pin-btn-cancel:active{transform:scale(.97)}
-
-/* DASHBOARD ALERTS */
-.dash-alert{display:flex;align-items:flex-start;gap:10px;padding:13px 14px;border-radius:var(--radius-sm);margin-bottom:10px;border:1.5px solid}
-.dash-alert-fuel{background:#FFF3D6;border-color:#F0C76B}
-.dash-alert-volatile{background:#FFE8E0;border-color:#F0A98A}
-.dash-alert-volatile.warn{background:#FFF3D6;border-color:#F0C76B}
-.dash-alert-icon{font-size:20px;flex-shrink:0;line-height:1}
-.dash-alert-body{flex:1}
-.dash-alert-title{font-size:13px;font-weight:700;color:#7A4A0A;margin-bottom:2px}
-.dash-alert-volatile .dash-alert-title{color:#A03A1E}
-.dash-alert-volatile.warn .dash-alert-title{color:#7A4A0A}
-.dash-alert-text{font-size:12px;color:#6B4E1E;line-height:1.4}
-.dash-alert-volatile .dash-alert-text{color:#7A3520}
-.dash-alert-volatile.warn .dash-alert-text{color:#6B4E1E}
-
 .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px}
 .stat-card{background:var(--bg-card);border-radius:var(--radius-sm);padding:14px 10px 13px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow-xs)}
 .stat-val{font-size:24px;font-weight:600;color:var(--brand-500);line-height:1;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
@@ -215,10 +185,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .counter-btn:active{transform:scale(.9);background:var(--brand-50);border-color:var(--brand-500)}
 .counter-display{font-size:48px;font-weight:700;min-width:80px;line-height:1;font-variant-numeric:tabular-nums;color:var(--brand-500);letter-spacing:-2px;transition:transform .15s ease,opacity .15s ease}
 .counter-display.bump{transform:scale(1.12);opacity:.7}
-.counter-input{font-size:48px;font-weight:700;width:110px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-2px;border:none;background:transparent;text-align:center;font-family:inherit;outline:none;border-radius:10px;padding:4px 6px;-moz-appearance:textfield;transition:background .15s ease,transform .15s ease}
-.counter-input::-webkit-outer-spin-button,.counter-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.counter-input:focus{background:var(--brand-50)}
-.counter-hint-row{font-size:10px;color:var(--text-light);margin-top:3px;font-weight:500}
 .counter-unit{font-size:12px;color:var(--text-muted);font-weight:500;margin-top:6px}
 .counter-step-hint{font-size:10px;color:var(--text-light);margin-top:4px;font-weight:500}
 .btn-take .action-icon{background:#FFF3D6;color:#9A6C1E}.btn-take .action-label{color:#9A6C1E}
@@ -327,37 +293,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .resp-btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
 .resp-cat-list{margin-top:4px}
 .resp-cat-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-light)}
-.resp-cat-block{border-bottom:1px solid var(--border-light);padding:10px 0}
-.resp-cat-header{display:flex;align-items:center;gap:8px;width:100%}
-.resp-cat-rename-row{display:none;gap:6px;margin:6px 0 2px;align-items:center}
-.resp-cat-rename-row.open{display:flex}
-.resp-cat-rename-input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;outline:none;background:var(--bg-card)}
-.resp-cat-rename-input:focus{border-color:var(--brand-500)}
-.resp-cat-subs{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px 32px}
-.resp-sub-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 11px;background:var(--bg-surface);border-radius:99px;font-size:11.5px;font-weight:600;border:1.5px solid var(--border)}
-.resp-sub-chip button{background:transparent;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:0;line-height:1;flex-shrink:0}
-.resp-sub-chip button:hover{color:#B33A3A}
-.resp-sub-edit-btn{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit}
-.resp-sub-edit-btn:hover{background:var(--brand-50);color:var(--brand-600);border-color:var(--brand-400)}
-.resp-add-sub-row{display:flex;gap:6px;margin:6px 0 0 32px;align-items:center}
-.resp-add-sub-input{flex:1;padding:7px 10px;border:1.5px dashed var(--border);border-radius:var(--radius-xs);font-size:12px;font-family:inherit;outline:none;background:transparent}
-.resp-add-sub-input:focus{border-color:var(--brand-400);border-style:solid;background:var(--bg-card)}
-.resp-add-sub-btn{padding:7px 12px;background:var(--brand-500);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap}
-
-/* ANALISI CANTIERE DASHBOARD */
-.cs-kpi-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-.cs-kpi{background:var(--bg-surface);border-radius:var(--radius-sm);padding:12px 10px;text-align:center}
-.cs-kpi-val{font-size:20px;font-weight:800;color:var(--brand-600);font-variant-numeric:tabular-nums}
-.cs-kpi-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
-.cs-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 8px}
-.cs-cat-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.cs-cat-label{font-size:12px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cs-cat-bar-wrap{flex:2;height:7px;background:var(--border);border-radius:99px;overflow:hidden}
-.cs-cat-bar{height:100%;border-radius:99px;transition:width .4s ease}
-.cs-cat-val{font-size:11px;font-weight:700;color:var(--text-muted);min-width:48px;text-align:right}
-.cs-product-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border-light);font-size:12px}
-.cs-product-name{flex:1;color:var(--text);font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cs-product-cost{font-weight:700;color:var(--brand-600);flex-shrink:0;margin-left:8px}
 .resp-cat-item:last-child{border-bottom:none}
 .resp-cat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .resp-cat-info{flex:1}
@@ -419,19 +354,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 /* CANTIERI / FORNITORI gestione */
 .resp-entity-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .resp-entity-item{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg-surface);border-radius:var(--radius-xs);font-size:13px}
-
-/* PRODOTTI VOLATILI */
-.volatile-item{display:flex;flex-direction:column;gap:4px;padding:11px 13px;background:var(--bg-surface);border-radius:var(--radius-xs);margin-bottom:6px;border-left:3px solid var(--border)}
-.volatile-item.due-soon{border-left-color:#E0A030;background:#FFF8EB}
-.volatile-item.overdue{border-left-color:#C0392B;background:#FDF0EE}
-.volatile-top{display:flex;align-items:center;gap:8px}
-.volatile-desc{flex:1;font-size:13px;font-weight:600}
-.volatile-qty{font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap}
-.volatile-deadline{font-size:11px;color:var(--text-light);font-weight:500}
-.volatile-deadline.due-soon{color:#A06A10;font-weight:700}
-.volatile-deadline.overdue{color:#C0392B;font-weight:700}
-.volatile-del{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;flex-shrink:0}
-.volatile-del:hover{background:#FDF5F5;color:#B33A3A;border-color:#F0C0C0}
 .resp-entity-name{flex:1;font-weight:600}
 .resp-entity-del{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit}
 .resp-entity-del:hover{background:#FDF5F5;color:#B33A3A;border-color:#F0C0C0}
@@ -604,7 +526,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="hero-title" id="hero-title">Magazzino Molinaro</div>
     <div class="hero-meta" id="hero-meta"></div>
   </div>
-  <div id="dash-alerts"></div>
   <div class="section-label">Panoramica</div>
   <div class="stats-grid" id="stats-grid"></div>
   <div class="section-label">Struttura magazzino</div>
@@ -670,9 +591,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="hero-eyebrow">Responsabile · Magazzino</div>
     <div class="hero-title" style="font-size:18px">📦 Carica Merce</div>
     <div class="hero-meta">Nuovo acquisto — aggiorna giacenze e prezzi</div>
-  </div>
-  <div class="carica-cat-select-wrap" style="margin-bottom:10px">
-    <input type="search" class="carica-cat-select" id="carica-search" placeholder="🔍 Cerca prodotto o codice in tutte le categorie..." oninput="onCaricaSearch()" style="cursor:text">
   </div>
   <div class="carica-cat-select-wrap">
     <select class="carica-cat-select" id="carica-cat-sel" onchange="setCaricaCat(this.value)"></select>
@@ -743,25 +661,16 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
           </select>
         </div>
       </div>
-      <div id="fm-altro-row" style="display:none;margin-top:8px">
-        <div class="fuel-vehicle-label">Descrizione mezzo (libera)</div>
-        <input type="text" class="fuel-vehicle-select" id="fm-altro-input"
-          placeholder="es. Trattore, Generatore, Motosega..."
-          style="width:100%;box-sizing:border-box;margin-top:3px">
-      </div>
     </div>
     <div class="counter-zone">
       <div class="counter-label">Litri da movimentare</div>
       <div class="counter-row">
         <button class="counter-btn" onclick="adjustFuelCounter(-1)">−</button>
-        <input class="counter-input" id="fm-counter" type="number" inputmode="numeric"
-          min="1" value="5" onfocus="this.select()"
-          oninput="onFuelCounterTyped()" onblur="onFuelCounterBlur()"
-          style="color:#9A6C1E">
+        <div class="counter-display" id="fm-counter" style="color:#9A6C1E">5</div>
         <button class="counter-btn" onclick="adjustFuelCounter(+1)">+</button>
       </div>
       <div class="counter-unit">litri</div>
-      <div class="counter-step-hint">Passo: 5 lt — o digita il numero</div>
+      <div class="counter-step-hint">Passo: 5 litri</div>
     </div>
     <div class="fuel-actions">
       <button class="fuel-action-btn fuel-take" onclick="doFuelAdjust(-1)">
@@ -819,27 +728,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     </div>
   </div>
   <div class="resp-card">
-    <h3>🚛 Gestione mezzi aziendali</h3>
-    <p>Aggiungi o rimuovi mezzi dal parco auto. Appariranno nel selettore di Nafta e AdBlue.</p>
-    <div class="resp-entity-list" id="resp-mezzi-list"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
-      <input class="resp-entity-input" id="new-mezzo-input" placeholder="Nome mezzo...">
-      <input class="resp-entity-input" id="new-targa-input" placeholder="Targa...">
-    </div>
-    <div class="resp-entity-add" style="margin-top:6px">
-      <button class="resp-entity-btn" style="width:100%" onclick="addMezzo()">+ Aggiungi mezzo</button>
-    </div>
-  </div>
-  <div class="resp-card">
-    <h3>👷 Gestione operai</h3>
-    <p>Registro degli operai attivi. Aggiorna quando vengono assunti o lasciano l'azienda.</p>
-    <div class="resp-entity-list" id="resp-operatori-list"></div>
-    <div class="resp-entity-add">
-      <input class="resp-entity-input" id="new-operatore-input" placeholder="Nome e cognome...">
-      <button class="resp-entity-btn" onclick="addOperatore()">+ Aggiungi</button>
-    </div>
-  </div>
-  <div class="resp-card">
     <h3>🏭 Gestione fornitori</h3>
     <p>Aggiungi i fornitori per il carico merce. Saranno selezionabili in "Carica Merce".</p>
     <div class="resp-entity-list" id="resp-fornitori-list"></div>
@@ -847,26 +735,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <input class="resp-entity-input" id="new-fornitore-input" placeholder="Nome fornitore...">
       <button class="resp-entity-btn" onclick="addFornitore()">+ Aggiungi</button>
     </div>
-  </div>
-  <div class="resp-card">
-    <h3>🎯 Prodotti volatili (a rimborso)</h3>
-    <p>Materiali non a perdere — es. bobine cavo — che vanno restituiti entro una scadenza, altrimenti vengono fatturati. Riceverai un alert in dashboard quando si avvicina la scadenza.</p>
-    <div class="resp-entity-list" id="resp-volatili-list"></div>
-    <div class="carica-add-grid" style="margin-top:8px">
-      <div class="carica-input-wrap carica-add-full">
-        <div class="carica-input-label">Descrizione materiale</div>
-        <input class="carica-input" id="new-volatile-desc" placeholder="es. Bobina cavo FG16 4x6 - Cliente Rossi" style="text-transform:none">
-      </div>
-      <div class="carica-input-wrap">
-        <div class="carica-input-label">Quantità</div>
-        <input class="carica-input" type="number" min="1" value="1" id="new-volatile-qty">
-      </div>
-      <div class="carica-input-wrap">
-        <div class="carica-input-label">Scadenza restituzione</div>
-        <input class="carica-input" type="date" id="new-volatile-deadline">
-      </div>
-    </div>
-    <button class="carica-add-btn" onclick="addVolatile()" style="margin-top:8px">+ Aggiungi prodotto volatile</button>
   </div>
   <div class="resp-card">
     <h3>🏗️ Excel movimentazioni per cantiere</h3>
@@ -881,8 +749,8 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   </div>
   <div class="resp-card">
     <h3>📊 Analisi costi per cantiere</h3>
-    <p>Seleziona un cantiere e una finestra temporale per vedere i costi sostenuti e la ripartizione del materiale.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <p>Seleziona cantiere e periodo per vedere costi e ripartizione materiale.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
       <select class="modal-cantiere-select" id="dash-cant-sel">
         <option value="">— Tutti i cantieri —</option>
       </select>
@@ -890,17 +758,16 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
         <option value="7">Ultimi 7 giorni</option>
         <option value="30" selected>Ultimo mese</option>
         <option value="90">Ultimi 3 mesi</option>
-        <option value="180">Ultimi 6 mesi</option>
         <option value="365">Ultimo anno</option>
         <option value="0">Tutto</option>
       </select>
     </div>
-    <button class="resp-btn resp-btn-green" onclick="renderCantiereStats()" style="margin-bottom:14px">
-      🔍 Analizza
-    </button>
+    <button class="resp-btn resp-btn-green" onclick="renderCantiereStats()" style="margin-bottom:12px">🔍 Analizza</button>
     <div id="cantiere-stats-panel"></div>
   </div>
-    <p>Rinomina categorie/sottocategorie o aggiungine di nuove. Elimina una categoria solo se sei sicuro: rimuove anche tutti i prodotti al suo interno.</p>
+  <div class="resp-card">
+    <h3>🗂️ Gestione categorie e sottocategorie</h3>
+    <p>Aggiungi/rimuovi sottocategorie. Elimina una categoria solo se sei sicuro.</p>
     <div class="resp-cat-list" id="resp-cat-list"></div>
   </div>
   <div class="resp-card">
@@ -917,15 +784,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="modal-top">
       <span class="modal-cat-badge" id="m-badge"></span>
       <div class="modal-product-code" id="m-code"></div>
-      <div class="modal-product-name" id="m-name" style="display:flex;align-items:flex-start;gap:8px">
-        <span id="m-name-text" style="flex:1"></span>
-        <button id="m-name-edit-btn" onclick="toggleNameEdit()" style="display:none;background:transparent;border:none;cursor:pointer;font-size:15px;padding:2px;flex-shrink:0;opacity:.6" title="Modifica nome">✏️</button>
-      </div>
-      <div id="m-name-edit-row" style="display:none;gap:6px;margin-top:8px">
-        <input type="text" id="m-name-input" class="resp-entity-input" style="flex:1;text-transform:uppercase">
-        <button class="resp-entity-btn" onclick="saveProductName()">Salva</button>
-        <button class="log-action-btn" style="border-color:var(--border)" onclick="toggleNameEdit()">✕</button>
-      </div>
+      <div class="modal-product-name" id="m-name"></div>
     </div>
     <div class="modal-qty-zone">
       <div class="modal-qty-label">Disponibilità in magazzino</div>
@@ -963,15 +822,11 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <div class="counter-label">Quantità da movimentare</div>
       <div class="counter-row">
         <button class="counter-btn" onclick="adjustCounter(-1)">−</button>
-        <input class="counter-input" id="m-counter" type="number" inputmode="numeric"
-          min="1" value="1" onfocus="this.select()"
-          oninput="onCounterTyped()" onblur="onCounterBlur()"
-          style="color:var(--brand-500)">
+        <div class="counter-display" id="m-counter">1</div>
         <button class="counter-btn" onclick="adjustCounter(+1)">+</button>
       </div>
       <div class="counter-unit" id="m-counter-unit">pezzi</div>
       <div class="counter-step-hint" id="m-counter-hint"></div>
-      <div class="counter-hint-row">✏️ Tocca il numero per digitare</div>
     </div>
     <div class="modal-actions">
       <button class="action-btn btn-take" onclick="doAdjust(-1)">
@@ -1007,21 +862,6 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 </div>
 <div class="toast" id="toast"></div>
 
-<!-- PIN CONFIRM (azioni distruttive responsabile) -->
-<div class="pin-backdrop" id="pin-backdrop">
-  <div class="pin-box">
-    <div class="pin-icon">🔒</div>
-    <div class="pin-title" id="pin-title">Conferma azione</div>
-    <div class="pin-subtitle" id="pin-subtitle">Inserisci il PIN di sicurezza per confermare.</div>
-    <input type="password" inputmode="numeric" maxlength="4" class="pin-input" id="pin-input" placeholder="••••" autocomplete="off">
-    <div class="pin-error" id="pin-error"></div>
-    <div class="pin-btns">
-      <button class="pin-btn pin-btn-cancel" onclick="closePinModal()">Annulla</button>
-      <button class="pin-btn pin-btn-confirm" onclick="confirmPinModal()">Conferma</button>
-    </div>
-  </div>
-</div>
-
 <script type="module">
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -1042,9 +882,7 @@ let logHasMore     = false;  // ci sono altri movimenti oltre quelli caricati
 const LOG_PAGE     = 100;    // voci per pagina
 
 // ── Mezzi aziendali (per rifornimento nafta) ──
-// I mezzi vengono caricati da Firestore (collezione 'mezzi').
-// La costante originale è usata solo per la migrazione iniziale (una volta sola).
-const MEZZI_DEFAULT=[
+const MEZZI_AZIENDALI=[
   {mezzo:'Toyota Hilux',targa:'BN 234409'},
   {mezzo:'Mitsubishi Fuso Canter (piattaforma aerea)',targa:'GD 122 FY'},
   {mezzo:'Daily Palfinger (piattaforma aerea)',targa:'GJ 536 GR'},
@@ -1063,9 +901,6 @@ const MEZZI_DEFAULT=[
 let catOrder       = [];
 let cantieriList   = [];
 let fornitoriList  = [];
-let volatiliList   = [];
-let mezziList      = [];
-let operatoriList  = [];
 let openCats       = {};
 let editMode       = false;
 let currentModalItem = null;
@@ -1272,13 +1107,15 @@ function getItemsByCat(cat){return itemsList.filter(i=>i.cat===cat)}
 // Garantisce valori corretti anche se Firestore non ha ancora
 // processato le delete della deduplicazione
 function itemsListDeduped(){
-  // Deduplicazione pura: per ogni codice tiene UN solo item (quello con qty maggiore)
-  // NON somma le quantità — la somma causerebbe valori doppi/tripli
   const seen=new Map();
   itemsList.forEach(it=>{
     if(!it.code){seen.set(it.id,it);return;}
-    if(!seen.has(it.code)||it.qty>seen.get(it.code).qty){
-      seen.set(it.code,it);
+    if(!seen.has(it.code)){seen.set(it.code,it);}
+    else{
+      // Tieni quello con qty maggiore, somma le qty
+      const existing=seen.get(it.code);
+      if(it.qty>existing.qty) seen.set(it.code,{...it,qty:existing.qty+it.qty});
+      else existing.qty+=it.qty;
     }
   });
   return [...seen.values()];
@@ -1322,29 +1159,11 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   }
   const heroTitle=document.getElementById('hero-title');
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
-
-  // Ogni errore nelle migrazioni NON deve bloccare l'app —
-  // la loading screen viene nascosta in ogni caso
-  try{
-    await loadFromFirestore();
-    await migrateV2();
-    await migrateV3();
-    await deduplicaInventario();
-    await riparaQtaDopoDedup();
-    await migrateAdBlue();
-    await migrateSubcategorie();
-
-    if(isResp() && mezziList.length===0){
-      const batch=writeBatch(db);
-      MEZZI_DEFAULT.forEach(m=>{const id=genId();batch.set(doc(db,'mezzi',id),{mezzo:m.mezzo,targa:m.targa});});
-      await batch.commit();
-      console.log('[INIT] Mezzi migrati su Firestore');
-    }
-  }catch(initErr){
-    console.error('[INIT] Errore durante inizializzazione:',initErr);
-    // L'app si carica comunque con i dati parzialmente disponibili
-  }
-
+  await loadFromFirestore();
+  await migrateV2();
+  if(isResp()) await migrateSubcategorie();
+  await migrateV3();
+  await deduplicaInventario();
   // Normalizza ordine categorie
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
@@ -1396,24 +1215,6 @@ async function loadFromFirestore(){
     fornitoriList=[];fornSnap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
     fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
   }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
-
-  // Collezioni secondarie — ognuna con il proprio try/catch
-  // così un errore su una non blocca le altre
-  try{
-    const volSnap=await getDocs(collection(db,'volatili'));
-    volatiliList=[];volSnap.forEach(d=>volatiliList.push({id:d.id,...d.data()}));
-    volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
-  }catch(e){console.warn('[load] volatili:',e.message);}
-  try{
-    const mezziSnap=await getDocs(collection(db,'mezzi'));
-    mezziList=[];mezziSnap.forEach(d=>mezziList.push({id:d.id,...d.data()}));
-    mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));
-  }catch(e){console.warn('[load] mezzi:',e.message);}
-  try{
-    const opSnap=await getDocs(collection(db,'operatori'));
-    operatoriList=[];opSnap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));
-    operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-  }catch(e){console.warn('[load] operatori:',e.message);}
 }
 
 async function initDefaultData(){
@@ -1583,204 +1384,6 @@ async function migrateV3(){
 //  qty nei duplicati, tiene un solo doc.
 //  NON tocca i movimenti.
 // ═══════════════════════════════════════
-
-// ═══════════════════════════════════════
-//  RIPARA QTÀ POST-DEDUP (one-shot)
-//  Ripristina i valori corretti del 15/06
-//  che la deduplicaInventario aveva sommato
-//  per errore. CB.001 (nafta) escluso:
-//  ha movimenti reali da preservare.
-// ═══════════════════════════════════════
-const QTY_CORRETTE_PRIMA = {
-  "AC.001": 53,
-  "AC.002": 11,
-  "AC.003": 27,
-  "AC.004": 68,
-  "AC.005": 3,
-  "AC.006": 9,
-  "AC.007": 5,
-  "AC.008": 5,
-  "AC.009": 9,
-  "AC.010": 2,
-  "AC.011": 8,
-  "AC.012": 4,
-  "AC.013": 2,
-  "AC.014": 2,
-  "AC.015": 2,
-  "CB.002": 0,
-  "CV.001": 1000,
-  "CV.002": 700,
-  "CV.003": 300,
-  "CV.004": 0,
-  "CV.005": 230,
-  "CV.006": 200,
-  "CV.007": 500,
-  "CV.008": 400,
-  "CV.009": 400,
-  "CV.010": 200,
-  "CV.011": 300,
-  "CV.012": 200,
-  "CV.013": 300,
-  "CV.014": 300,
-  "CV.015": 100,
-  "CV.016": 100,
-  "CV.017": 400,
-  "CV.018": 100,
-  "CV.019": 500,
-  "CV.020": 600,
-  "CV.021": 600,
-  "CV.022": 200,
-  "CV.023": 200,
-  "CV.024": 100,
-  "CV.025": 100,
-  "CV.026": 300,
-  "CV.027": 100,
-  "CV.028": 100,
-  "CV.029": 100,
-  "CV.030": 100,
-  "CV.031": 100,
-  "CV.032": 80,
-  "CV.033": 80,
-  "CV.034": 30,
-  "CV.035": 100,
-  "FV.001": 4,
-  "FV.002": 3,
-  "IL.001": 20,
-  "IL.002": 1,
-  "IL.003": 25,
-  "IL.004": 8,
-  "IL.005": 12,
-  "IL.006": 15,
-  "IL.007": 2,
-  "IL.008": 18,
-  "IL.009": 32,
-  "IL.010": 0,
-  "IL.011": 100,
-  "IL.012": 2,
-  "IL.013": 8,
-  "IL.014": 94,
-  "IL.015": 2,
-  "IL.016": 1,
-  "IL.017": 26,
-  "IL.018": 8,
-  "IL.019": 6,
-  "IL.020": 6,
-  "IL.021": 3,
-  "IL.022": 8,
-  "IL.023": 4,
-  "IL.024": 3,
-  "IL.025": 1,
-  "IL.026": 4,
-  "IL.027": 1,
-  "IL.028": 3,
-  "IL.029": 10,
-  "IL.030": 4,
-  "IL.031": 2,
-  "IL.032": 7,
-  "IL.033": 0,
-  "IL.034": 4,
-  "IL.035": 10,
-  "IL.036": 244,
-  "IL.037": 45,
-  "IL.038": 0,
-  "IL.039": 3,
-  "IL.040": 8,
-  "IL.041": 3,
-  "IL.042": 112,
-  "IL.043": 55,
-  "IL.044": 146,
-  "ME.001": 12,
-  "ME.002": 3,
-  "ME.003": 14,
-  "ME.004": 7,
-  "ME.005": 18,
-  "ME.006": 26,
-  "ME.007": 6,
-  "ME.008": 2,
-  "ME.009": 1,
-  "ME.010": 4,
-  "ME.011": 3,
-  "ME.012": 13,
-  "ME.013": 1,
-  "ME.014": 1,
-  "ME.015": 0,
-  "ME.016": 1,
-  "ME.017": 2,
-  "ME.018": 3,
-  "ME.019": 2,
-  "ME.020": 18,
-  "ME.021": 1,
-  "ME.022": 2,
-  "ME.023": 22,
-  "ME.024": 13,
-  "ME.025": 58,
-  "SA.001": 1700,
-  "SA.002": 400,
-  "SA.003": 100,
-  "SA.004": 13,
-  "SA.005": 13,
-  "SA.006": 12,
-  "SA.007": 14,
-  "SA.008": 25,
-  "SA.009": 4,
-  "SA.010": 41,
-  "SA.011": 32,
-  "SA.012": 0,
-  "SA.013": 10,
-  "SA.014": 14,
-  "SA.015": 12,
-  "SA.016": 9,
-  "SA.017": 7,
-  "SA.018": 0,
-  "SA.019": 8,
-  "SA.020": 3,
-  "SA.021": 20,
-  "SA.022": 2,
-  "SA.023": 5,
-  "SA.024": 3,
-  "SA.025": 1,
-  "SA.026": 237,
-  "SA.027": 50,
-  "SA.028": 60,
-  "SA.029": 50,
-  "SA.030": 4,
-  "SA.031": 28,
-  "SA.032": 32,
-  "SA.033": 1,
-};
-
-async function riparaQtaDopoDedup(){
-  // Verifica se già eseguita
-  const flagDoc=await getDoc(doc(db,'meta','riparaQta_v1'));
-  if(flagDoc.exists()) return;
-
-  // Controlla se ci sono effettivamente valori doppiati
-  const campione=itemsList.find(i=>i.code==='IL.001');
-  if(!campione || campione.qty<=20) return; // valori già corretti
-
-  console.log('[RIPARA] Ripristino quantità post-dedup...');
-  showToast('Ripristino quantità in corso...','toast-sync');
-
-  const batch=writeBatch(db);
-  let count=0;
-
-  itemsList.forEach(it=>{
-    if(!it.code || !(it.code in QTY_CORRETTE_PRIMA)) return;
-    const qtaCorretta=QTY_CORRETTE_PRIMA[it.code];
-    if(it.qty===qtaCorretta) return; // già corretto
-    it.qty=qtaCorretta;
-    const{id,...data}=it;
-    batch.set(doc(db,'inventario',id),data);
-    count++;
-  });
-
-  // Segna come eseguita
-  batch.set(doc(db,'meta','riparaQta_v1'),{eseguita:true,data:Date.now()});
-  await batch.commit();
-  console.log('[RIPARA] Corretti '+count+' prodotti');
-  showToast('Quantità ripristinate correttamente ('+count+' prodotti)','toast-return');
-}
-
 async function deduplicaInventario(){
   // Raggruppa per code
   const byCode={};
@@ -1801,10 +1404,16 @@ async function deduplicaInventario(){
 
   codesWithDups.forEach(code=>{
     const group=byCode[code];
-    // Keeper = quello con qty maggiore (non sommare — la somma duplica il valore!)
+    // Keeper = quello con qty maggiore (o il primo se tutti uguali)
     group.sort((a,b)=>b.qty-a.qty);
     const keeper=group[0];
-    // NON sommiamo — la qty del keeper è già quella corretta
+    // Somma le qty degli altri nel keeper
+    const totalQty=group.reduce((s,it)=>s+it.qty,0);
+    if(keeper.qty!==totalQty){
+      keeper.qty=totalQty;
+      const{id,...data}=keeper;
+      batch.set(doc(db,'inventario',id),data);
+    }
     // Elimina i duplicati (tutti tranne il keeper)
     group.slice(1).forEach(dup=>{
       batch.delete(doc(db,'inventario',dup.id));
@@ -1861,28 +1470,6 @@ function listenRealtime(){
     fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
     if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
   });
-  onSnapshot(collection(db,'volatili'),snap=>{
-    volatiliList=[];snap.forEach(d=>volatiliList.push({id:d.id,...d.data()}));
-    volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
-    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
-    if(document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboardAlerts();
-  });
-  onSnapshot(collection(db,'mezzi'),
-    snap=>{
-      mezziList=[];snap.forEach(d=>mezziList.push({id:d.id,...d.data()}));
-      mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));
-      if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
-    },
-    err=>console.warn('[snapshot] mezzi:',err.message)
-  );
-  onSnapshot(collection(db,'operatori'),
-    snap=>{
-      operatoriList=[];snap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));
-      operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-      if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
-    },
-    err=>console.warn('[snapshot] operatori:',err.message)
-  );
 }
 
 async function saveItem(item){const{id,...data}=item;await setDoc(doc(db,'inventario',id),data)}
@@ -1944,9 +1531,6 @@ function renderDashboard(){
   const heroMeta=document.getElementById('hero-meta');
   if(heroMeta) heroMeta.textContent=day.charAt(0).toUpperCase()+day.slice(1)+' · '+itemsList.length+' prodotti';
 
-  // ── Alert dashboard (solo responsabili) ──
-  renderDashboardAlerts();
-
   // Stats — responsabili vedono valore totale
   let statsHTML=`
     <div class="stat-card"><div class="stat-val">${itemsList.length}</div><div class="stat-label">Prodotti</div></div>
@@ -1969,54 +1553,6 @@ function renderDashboard(){
     </div>`;
   });
   document.getElementById('tree-branches').innerHTML=th;
-}
-
-const FUEL_ALERT_THRESHOLD=200; // litri
-
-function renderDashboardAlerts(){
-  const el=document.getElementById('dash-alerts');
-  if(!el) return;
-  if(!isResp()){el.innerHTML='';return;} // alert solo per responsabili
-
-  let html='';
-
-  // ── Alert gasolio sotto soglia ──
-  const nafta=itemsList.find(i=>i.code==='CB.001');
-  if(nafta && nafta.qty<FUEL_ALERT_THRESHOLD){
-    html+=`<div class="dash-alert dash-alert-fuel">
-      <div class="dash-alert-icon">⛽</div>
-      <div class="dash-alert-body">
-        <div class="dash-alert-title">Scorta nafta in esaurimento</div>
-        <div class="dash-alert-text">Disponibili solo <strong>${nafta.qty} litri</strong> (soglia: ${FUEL_ALERT_THRESHOLD} lt). Pianifica un rifornimento.</div>
-      </div>
-    </div>`;
-  }
-
-  // ── Alert prodotti volatili in scadenza o scaduti ──
-  const oggi=new Date();oggi.setHours(0,0,0,0);
-  volatiliList.forEach(v=>{
-    const dl=new Date(v.deadline+'T00:00:00');
-    const giorni=Math.round((dl-oggi)/86400000);
-    if(giorni<0){
-      html+=`<div class="dash-alert dash-alert-volatile">
-        <div class="dash-alert-icon">⛔</div>
-        <div class="dash-alert-body">
-          <div class="dash-alert-title">Prodotto volatile scaduto</div>
-          <div class="dash-alert-text"><strong>${v.desc}</strong> (×${v.qty}) doveva essere restituito il ${dl.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})} — <strong>${Math.abs(giorni)} giorni di ritardo</strong>.</div>
-        </div>
-      </div>`;
-    } else if(giorni<=14){
-      html+=`<div class="dash-alert dash-alert-volatile warn">
-        <div class="dash-alert-icon">🎯</div>
-        <div class="dash-alert-body">
-          <div class="dash-alert-title">Restituzione in scadenza</div>
-          <div class="dash-alert-text"><strong>${v.desc}</strong> (×${v.qty}) va restituito entro <strong>${giorni} giorni</strong> (${dl.toLocaleDateString('it-IT',{day:'2-digit',month:'long'})}).</div>
-        </div>
-      </div>`;
-    }
-  });
-
-  el.innerHTML=html;
 }
 
 // ═══════════════════════════════════════
@@ -2121,71 +1657,6 @@ window.deleteItem=async function(id){
 };
 
 // ═══════════════════════════════════════
-//  RINOMINA PRODOTTO (responsabili)
-//  Aggiorna l'item E tutti i movimenti
-//  storici collegati, così il registro
-//  mostra sempre il nome corretto.
-// ═══════════════════════════════════════
-window.toggleNameEdit=function(){
-  if(!currentModalItem) return;
-  const row=document.getElementById('m-name-edit-row');
-  const isOpen=row.style.display==='flex';
-  if(isOpen){
-    row.style.display='none';
-  } else {
-    document.getElementById('m-name-input').value=currentModalItem.name;
-    row.style.display='flex';
-    setTimeout(()=>document.getElementById('m-name-input').focus(),50);
-  }
-};
-
-window.saveProductName=async function(){
-  if(!currentModalItem) return;
-  const newName=document.getElementById('m-name-input').value.trim().toUpperCase();
-  if(!newName){showToast('Il nome non può essere vuoto','toast-danger');return;}
-  if(newName===currentModalItem.name){
-    document.getElementById('m-name-edit-row').style.display='none';
-    return;
-  }
-
-  const oldName=currentModalItem.name;
-  const itemId=currentModalItem.id;
-
-  showToast('Aggiornamento in corso...','toast-sync');
-
-  // 1) Aggiorna l'item nell'inventario
-  currentModalItem.name=newName;
-  await saveItem(currentModalItem);
-
-  // 2) Aggiorna il nome in tutti i movimenti storici collegati a questo prodotto
-  //    (così il registro mostra sempre il nome corretto, passato e presente)
-  try{
-    const movSnap=await getDocs(collection(db,'movimenti'));
-    const batch=writeBatch(db);
-    let count=0;
-    movSnap.forEach(d=>{
-      if(d.data().itemId!==itemId) return; // filtro lato client
-      batch.update(doc(db,'movimenti',d.id),{name:newName});
-      // aggiorna anche in memoria se presente nel log caricato
-      const local=actLog.find(e=>e.id===d.id);
-      if(local) local.name=newName;
-      count++;
-    });
-    if(count>0) await batch.commit();
-    console.log('[RINOMINA] Aggiornati '+count+' movimenti storici da "'+oldName+'" a "'+newName+'"');
-  }catch(e){
-    console.error('Errore aggiornamento movimenti storici:',e);
-    showToast('Nome aggiornato, ma alcuni movimenti storici potrebbero non essere sincronizzati','toast-info');
-  }
-
-  document.getElementById('m-name-text').textContent=newName;
-  document.getElementById('m-name-edit-row').style.display='none';
-  renderMateriali();
-  if(document.getElementById('page-registro')?.classList.contains('active')) renderLog();
-  showToast('Prodotto rinominato in "'+newName+'"','toast-return');
-};
-
-// ═══════════════════════════════════════
 //  MODAL PRODOTTO
 // ═══════════════════════════════════════
 window.openModal=function(id){
@@ -2198,9 +1669,7 @@ window.openModal=function(id){
   document.getElementById('m-badge').style.background=cfg.bg;
   document.getElementById('m-badge').style.color=cfg.color;
   document.getElementById('m-code').textContent=item.code;
-  document.getElementById('m-name-text').textContent=item.name;
-  document.getElementById('m-name-edit-row').style.display='none';
-  document.getElementById('m-name-edit-btn').style.display=isResp()?'block':'none';
+  document.getElementById('m-name').textContent=item.name;
   document.getElementById('m-qty').textContent=item.qty;
   document.getElementById('modal-operator-name').textContent=currentUser.nome;
   const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili',lt:'litri disponibili'};
@@ -2233,7 +1702,7 @@ window.openModal=function(id){
 
 function updateCounterDisplay(){
   const el=document.getElementById('m-counter');
-  el.value=counterVal;
+  el.textContent=counterVal;
   el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
   const unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
   const un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
@@ -2245,27 +1714,8 @@ function updateCounterDisplay(){
 
 window.adjustCounter=function(dir){
   const newVal=counterVal+(dir*counterStep);
-  if(newVal<1) return;
+  if(newVal<counterStep) return;
   counterVal=newVal;
-  updateCounterDisplay();
-};
-
-// Input manuale da tastiera — aggiorna etichette in tempo reale
-window.onCounterTyped=function(){
-  const el=document.getElementById('m-counter');
-  const raw=parseInt(el.value);
-  if(isNaN(raw)||raw<1) return;
-  counterVal=raw;
-  const unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
-  const un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
-  document.getElementById('m-take-label').innerHTML='Preleva<br><b>'+counterVal+' '+un+'</b>';
-  document.getElementById('m-return-label').innerHTML='Reinserisci<br><b>'+counterVal+' '+un+'</b>';
-};
-window.onCounterBlur=function(){
-  const el=document.getElementById('m-counter');
-  let val=parseInt(el.value);
-  if(isNaN(val)||val<1) val=counterStep||1;
-  counterVal=val;
   updateCounterDisplay();
 };
 
@@ -2384,22 +1834,32 @@ function renderLog(){
   const container=document.getElementById('log-container');
   const filterWrap=document.getElementById('log-filter-wrap');
 
-  // Operai vedono solo i PROPRI movimenti; responsabili vedono tutto
-  // Tutti vedono tutti i movimenti; modifica/elimina restano limitati ai propri (vedi renderLogItem)
-  const baseLog=actLog;
-
   if(actLog.length===0){
     if(filterWrap) filterWrap.innerHTML='';
     container.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg><p>Nessun movimento registrato</p></div>';
     return;
   }
 
-  // ── Vista unificata: raggruppata per mese/giorno con filtri ──
-  // (operai vedono solo i propri, responsabili vedono tutto)
+  if(!isResp()){
+    // ── Vista operaio: lista semplice ──
+    if(filterWrap) filterWrap.innerHTML='<div class="section-label">Movimenti recenti</div>';
+    let html='';
+    actLog.forEach(entry=>{
+      const isTake=entry.delta<0;
+      const d=new Date(entry.time);
+      const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+      html+=renderLogItem(entry,isTake,ts);
+    });
+    if(logHasMore) html+=`<button id="log-load-more-btn" class="log-load-more-btn" onclick="loadMoreLog()">↓ Carica altri 100 movimenti</button>`;
+    container.innerHTML=html;
+    return;
+  }
+
+  // ── Vista responsabile: raggruppata per mese/giorno con filtri ──
 
   // Costruisci opzioni mesi disponibili
   const monthSet=new Map();
-  baseLog.forEach(e=>{
+  actLog.forEach(e=>{
     const d=new Date(e.time);
     const mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     const ml=d.toLocaleDateString('it-IT',{month:'long',year:'numeric'});
@@ -2419,7 +1879,7 @@ function renderLog(){
     </div>`;
 
   // Applica filtri
-  let filtered=baseLog;
+  let filtered=actLog;
   if(logFilterDay){
     filtered=filtered.filter(e=>{
       const d=new Date(e.time);
@@ -2759,39 +2219,37 @@ function renderResponsabile(){
     const cfg=categories[cat];if(!cfg) return;
     const ci=getItemsByCat(cat);
     const subs=cfg.subs||[];
-    const subChips=subs.map(s=>`
-      <span class="resp-sub-chip">
-        ${s}
-        <button onclick="startRenameSubcat('${cat}','${s}')" title="Rinomina">✏️</button>
-        <button onclick="deleteSubcat('${cat}','${s}')" title="Elimina">✕</button>
-      </span>`).join('');
+    const chips=subs.map(s=>{
+      const sc=s.replace(/'/g,"\'");
+      const cc=cat.replace(/'/g,"\'");
+      return '<span class="resp-sub-chip">'+s+
+        ' <button class="resp-sub-chip-del" onclick="deleteSubcat(''+cc+'',''+sc+'')" title="Rimuovi">✕</button></span>';
+    }).join('');
+    const catK=cat.replace(/\s/g,'_');
     html+=`<div class="resp-cat-block">
       <div class="resp-cat-header">
         <div class="resp-cat-icon" style="background:${cfg.bg}">${cfg.icon}</div>
-        <div class="resp-cat-info" style="flex:1">
-          <div class="resp-cat-name" style="color:${cfg.color}">${cfg.label}</div>
-          <div class="resp-cat-sub">${cfg.prefix} · ${ci.length} prodotti</div>
-        </div>
-        <button class="resp-sub-edit-btn" onclick="startRenameCat('${cat}')" title="Rinomina categoria">✏️</button>
+        <div class="resp-cat-info" style="flex:1"><div class="resp-cat-name" style="color:${cfg.color}">${cfg.label}</div>
+        <div class="resp-cat-sub">${cfg.prefix} · ${ci.length} prodotti</div></div>
         <button class="resp-cat-del" onclick="deleteCategory('${cat}')">✕</button>
       </div>
-      <div class="resp-cat-rename-row" id="rename-cat-row-${cat.replace(/\s/g,'_')}">
-        <input class="resp-cat-rename-input" id="rename-cat-input-${cat.replace(/\s/g,'_')}" value="${cfg.label}" placeholder="Nuovo nome categoria">
-        <button class="resp-entity-btn" style="padding:7px 12px;font-size:12px" onclick="saveCatRename('${cat}')">✓</button>
-        <button class="log-action-btn" onclick="cancelRenameCat('${cat}')">✕</button>
-      </div>
-      <div class="resp-cat-subs" id="subs-row-${cat.replace(/\s/g,'_')}">
-        ${subChips||'<span style="font-size:11px;color:var(--text-light)">Nessuna sottocategoria</span>'}
-      </div>
+      <div class="resp-cat-subs">${chips||'<span style="font-size:11px;color:var(--text-light)">Nessuna sottocategoria</span>'}</div>
       <div class="resp-add-sub-row">
-        <input class="resp-add-sub-input" id="new-sub-input-${cat.replace(/\s/g,'_')}"
-          placeholder="+ Nuova sottocategoria..."
-          onkeydown="if(event.key==='Enter') addSubcat('${cat}')">
+        <input class="resp-add-sub-input" id="nsi-${catK}" placeholder="+ Nuova sottocategoria...">
         <button class="resp-add-sub-btn" onclick="addSubcat('${cat}')">Aggiungi</button>
       </div>
     </div>`;
   });
   document.getElementById('resp-cat-list').innerHTML=html||'<p style="font-size:12px;color:var(--text-light);padding:10px 0">Nessuna categoria</p>';
+
+  // Popola dropdown analisi cantiere
+  const dashCant=document.getElementById('dash-cant-sel');
+  if(dashCant){
+    const pv=dashCant.value;
+    dashCant.innerHTML='<option value="">— Tutti i cantieri —</option>'+
+      cantieriList.map(c=>'<option value="'+c.nome+'">'+c.nome+'</option>').join('');
+    if(pv) dashCant.value=pv;
+  }
 
   // Cantieri
   const cantHtml=cantieriList.length===0
@@ -2802,25 +2260,6 @@ function renderResponsabile(){
       </div>`).join('');
   document.getElementById('resp-cantieri-list').innerHTML=cantHtml;
 
-  // Mezzi
-  const mezziHtml=mezziList.length===0
-    ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun mezzo. Aggiungine uno.</p>'
-    :mezziList.map(m=>`<div class="resp-entity-item">
-        <span class="resp-entity-name">🚛 ${m.mezzo}</span>
-        <span style="font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px">${m.targa||''}</span>
-        <button class="resp-entity-del" onclick="deleteMezzo('${m.id}')">✕ Rimuovi</button>
-      </div>`).join('');
-  document.getElementById('resp-mezzi-list').innerHTML=mezziHtml;
-
-  // Operatori
-  const opHtml=operatoriList.length===0
-    ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun operaio registrato. Aggiungine uno.</p>'
-    :operatoriList.map(o=>`<div class="resp-entity-item">
-        <span class="resp-entity-name">👷 ${o.nome}</span>
-        <button class="resp-entity-del" onclick="deleteOperatore('${o.id}')">✕ Rimuovi</button>
-      </div>`).join('');
-  document.getElementById('resp-operatori-list').innerHTML=opHtml;
-
   // Fornitori
   const fornHtml=fornitoriList.length===0
     ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun fornitore. Aggiungine uno.</p>'
@@ -2830,169 +2269,18 @@ function renderResponsabile(){
       </div>`).join('');
   document.getElementById('resp-fornitori-list').innerHTML=fornHtml;
 
-  // Prodotti volatili
-  const oggi=new Date();oggi.setHours(0,0,0,0);
-  const volHtml=volatiliList.length===0
-    ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun prodotto volatile in carico. Aggiungine uno.</p>'
-    :volatiliList.map(v=>{
-      const dl=new Date(v.deadline+'T00:00:00');
-      const giorni=Math.round((dl-oggi)/86400000);
-      let cls='',badge='';
-      if(giorni<0){cls='overdue';badge='⛔ Scaduto da '+Math.abs(giorni)+' giorni';}
-      else if(giorni<=14){cls='due-soon';badge='⚠️ Scade tra '+giorni+' giorni';}
-      else{badge='Scade il '+dl.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});}
-      return `<div class="volatile-item ${cls}">
-        <div class="volatile-top">
-          <span class="volatile-desc">🎯 ${v.desc}</span>
-          <span class="volatile-qty">×${v.qty}</span>
-          <button class="volatile-del" onclick="deleteVolatile('${v.id}')">✓ Restituito</button>
-        </div>
-        <div class="volatile-deadline ${cls}">${badge}</div>
-      </div>`;
-    }).join('');
-  document.getElementById('resp-volatili-list').innerHTML=volHtml;
-
   // Popola dropdown export cantiere
   const expSel=document.getElementById('resp-cantiere-export');
   if(expSel) expSel.innerHTML='<option value="">Tutti i cantieri</option>'+
     cantieriList.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
-
-  // Popola dropdown analisi cantiere (preserva selezione)
-  const dashCant=document.getElementById('dash-cant-sel');
-  if(dashCant){
-    const prevVal=dashCant.value;
-    dashCant.innerHTML='<option value="">— Tutti i cantieri —</option>'+
-      cantieriList.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
-    if(prevVal) dashCant.value=prevVal;
-  }
 }
-// ═══════════════════════════════════════
-//  PIN CONFERMA — per azioni distruttive
-// ═══════════════════════════════════════
-const DELETE_PIN='4790'; // PIN di sicurezza — modificabile qui dal codice
-let _pinCallback=null;
-
-function askPinConfirm(title,subtitle,onConfirm){
-  document.getElementById('pin-title').textContent=title;
-  document.getElementById('pin-subtitle').textContent=subtitle;
-  document.getElementById('pin-input').value='';
-  document.getElementById('pin-error').textContent='';
-  _pinCallback=onConfirm;
-  document.getElementById('pin-backdrop').classList.add('open');
-  setTimeout(()=>document.getElementById('pin-input').focus(),100);
-}
-window.closePinModal=function(){
-  document.getElementById('pin-backdrop').classList.remove('open');
-  _pinCallback=null;
-};
-window.confirmPinModal=function(){
-  const val=document.getElementById('pin-input').value.trim();
-  if(val!==DELETE_PIN){
-    document.getElementById('pin-error').textContent='PIN errato. Riprova.';
-    document.getElementById('pin-input').value='';
-    document.getElementById('pin-input').focus();
-    return;
-  }
-  const cb=_pinCallback;
-  document.getElementById('pin-backdrop').classList.remove('open');
-  _pinCallback=null;
-  if(cb) cb();
-};
-// Invio con tasto Enter
-document.addEventListener('DOMContentLoaded',()=>{
-  const pinInput=document.getElementById('pin-input');
-  if(pinInput) pinInput.addEventListener('keydown',e=>{if(e.key==='Enter') confirmPinModal();});
-});
-
-// ═══════════════════════════════════════
-//  SOTTOCATEGORIE — CRUD
-// ═══════════════════════════════════════
-window.addSubcat=async function(cat){
-  const key=cat.replace(/\s/g,'_');
-  const input=document.getElementById('new-sub-input-'+key);
-  if(!input) return;
-  const nome=input.value.trim();
-  if(!nome){showToast('Inserisci il nome della sottocategoria','toast-danger');input.focus();return;}
-  const cfg=categories[cat];if(!cfg) return;
-  cfg.subs=cfg.subs||[];
-  if(cfg.subs.includes(nome)){showToast('Sottocategoria già presente','toast-danger');return;}
-  cfg.subs.push(nome);
-  await saveCategory(cat,cfg);
-  input.value='';
-  renderResponsabile();
-  showToast('"'+nome+'" aggiunto a '+cfg.label,'toast-return');
-};
-
-window.deleteSubcat=async function(cat,sub){
-  const cfg=categories[cat];if(!cfg||!cfg.subs) return;
-  if(!confirm('Eliminare la sottocategoria "'+sub+'"?\n\nI prodotti che la usano rimarranno ma perderanno la sottocategoria.')) return;
-  cfg.subs=cfg.subs.filter(s=>s!==sub);
-  await saveCategory(cat,cfg);
-  renderResponsabile();
-  showToast('"'+sub+'" rimossa','toast-info');
-};
-
-// ── Rename sottocategoria ──
-window.startRenameSubcat=function(cat,sub){
-  const nome=prompt('Rinomina "'+sub+'" in:',sub);
-  if(!nome||nome.trim()===sub) return;
-  renameSubcat(cat,sub,nome.trim());
-};
-
-async function renameSubcat(cat,oldSub,newSub){
-  const cfg=categories[cat];if(!cfg||!cfg.subs) return;
-  if(cfg.subs.includes(newSub)){showToast('Nome già esistente','toast-danger');return;}
-  cfg.subs=cfg.subs.map(s=>s===oldSub?newSub:s);
-  await saveCategory(cat,cfg);
-  // Aggiorna tutti gli item che usano questa sottocategoria
-  const batch=writeBatch(db);let count=0;
-  itemsList.filter(it=>it.cat===cat&&it.sub===oldSub).forEach(it=>{
-    it.sub=newSub;const{id,...data}=it;batch.set(doc(db,'inventario',id),data);count++;
-  });
-  if(count>0) await batch.commit();
-  renderResponsabile();renderMateriali();
-  showToast('"'+oldSub+'" → "'+newSub+'" ('+count+' prodotti aggiornati)','toast-return');
-}
-
-// ── Rename categoria ──
-window.startRenameCat=function(cat){
-  const key=cat.replace(/\s/g,'_');
-  const row=document.getElementById('rename-cat-row-'+key);
-  if(row) row.classList.add('open');
-  const inp=document.getElementById('rename-cat-input-'+key);
-  if(inp) setTimeout(()=>inp.focus(),50);
-};
-window.cancelRenameCat=function(cat){
-  const key=cat.replace(/\s/g,'_');
-  const row=document.getElementById('rename-cat-row-'+key);
-  if(row) row.classList.remove('open');
-};
-window.saveCatRename=async function(cat){
-  const key=cat.replace(/\s/g,'_');
-  const inp=document.getElementById('rename-cat-input-'+key);
-  if(!inp) return;
-  const newLabel=inp.value.trim();
-  if(!newLabel||newLabel===categories[cat]?.label){cancelRenameCat(cat);return;}
-  // Il nome chiave Firestore (cat) resta invariato; cambia solo il label
-  const cfg=categories[cat];
-  cfg.label=newLabel;
-  await saveCategory(cat,cfg);
-  cancelRenameCat(cat);
-  renderResponsabile();renderDashboard();renderMateriali();
-  showToast('Categoria rinominata in "'+newLabel+'"','toast-return');
-};
+window.deleteCategory=async function(cat){
   const cfg=categories[cat];if(!cfg) return;
   const ci=getItemsByCat(cat);
   if(!confirm('Eliminare "'+cfg.label+'"?\n\nVerranno eliminati anche '+ci.length+' prodotti.\nAzione irreversibile.')) return;
-  askPinConfirm(
-    '🗑️ Elimina categoria',
-    'Stai per eliminare "'+cfg.label+'" e '+ci.length+' prodotti. Inserisci il PIN per confermare.',
-    async()=>{
-      for(const it of ci) await deleteItemFromDB(it.id);
-      itemsList=itemsList.filter(i=>i.cat!==cat);delete categories[cat];catOrder=catOrder.filter(c=>c!==cat);
-      await deleteCategoryFromDB(cat);renderResponsabile();renderDashboard();showToast('Categoria eliminata','toast-danger');
-    }
-  );
+  for(const it of ci) await deleteItemFromDB(it.id);
+  itemsList=itemsList.filter(i=>i.cat!==cat);delete categories[cat];catOrder=catOrder.filter(c=>c!==cat);
+  await deleteCategoryFromDB(cat);renderResponsabile();renderDashboard();showToast('Categoria eliminata','toast-danger');
 };
 window.clearAllLogs=async function(){
   if(actLog.length===0){alert('Il registro è già vuoto.');return}
@@ -3133,84 +2421,18 @@ window.exportValoreMagazzino=async function(){
   showToast('Excel scaricato — 2 fogli','toast-return');
 };
 
-window.exportExcel=async function(){
-  if(typeof XLSX==='undefined'){showToast('Libreria Excel non disponibile','toast-danger');return;}
-  showToast('Generazione report...','toast-sync');
-
-  // Recupera tutti i movimenti da Firestore (fino a 5000)
-  let tuttiMov=[];
-  try{
-    const snap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(5000)));
-    snap.forEach(d=>tuttiMov.push({id:d.id,...d.data()}));
-  }catch(err){
-    tuttiMov=[...actLog]; // fallback su memoria
-  }
-  tuttiMov.sort((a,b)=>b.time-a.time);
-
-  const wb=XLSX.utils.book_new();
-  const oggi=new Date();
-  const dataReport=oggi.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
-
-  // ── FOGLIO 1: Tutte le movimentazioni ──────────────────
-  const f1=[];
-  f1.push(['REPORT MOVIMENTAZIONI MAGAZZINO']);
-  f1.push(['Generato il: '+dataReport]);
-  f1.push([]);
-  f1.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Cantiere','Quantità','Unità','Operatore']);
-
-  tuttiMov.forEach(e=>{
+window.exportExcel=function(){
+  if(actLog.length===0){alert('Nessun movimento da esportare.');return}
+  let csv='\uFEFF"Data","Ora","Codice","Prodotto","Categoria","Operazione","Quantità","Operatore"\n';
+  actLog.forEach(e=>{
     const d=new Date(e.time);
     const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-    const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-    const item=itemsList.find(i=>i.id===e.itemId)||itemsList.find(i=>i.code===e.code);
+    const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const item=itemsList.find(i=>i.id===e.itemId);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
-    const tipo={take:'Prelievo',return:'Restituzione',load:'Carico'}[e.type]||(e.delta<0?'Prelievo':'Reimmissione');
-    f1.push([data,ora,tipo,e.code,e.name,catLabel,e.cantiere||'',Math.abs(e.delta),item?.unit||'',e.operator||'N/D']);
+    csv+=`"${data}","${ora}","${e.code}","${e.name.replace(/"/g,'""')}","${catLabel}","${e.delta<0?'Prelievo':'Reimmissione'}","${Math.abs(e.delta)}","${e.operator||'N/D'}"\n`;
   });
-  f1.push([]);f1.push(['Totale movimenti:',tuttiMov.length]);
-
-  const ws1=XLSX.utils.aoa_to_sheet(f1);
-  ws1['!cols']=[{wch:12},{wch:8},{wch:14},{wch:10},{wch:40},{wch:22},{wch:28},{wch:10},{wch:8},{wch:22}];
-  ws1['!merges']=[{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}}];
-  XLSX.utils.book_append_sheet(wb,ws1,'Movimentazioni');
-
-  // ── FOGLIO 2: Dettaglio Carburante ─────────────────────
-  const FUEL_CODES=new Set(['CB.001','CB.002','CB.003']);
-  const fuelMov=tuttiMov.filter(e=>FUEL_CODES.has(e.code));
-
-  const f2=[];
-  f2.push(['DETTAGLIO MOVIMENTAZIONI CARBURANTE']);
-  f2.push(['Generato il: '+dataReport]);
-  f2.push([]);
-  f2.push(['Data','Ora','Tipo','Prodotto','Litri','Operatore','Mezzo','Targa','Note']);
-
-  let totNafta=0,totBenzina=0,totAdblue=0;
-  fuelMov.forEach(e=>{
-    const d=new Date(e.time);
-    const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-    const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-    const tipo=e.delta<0?'Prelievo':'Reinserimento';
-    const litri=e.delta; // negativo=prelievo, positivo=reinserimento
-    f2.push([data,ora,tipo,e.name,litri,e.operator||'N/D',e.mezzo||'—',e.targa||'—','']);
-    if(e.code==='CB.001'&&e.delta<0) totNafta+=Math.abs(e.delta);
-    if(e.code==='CB.002'&&e.delta<0) totBenzina+=Math.abs(e.delta);
-    if(e.code==='CB.003'&&e.delta<0) totAdblue+=Math.abs(e.delta);
-  });
-
-  if(fuelMov.length===0) f2.push(['Nessuna movimentazione carburante registrata']);
-
-  f2.push([]);
-  f2.push(['TOTALE PRELIEVI:','','','Nafta:',totNafta,'lt','Benzina:',totBenzina,'lt AdBlue:',totAdblue,'lt']);
-
-  const ws2=XLSX.utils.aoa_to_sheet(f2);
-  ws2['!cols']=[{wch:12},{wch:8},{wch:14},{wch:16},{wch:10},{wch:22},{wch:36},{wch:16},{wch:20}];
-  ws2['!merges']=[{s:{r:0,c:0},e:{r:0,c:8}},{s:{r:1,c:0},e:{r:1,c:8}}];
-  XLSX.utils.book_append_sheet(wb,ws2,'Carburante');
-
-  // Salva
-  const fname='Report_Magazzino_'+new Date().toISOString().slice(0,10)+'.xlsx';
-  XLSX.writeFile(wb,fname);
-  showToast('Report scaricato (2 fogli)','toast-return');
+  downloadCSV(csv,'Report_Movimentazioni_'+dateStr()+'.csv');showToast('Report scaricato','toast-info');
 };
 window.exportInventory=function(){
   let csv='\uFEFF"Codice","Prodotto","Categoria","Sottocategoria","Quantità","Unità","Prezzo €/un.","Valore Totale €"\n';
@@ -3585,39 +2807,6 @@ function handleUrlProductCode(){
 }
 
 // ═══════════════════════════════════════
-
-async function migrateSubcategorie(){
-  if(!isResp()) return; // solo i responsabili possono scrivere su categorie
-  try{
-    const updates=[
-      {cat:'Cavi',      subs:['Unipolari','Bipolari','Multipolari','Precordati','Videosorveglianza','Dati / Ethernet']},
-      {cat:'Accessori e Consumabili', subs:['Nastro','Vernice']},
-    ];
-    for(const {cat,subs} of updates){
-      const current=categories[cat];
-      if(!current) continue;
-      const existing=current.subs||[];
-      const toAdd=subs.filter(s=>!existing.includes(s));
-      if(toAdd.length===0) continue;
-      current.subs=[...existing,...toAdd];
-      await saveCategory(cat,current);
-      console.log('[SUBCAT] '+cat+': aggiunte '+toAdd.join(', '));
-    }
-  }catch(e){console.warn('[SUBCAT] Errore migrazione sottocategorie:',e.message);}
-}
-
-//  ADBLUE — migrazione one-shot
-// ═══════════════════════════════════════
-async function migrateAdBlue(){
-  if(itemsList.find(i=>i.code==='CB.003')) return; // già presente
-  const id=genId();
-  const adblue={id,name:'ADBLUE',cat:'Carburante',qty:0,unit:'lt',code:'CB.003',prezzo:0.90,sub:null};
-  itemsList.push(adblue);
-  await setDoc(doc(db,'inventario',id),{name:'ADBLUE',cat:'Carburante',qty:0,unit:'lt',code:'CB.003',prezzo:0.90,sub:null});
-  console.log('[ADBLUE] CB.003 creato');
-  showToast('AdBlue aggiunto al magazzino carburante','toast-return');
-}
-
 //  CARBURANTE
 // ═══════════════════════════════════════
 let currentFuelItem=null;
@@ -3629,7 +2818,7 @@ function getFuelItems(){return itemsList.filter(i=>i.cat==='Carburante')}
 
 function updateFuelCounterDisplay(){
   const el=document.getElementById('fm-counter');
-  el.value=fuelCounterVal;
+  el.textContent=fuelCounterVal;
   el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
   document.getElementById('fm-take-label').innerHTML='Preleva<br><b>'+fuelCounterVal+' lt</b>';
   document.getElementById('fm-return-label').innerHTML='Reinserisci<br><b>'+fuelCounterVal+' lt</b>';
@@ -3637,24 +2826,8 @@ function updateFuelCounterDisplay(){
 
 window.adjustFuelCounter=function(dir){
   const newVal=fuelCounterVal+(dir*FUEL_STEP);
-  if(newVal<1) return;
+  if(newVal<FUEL_STEP) return;
   fuelCounterVal=newVal;
-  updateFuelCounterDisplay();
-};
-
-window.onFuelCounterTyped=function(){
-  const el=document.getElementById('fm-counter');
-  const raw=parseInt(el.value);
-  if(isNaN(raw)||raw<1) return;
-  fuelCounterVal=raw;
-  document.getElementById('fm-take-label').innerHTML='Preleva<br><b>'+fuelCounterVal+' lt</b>';
-  document.getElementById('fm-return-label').innerHTML='Reinserisci<br><b>'+fuelCounterVal+' lt</b>';
-};
-window.onFuelCounterBlur=function(){
-  const el=document.getElementById('fm-counter');
-  let val=parseInt(el.value);
-  if(isNaN(val)||val<1) val=FUEL_STEP;
-  fuelCounterVal=val;
   updateFuelCounterDisplay();
 };
 
@@ -3712,26 +2885,16 @@ window.openFuelModal=function(id){
   document.getElementById('fm-operator-name').textContent=currentUser.nome;
   updateFuelCounterDisplay();
 
-  // ── Mezzo aziendale: Nafta (CB.001) e AdBlue (CB.003) ──
+  // ── Mezzo aziendale: solo per Nafta (CB.001) ──
   const vZone=document.getElementById('fm-vehicle-zone');
-  const needsVehicle=item.code==='CB.001'||item.code==='CB.003';
-  vZone.style.display=needsVehicle?'block':'none';
-  if(needsVehicle){
+  const isNafta=item.code==='CB.001';
+  vZone.style.display=isNafta?'block':'none';
+  if(isNafta){
     const mSel=document.getElementById('fm-mezzo');
     const tSel=document.getElementById('fm-targa');
-    const altroRow=document.getElementById('fm-altro-row');
-    const altroInput=document.getElementById('fm-altro-input');
-    const opts='<option value="">— Seleziona mezzo —</option>'+
-      mezziList.map(v=>`<option value="${v.id}">${v.mezzo}</option>`).join('')+
-      '<option value="altro">✍️ Altro (specificare...)</option>';
-    const targaOpts='<option value="">— Seleziona targa —</option>'+
-      mezziList.map(v=>`<option value="${v.id}">${v.targa}</option>`).join('')+
-      '<option value="altro">N/D (Altro)</option>';
-    mSel.innerHTML=opts;
-    tSel.innerHTML=targaOpts;
+    mSel.innerHTML='<option value="">— Seleziona mezzo —</option>'+MEZZI_AZIENDALI.map((v,i)=>`<option value="${i}">${v.mezzo}</option>`).join('');
+    tSel.innerHTML='<option value="">— Seleziona targa —</option>'+MEZZI_AZIENDALI.map((v,i)=>`<option value="${i}">${v.targa}</option>`).join('');
     mSel.value='';tSel.value='';
-    altroRow.style.display='none';
-    if(altroInput) altroInput.value='';
   }
   const priceZone=document.getElementById('fuel-price-zone');
   if(isResp()){
@@ -3756,40 +2919,15 @@ window.closeFuelModal=function(e){
 window.syncVehicle=function(from){
   const mSel=document.getElementById('fm-mezzo');
   const tSel=document.getElementById('fm-targa');
-  const altroRow=document.getElementById('fm-altro-row');
-  if(from==='mezzo'){
-    if(mSel.value==='altro'){
-      tSel.value='altro';
-      altroRow.style.display='block';
-      document.getElementById('fm-altro-input')?.focus();
-    } else {
-      tSel.value=mSel.value; // stesso id → stessa voce
-      altroRow.style.display='none';
-    }
-  } else {
-    if(tSel.value==='altro'){
-      mSel.value='altro';
-      altroRow.style.display='block';
-      document.getElementById('fm-altro-input')?.focus();
-    } else {
-      mSel.value=tSel.value;
-      altroRow.style.display='none';
-    }
-  }
+  if(from==='mezzo') tSel.value=mSel.value;
+  else mSel.value=tSel.value;
 };
 
 function getSelectedVehicle(){
-  if(!currentFuelItem) return null;
-  const needsVehicle=currentFuelItem.code==='CB.001'||currentFuelItem.code==='CB.003';
-  if(!needsVehicle) return null;
-  const val=document.getElementById('fm-mezzo')?.value;
-  if(!val) return null;
-  if(val==='altro'){
-    const desc=(document.getElementById('fm-altro-input')?.value||'').trim();
-    if(!desc) return null; // testo obbligatorio quando "Altro"
-    return {mezzo:desc,targa:'—'};
-  }
-  const v=mezziList.find(m=>m.id===val);
+  if(!currentFuelItem||currentFuelItem.code!=='CB.001') return null;
+  const idx=document.getElementById('fm-mezzo')?.value;
+  if(idx===''||idx==null) return null;
+  const v=MEZZI_AZIENDALI[parseInt(idx)];
   return v?{mezzo:v.mezzo,targa:v.targa}:null;
 }
 
@@ -3799,11 +2937,8 @@ window.doFuelAdjust=async function(sign){
     if(currentFuelItem.qty<=0){showToast('⛔ Carburante esaurito!','toast-danger');return;}
     if(fuelCounterVal>currentFuelItem.qty){showToast('⚠️ Disponibili solo '+currentFuelItem.qty+' lt!','toast-danger');return;}
     // Per nafta: mezzo obbligatorio al prelievo
-    if((currentFuelItem.code==='CB.001'||currentFuelItem.code==='CB.003')&&!getSelectedVehicle()){
-      const val=document.getElementById('fm-mezzo')?.value;
-      if(val==='altro') showToast('⚠️ Descrivi il mezzo nel campo testo!','toast-danger');
-      else showToast('⚠️ Seleziona il mezzo aziendale!','toast-danger');
-      return;
+    if(currentFuelItem.code==='CB.001'&&!getSelectedVehicle()){
+      showToast('⚠️ Seleziona il mezzo aziendale!','toast-danger');return;
     }
   }
   const amount=fuelCounterVal*sign;
@@ -3882,73 +3017,6 @@ window.setCaricaCat=function(cat){
   renderCaricaList();
 };
 
-function caricaItemCardHTML(it,showCatBadge){
-  const cfg=categories[it.cat]||{};
-  const priceVal=it.prezzo!=null?it.prezzo:'';
-  const catBadge=showCatBadge?`<span style="font-size:9.5px;font-weight:700;color:${cfg.color};background:${cfg.bg};padding:2px 8px;border-radius:99px;margin-left:6px;white-space:nowrap">${cfg.icon||''} ${cfg.label||it.cat}</span>`:'';
-  return `<div class="carica-item">
-    <div class="carica-item-top">
-      <span class="carica-item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
-      <span class="carica-item-name">${it.name}${catBadge}</span>
-      <span class="carica-item-qty">${it.qty} ${it.unit}</span>
-    </div>
-    <div class="carica-inputs">
-      <div class="carica-input-wrap">
-        <div class="carica-input-label">Quantità da caricare</div>
-        <input class="carica-input" type="number" min="1" placeholder="0"
-          id="cq-${it.id}" value="" inputmode="numeric">
-      </div>
-      <div class="carica-input-wrap">
-        <div class="carica-input-label">Nuovo prezzo €/${it.unit}</div>
-        <input class="carica-input" type="number" min="0" step="0.01"
-          placeholder="${priceVal||'—'}" id="cp-${it.id}" value="" inputmode="decimal">
-      </div>
-      <div class="carica-input-wrap carica-add-full">
-        <div class="carica-input-label">Fornitore</div>
-        <select class="carica-input" id="cf-${it.id}" style="text-align:left">
-          <option value="">— Seleziona fornitore —</option>
-          ${fornitoriList.map(f=>'<option value="'+f.nome+'">'+f.nome+'</option>').join('')}
-        </select>
-      </div>
-    </div>
-    <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
-  </div>`;
-}
-
-window.onCaricaSearch=function(){
-  const q=(document.getElementById('carica-search')?.value||'').trim().toLowerCase();
-  const list=document.getElementById('carica-list');
-  const catSelWrap=document.getElementById('carica-cat-sel')?.parentElement;
-
-  if(!q){
-    // Ricerca vuota: torna alla vista normale per categoria
-    if(catSelWrap) catSelWrap.style.display='';
-    renderCaricaList();
-    return;
-  }
-
-  // Ricerca attiva: nascondi il selettore categoria, mostra risultati cross-categoria
-  if(catSelWrap) catSelWrap.style.display='none';
-
-  const matches=itemsList.filter(it=>
-    it.cat!=='Carburante' && (
-      it.name.toLowerCase().includes(q) ||
-      (it.code||'').toLowerCase().includes(q)
-    )
-  ).sort((a,b)=>a.code.localeCompare(b.code));
-
-  if(matches.length===0){
-    list.innerHTML=`<div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:13px">
-      Nessun prodotto trovato per "<strong>${q}</strong>"
-    </div>`;
-    return;
-  }
-
-  list.innerHTML=`<div style="font-size:11px;color:var(--text-light);font-weight:600;margin-bottom:10px">
-      ${matches.length} risultat${matches.length===1?'o':'i'} trovat${matches.length===1?'o':'i'}
-    </div>`+matches.map(it=>caricaItemCardHTML(it,true)).join('');
-};
-
 function renderCaricaList(){
   const list=document.getElementById('carica-list');
   if(!caricaActiveCat){list.innerHTML='';return;}
@@ -3960,7 +3028,36 @@ function renderCaricaList(){
     ? `<div style="text-align:center;padding:20px 0 10px;color:var(--text-muted);font-size:13px">
         Nessun prodotto ancora in <strong>${cfg.label}</strong> — aggiungilo con il form qui sotto.
        </div>`
-    : items.map(it=>caricaItemCardHTML(it,false)).join('');
+    : items.map(it=>{
+        const priceVal=it.prezzo!=null?it.prezzo:'';
+        return `<div class="carica-item">
+          <div class="carica-item-top">
+            <span class="carica-item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
+            <span class="carica-item-name">${it.name}</span>
+            <span class="carica-item-qty">${it.qty} ${it.unit}</span>
+          </div>
+          <div class="carica-inputs">
+            <div class="carica-input-wrap">
+              <div class="carica-input-label">Quantità da caricare</div>
+              <input class="carica-input" type="number" min="1" placeholder="0"
+                id="cq-${it.id}" value="" inputmode="numeric">
+            </div>
+            <div class="carica-input-wrap">
+              <div class="carica-input-label">Nuovo prezzo €/${it.unit}</div>
+              <input class="carica-input" type="number" min="0" step="0.01"
+                placeholder="${priceVal||'—'}" id="cp-${it.id}" value="" inputmode="decimal">
+            </div>
+            <div class="carica-input-wrap carica-add-full">
+              <div class="carica-input-label">Fornitore</div>
+              <select class="carica-input" id="cf-${it.id}" style="text-align:left">
+                <option value="">— Seleziona fornitore —</option>
+                ${fornitoriList.map(f=>'<option value="'+f.nome+'">'+f.nome+'</option>').join('')}
+              </select>
+            </div>
+          </div>
+          <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
+        </div>`;
+      }).join('');
 
   // ── Form nuovo prodotto ─────────────────────
   const unitOpts=['pz','m','kit','conf','lt'].map(u=>`<option value="${u}">${u}</option>`).join('');
@@ -4118,217 +3215,8 @@ window.deleteFornitore=async function(id){
 };
 
 // ═══════════════════════════════════════
-//  MEZZI AZIENDALI — CRUD
-// ═══════════════════════════════════════
-window.addMezzo=async function(){
-  const mezzoEl=document.getElementById('new-mezzo-input');
-  const targaEl=document.getElementById('new-targa-input');
-  const mezzo=mezzoEl.value.trim();
-  const targa=targaEl.value.trim().toUpperCase();
-  if(!mezzo){showToast('Inserisci il nome del mezzo','toast-danger');mezzoEl.focus();return;}
-  const id=genId();
-  await setDoc(doc(db,'mezzi',id),{mezzo,targa,creato:Date.now()});
-  mezzoEl.value='';targaEl.value='';
-  setTimeout(()=>renderResponsabile(),300);
-  showToast('Mezzo "'+mezzo+'" aggiunto','toast-return');
-};
-window.deleteMezzo=async function(id){
-  const m=mezziList.find(x=>x.id===id);
-  if(!m||!confirm('Rimuovere "'+m.mezzo+'" dall\'elenco mezzi?')) return;
-  await deleteDoc(doc(db,'mezzi',id));
-  setTimeout(()=>renderResponsabile(),300);
-  showToast('Mezzo rimosso','toast-info');
-};
-
-// ═══════════════════════════════════════
-//  OPERATORI — CRUD
-// ═══════════════════════════════════════
-window.addOperatore=async function(){
-  const input=document.getElementById('new-operatore-input');
-  const nome=input.value.trim();
-  if(!nome){showToast('Inserisci nome e cognome','toast-danger');input.focus();return;}
-  if(operatoriList.find(o=>o.nome.toLowerCase()===nome.toLowerCase())){showToast('Operaio già presente','toast-danger');return;}
-  try{
-    const id=genId();
-    await setDoc(doc(db,'operatori',id),{nome,creato:Date.now()});
-    // Aggiorna subito la lista locale — non aspettare l'onSnapshot
-    if(!operatoriList.find(o=>o.id===id)){
-      operatoriList.push({id,nome,creato:Date.now()});
-      operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
-    }
-    input.value='';
-    renderResponsabile();
-    showToast('Operaio "'+nome+'" aggiunto','toast-return');
-  }catch(err){
-    console.error('Errore addOperatore:',err);
-    showToast('Errore nel salvataggio: '+err.message,'toast-danger');
-  }
-};
-window.deleteOperatore=async function(id){
-  const o=operatoriList.find(x=>x.id===id);
-  if(!o||!confirm('Rimuovere "'+o.nome+'" dall\'elenco operai?')) return;
-  try{
-    await deleteDoc(doc(db,'operatori',id));
-    operatoriList=operatoriList.filter(x=>x.id!==id);
-    renderResponsabile();
-    showToast('Operaio rimosso','toast-info');
-  }catch(err){
-    console.error('Errore deleteOperatore:',err);
-    showToast('Errore nella rimozione: '+err.message,'toast-danger');
-  }
-};
-
-// ═══════════════════════════════════════
-//  PRODOTTI VOLATILI — CRUD
-// ═══════════════════════════════════════
-window.addVolatile=async function(){
-  const descEl=document.getElementById('new-volatile-desc');
-  const qtyEl=document.getElementById('new-volatile-qty');
-  const deadlineEl=document.getElementById('new-volatile-deadline');
-  const desc=descEl.value.trim();
-  const qty=parseInt(qtyEl.value)||1;
-  const deadline=deadlineEl.value;
-  if(!desc){showToast('Inserisci la descrizione del materiale','toast-danger');descEl.focus();return;}
-  if(!deadline){showToast('Imposta la scadenza di restituzione','toast-danger');deadlineEl.focus();return;}
-  const id=genId();
-  await setDoc(doc(db,'volatili',id),{desc,qty,deadline,creato:Date.now()});
-  descEl.value='';qtyEl.value='1';deadlineEl.value='';
-  setTimeout(()=>{renderResponsabile();renderDashboardAlerts();},300);
-  showToast('Prodotto volatile aggiunto','toast-return');
-};
-window.deleteVolatile=async function(id){
-  const v=volatiliList.find(x=>x.id===id);
-  if(!v||!confirm('Eliminare "'+v.desc+'" dalla lista prodotti volatili?\n\n(Usa questo quando il materiale è stato restituito)')) return;
-  await deleteDoc(doc(db,'volatili',id));
-  setTimeout(()=>{renderResponsabile();renderDashboardAlerts();},300);
-  showToast('Prodotto volatile rimosso','toast-info');
-};
-
-// ═══════════════════════════════════════
 //  EXCEL PER CANTIERE
 // ═══════════════════════════════════════
-// ═══════════════════════════════════════
-//  DASHBOARD ANALISI CANTIERE
-// ═══════════════════════════════════════
-const CAT_COLORS=['#4DAB3D','#2563EB','#E0A030','#A03A1E','#553687','#2f8472','#823560','#4a6b72','#8e5c3d'];
-
-window.renderCantiereStats=async function(){
-  const panel=document.getElementById('cantiere-stats-panel');
-  if(!panel) return;
-  panel.innerHTML='<div style="text-align:center;padding:20px 0;color:var(--text-muted);font-size:13px">⏳ Calcolo in corso...</div>';
-
-  const cantFilter=document.getElementById('dash-cant-sel')?.value||'';
-  const days=parseInt(document.getElementById('dash-cant-period')?.value||'30');
-  const cutoff=days>0?Date.now()-days*86400000:0;
-  const label=cantFilter||(days>0?'Tutti i cantieri — ultimi '+days+' giorni':'Tutti i cantieri — sempre');
-
-  // Recupera movimenti da Firestore
-  let movimenti=[];
-  try{
-    const snap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(3000)));
-    snap.forEach(d=>{
-      const e={id:d.id,...d.data()};
-      if(cantFilter && e.cantiere!==cantFilter) return;
-      if(!cantFilter && !e.cantiere) return;
-      if(days>0 && e.time<cutoff) return;
-      if(e.type==='load') return; // solo prelievi e restituzioni
-      movimenti.push(e);
-    });
-  }catch(err){
-    movimenti=actLog.filter(e=>{
-      if(cantFilter && e.cantiere!==cantFilter) return false;
-      if(!cantFilter && !e.cantiere) return false;
-      if(days>0 && e.time<cutoff) return false;
-      if(e.type==='load') return false;
-      return true;
-    });
-  }
-
-  if(movimenti.length===0){
-    panel.innerHTML=`<div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:13px">
-      Nessun movimento nel periodo selezionato${cantFilter?' per '+cantFilter:''}.
-    </div>`;
-    return;
-  }
-
-  const deduped=itemsListDeduped();
-  // Netto per prodotto (prelievi − restituzioni)
-  const netto={}; // code → {nome,cat,qty,prezzo,unit}
-  movimenti.forEach(e=>{
-    const item=deduped.find(i=>i.id===e.itemId)||deduped.find(i=>i.code===e.code);
-    const prezzo=item?.prezzo??null;
-    if(!netto[e.code]) netto[e.code]={nome:e.name,cat:item?.cat||'',qty:0,prezzo,unit:item?.unit||''};
-    netto[e.code].qty+=e.delta; // take=negativo → netto negativo = ancora fuori
-  });
-  // Solo prodotti con netto negativo (material still out / consumed)
-  const consumati=Object.entries(netto)
-    .map(([code,v])=>({code,...v,qtaFuori:-v.qty}))
-    .filter(v=>v.qtaFuori>0)
-    .sort((a,b)=>{
-      const ca=(b.prezzo??0)*b.qtaFuori-(a.prezzo??0)*a.qtaFuori;
-      return ca||b.qtaFuori-a.qtaFuori;
-    });
-
-  const totCosto=consumati.reduce((s,v)=>s+(v.prezzo??0)*v.qtaFuori,0);
-  const totProd=consumati.length;
-  const totMov=movimenti.length;
-
-  // Ripartizione per categoria
-  const perCat={};
-  consumati.forEach(v=>{
-    if(!perCat[v.cat]) perCat[v.cat]={costo:0,n:0};
-    perCat[v.cat].costo+=(v.prezzo??0)*v.qtaFuori;
-    perCat[v.cat].n++;
-  });
-  const catRank=Object.entries(perCat).sort((a,b)=>b[1].costo-a[1].costo);
-  const maxCat=catRank[0]?.[1]?.costo||1;
-
-  // ── Render HTML ──
-  let html=`
-  <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">📍 ${label}</div>
-  <div class="cs-kpi-row">
-    <div class="cs-kpi">
-      <div class="cs-kpi-val">€${totCosto.toLocaleString('it-IT',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
-      <div class="cs-kpi-label">Costo netto</div>
-    </div>
-    <div class="cs-kpi">
-      <div class="cs-kpi-val">${totProd}</div>
-      <div class="cs-kpi-label">Prodotti usati</div>
-    </div>
-    <div class="cs-kpi">
-      <div class="cs-kpi-val">${totMov}</div>
-      <div class="cs-kpi-label">Movimenti</div>
-    </div>
-  </div>`;
-
-  // Barre per categoria
-  if(catRank.length>0){
-    html+=`<div class="cs-section-title">Ripartizione per categoria</div>`;
-    catRank.forEach(([cat,v],i)=>{
-      const cfg=categories[cat];
-      const pct=Math.round(v.costo/Math.max(totCosto,1)*100);
-      const color=cfg?.color||CAT_COLORS[i%CAT_COLORS.length];
-      html+=`<div class="cs-cat-row">
-        <span class="cs-cat-label" style="color:${color}">${cfg?.icon||''} ${cfg?.label||cat}</span>
-        <div class="cs-cat-bar-wrap"><div class="cs-cat-bar" style="width:${pct}%;background:${color}"></div></div>
-        <span class="cs-cat-val">€${v.costo.toLocaleString('it-IT',{maximumFractionDigits:0})}</span>
-      </div>`;
-    });
-  }
-
-  // Top 10 prodotti per costo
-  html+=`<div class="cs-section-title">Top prodotti per costo</div>`;
-  consumati.slice(0,10).forEach(v=>{
-    const costo=(v.prezzo??0)*v.qtaFuori;
-    html+=`<div class="cs-product-row">
-      <span class="cs-product-name">${v.code} — ${v.nome}</span>
-      <span class="cs-product-cost">${costo>0?'€'+costo.toLocaleString('it-IT',{maximumFractionDigits:0}):v.qtaFuori+' '+v.unit}</span>
-    </div>`;
-  });
-
-  panel.innerHTML=html;
-};
-
 window.exportByCantiere=async function(){
   if(typeof XLSX==='undefined'){showToast('Libreria Excel non caricata','toast-danger');return;}
 
@@ -4353,14 +3241,11 @@ window.exportByCantiere=async function(){
   rows.push(['MOVIMENTAZIONI MATERIALE PER CANTIERE']);
   rows.push(['Cantiere: '+label+'  |  Generato il: '+new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})]);
   rows.push([]);
-  rows.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Quantità','Unità','Prezzo €/un.','Valore €','Cantiere','Operatore']);
+  rows.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Quantità','Unità','Cantiere','Operatore']);
 
   movimenti.sort((a,b)=>b.time-a.time);
   const dedupedBC=itemsListDeduped();
   let totPrelievi=0, totRestituzioni=0;
-  // Accumulo netto per prodotto: prelevato - restituito (i carichi non contano nel netto cantiere)
-  const nettoPerCodice={}; // code → {qty, nome, prezzo, unit}
-
   movimenti.forEach(e=>{
     const d=new Date(e.time);
     const data=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -4368,56 +3253,18 @@ window.exportByCantiere=async function(){
     const item=dedupedBC.find(i=>i.id===e.itemId)||dedupedBC.find(i=>i.code===e.code);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
     const tipo={take:'Prelievo',return:'Restituzione',load:'Carico'}[e.type]||'Movimento';
-    const prezzo=item?.prezzo!=null?item.prezzo:null;
-    const valoreRiga=prezzo!=null?Math.round(prezzo*Math.abs(e.delta)*100)/100:'';
-    rows.push([data,ora,tipo,e.code,e.name,catLabel,e.delta,item?.unit||'',prezzo!=null?prezzo:'',valoreRiga,e.cantiere||'',e.operator||'']);
+    rows.push([data,ora,tipo,e.code,e.name,catLabel,e.delta,item?.unit||'',e.cantiere||'',e.operator||'']);
     if(e.delta<0) totPrelievi+=Math.abs(e.delta);
     else totRestituzioni+=e.delta;
-
-    // Netto solo per prelievi/restituzioni (escludi i carichi merce, che non riguardano il cantiere)
-    if(e.type==='take'||e.type==='return'){
-      if(!nettoPerCodice[e.code]) nettoPerCodice[e.code]={qty:0,nome:e.name,prezzo,unit:item?.unit||''};
-      nettoPerCodice[e.code].qty+=e.delta; // take è negativo, return è positivo → netto = preso non restituito
-    }
   });
 
   rows.push([]);
   rows.push(['','','','','Totale movimenti:',movimenti.length,'Prelievi:',totPrelievi,'Restituzioni:',totRestituzioni]);
 
   const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:12},{wch:8},{wch:14},{wch:10},{wch:40},{wch:22},{wch:10},{wch:8},{wch:12},{wch:12},{wch:28},{wch:20}];
-  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:11}},{s:{r:1,c:0},e:{r:1,c:11}}];
+  ws['!cols']=[{wch:12},{wch:8},{wch:14},{wch:10},{wch:40},{wch:22},{wch:10},{wch:8},{wch:28},{wch:20}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}}];
   XLSX.utils.book_append_sheet(wb,ws,'Movimenti Cantiere');
-
-  // ─── FOGLIO 2: Costo materiale non restituito ───
-  const rows2=[];
-  rows2.push(['MATERIALE PRELEVATO E NON RESTITUITO — '+label]);
-  rows2.push(['Valore economico del materiale ancora in cantiere (preso − restituito) × prezzo unitario']);
-  rows2.push([]);
-  rows2.push(['Codice','Prodotto','Qtà non restituita','Unità','Prezzo €/un.','Valore €']);
-
-  let totaleNonRestituito=0;
-  const nettoRows=Object.entries(nettoPerCodice)
-    .map(([code,v])=>({code,...v}))
-    .filter(v=>v.qty<0) // qty negativa = ancora fuori (preso più di quanto restituito)
-    .sort((a,b)=>a.code.localeCompare(b.code));
-
-  nettoRows.forEach(v=>{
-    const qtyFuori=Math.abs(v.qty);
-    const valore=v.prezzo!=null?Math.round(v.prezzo*qtyFuori*100)/100:'';
-    if(v.prezzo!=null) totaleNonRestituito+=v.prezzo*qtyFuori;
-    rows2.push([v.code,v.nome,qtyFuori,v.unit,v.prezzo!=null?v.prezzo:'',valore]);
-  });
-
-  if(nettoRows.length===0) rows2.push(['Nessun materiale risulta ancora non restituito per questo cantiere']);
-
-  rows2.push([]);
-  rows2.push(['','','','','TOTALE NON RESTITUITO:',Math.round(totaleNonRestituito*100)/100]);
-
-  const ws2=XLSX.utils.aoa_to_sheet(rows2);
-  ws2['!cols']=[{wch:10},{wch:40},{wch:18},{wch:8},{wch:12},{wch:14}];
-  ws2['!merges']=[{s:{r:0,c:0},e:{r:0,c:5}},{s:{r:1,c:0},e:{r:1,c:5}}];
-  XLSX.utils.book_append_sheet(wb,ws2,'Materiale Non Restituito');
 
   const fname='Cantiere_'+(cantFilter||'Tutti').replace(/\s/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.xlsx';
   XLSX.writeFile(wb,fname);
@@ -4427,6 +3274,134 @@ window.exportByCantiere=async function(){
 // ═══════════════════════════════════════
 //  TOAST
 // ═══════════════════════════════════════
+
+async function migrateSubcategorie(){
+  try{
+    const toUpdate=[
+      {cat:'Cavi',subs:['Unipolari','Bipolari','Multipolari','Precordati','Videosorveglianza','Dati / Ethernet']},
+      {cat:'Accessori e Consumabili',subs:['Nastro','Vernice']},
+    ];
+    for(const u of toUpdate){
+      const cfg=categories[u.cat]; if(!cfg) continue;
+      const existing=cfg.subs||[];
+      const toAdd=u.subs.filter(s=>!existing.includes(s));
+      if(toAdd.length===0) continue;
+      cfg.subs=[...existing,...toAdd];
+      await setDoc(doc(db,'categorie',u.cat),cfg);
+      console.log('[SUBCAT]',u.cat,'+',toAdd);
+    }
+  }catch(e){console.warn('[SUBCAT]',e.message);}
+}
+
+
+// ═══════════════════════════
+//  SOTTOCATEGORIE CRUD
+// ═══════════════════════════
+window.addSubcat=async function(cat){
+  const k=cat.replace(/\s/g,'_');
+  const inp=document.getElementById('nsi-'+k);
+  if(!inp) return;
+  const nome=inp.value.trim();
+  if(!nome){showToast('Inserisci il nome','toast-danger');inp.focus();return;}
+  const cfg=categories[cat];if(!cfg) return;
+  cfg.subs=cfg.subs||[];
+  if(cfg.subs.includes(nome)){showToast('Gia presente','toast-danger');return;}
+  cfg.subs.push(nome);
+  try{
+    await setDoc(doc(db,'categorie',cat),cfg);
+    inp.value='';
+    renderResponsabile();
+    showToast('"'+nome+'" aggiunto','toast-return');
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+};
+
+window.deleteSubcat=async function(cat,sub){
+  const cfg=categories[cat];if(!cfg) return;
+  if(!confirm('Eliminare la sottocategoria "'+sub+'"?')) return;
+  cfg.subs=(cfg.subs||[]).filter(function(s){return s!==sub;});
+  try{
+    await setDoc(doc(db,'categorie',cat),cfg);
+    renderResponsabile();
+    showToast('"'+sub+'" rimossa','toast-info');
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+};
+
+// ═══════════════════════════
+//  ANALISI CANTIERE
+// ═══════════════════════════
+const _catColors=['#4DAB3D','#2563EB','#E0A030','#A03A1E','#553687','#2f8472','#823560'];
+window.renderCantiereStats=async function(){
+  const panel=document.getElementById('cantiere-stats-panel');
+  if(!panel) return;
+  panel.innerHTML='<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">Calcolo in corso...</div>';
+  const cantFilter=document.getElementById('dash-cant-sel')&&document.getElementById('dash-cant-sel').value||'';
+  const days=parseInt((document.getElementById('dash-cant-period')&&document.getElementById('dash-cant-period').value)||'30');
+  const cutoff=days>0?Date.now()-days*86400000:0;
+
+  // Usa i movimenti già in memoria (actLog) per non fare query aggiuntive
+  const movimenti=actLog.filter(function(e){
+    if(cantFilter && e.cantiere!==cantFilter) return false;
+    if(!cantFilter && !e.cantiere) return false;
+    if(days>0 && e.time<cutoff) return false;
+    if(e.type==='load') return false;
+    return true;
+  });
+
+  if(movimenti.length===0){
+    panel.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Nessun movimento nel periodo.</div>';
+    return;
+  }
+
+  // Calcola netto per prodotto
+  const netto={};
+  movimenti.forEach(function(e){
+    const item=itemsList.find(function(i){return i.id===e.itemId;})||itemsList.find(function(i){return i.code===e.code;});
+    if(!netto[e.code]) netto[e.code]={nome:e.name,cat:item&&item.cat||'',qty:0,prezzo:item&&item.prezzo!=null?item.prezzo:null,unit:item&&item.unit||''};
+    netto[e.code].qty+=e.delta;
+  });
+  const consumati=Object.keys(netto).map(function(code){const v=netto[code];return Object.assign({code:code},v,{qtaFuori:-v.qty});})
+    .filter(function(v){return v.qtaFuori>0;})
+    .sort(function(a,b){return ((b.prezzo||0)*b.qtaFuori)-((a.prezzo||0)*a.qtaFuori);});
+
+  const totCosto=consumati.reduce(function(s,v){return s+(v.prezzo||0)*v.qtaFuori;},0);
+
+  // Ripartizione per categoria
+  const perCat={};
+  consumati.forEach(function(v){
+    if(!perCat[v.cat]) perCat[v.cat]={costo:0};
+    perCat[v.cat].costo+=(v.prezzo||0)*v.qtaFuori;
+  });
+  const catRank=Object.keys(perCat).map(function(c){return {cat:c,costo:perCat[c].costo};}).sort(function(a,b){return b.costo-a.costo;});
+  const label=cantFilter||'Tutti i cantieri';
+
+  let html='<div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:10px">📍 '+label+(days>0?' — ultimi '+days+' giorni':'')+'</div>';
+  html+='<div class="cs-kpi-row">';
+  html+='<div class="cs-kpi"><div class="cs-kpi-val">€'+Math.round(totCosto).toLocaleString('it-IT')+'</div><div class="cs-kpi-label">Costo netto</div></div>';
+  html+='<div class="cs-kpi"><div class="cs-kpi-val">'+consumati.length+'</div><div class="cs-kpi-label">Prodotti usati</div></div>';
+  html+='<div class="cs-kpi"><div class="cs-kpi-val">'+movimenti.length+'</div><div class="cs-kpi-label">Movimenti</div></div>';
+  html+='</div>';
+
+  if(catRank.length>0){
+    html+='<div class="cs-section-title">Per categoria</div>';
+    catRank.forEach(function(r,i){
+      const cfg=categories[r.cat];
+      const pct=Math.round(r.costo/Math.max(totCosto,1)*100);
+      const color=cfg&&cfg.color||_catColors[i%_catColors.length];
+      html+='<div class="cs-cat-row"><span class="cs-cat-label" style="color:'+color+'">'+(cfg&&cfg.icon||'')+' '+(cfg&&cfg.label||r.cat)+'</span>';
+      html+='<div class="cs-cat-bar-wrap"><div class="cs-cat-bar" style="width:'+pct+'%;background:'+color+'"></div></div>';
+      html+='<span class="cs-cat-val">€'+Math.round(r.costo).toLocaleString('it-IT')+'</span></div>';
+    });
+  }
+
+  html+='<div class="cs-section-title">Top prodotti</div>';
+  consumati.slice(0,8).forEach(function(v){
+    const costo=(v.prezzo||0)*v.qtaFuori;
+    html+='<div class="cs-product-row"><span class="cs-product-name">'+v.code+' — '+v.nome+'</span>';
+    html+='<span class="cs-product-cost">'+(costo>0?'€'+Math.round(costo).toLocaleString('it-IT'):v.qtaFuori+' '+v.unit)+'</span></div>';
+  });
+  panel.innerHTML=html;
+};
+
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
