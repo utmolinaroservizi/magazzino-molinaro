@@ -1332,8 +1332,8 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   // Migrazione sottocategorie (one-shot via flag meta)
   await migrateSubcategorie();
 
-  // Migra i mezzi da costante a Firestore (una volta sola)
-  if(mezziList.length===0){
+  // Migra i mezzi da costante a Firestore (una volta sola, solo resp)
+  if(isResp() && mezziList.length===0){
     const batch=writeBatch(db);
     MEZZI_DEFAULT.forEach(m=>{const id=genId();batch.set(doc(db,'mezzi',id),{mezzo:m.mezzo,targa:m.targa});});
     await batch.commit();
@@ -3580,20 +3580,23 @@ function handleUrlProductCode(){
 // ═══════════════════════════════════════
 
 async function migrateSubcategorie(){
-  const updates=[
-    {cat:'Cavi',      subs:['Unipolari','Bipolari','Multipolari','Precordati','Videosorveglianza','Dati / Ethernet']},
-    {cat:'Accessori e Consumabili', subs:['Nastro','Vernice']},
-  ];
-  for(const {cat,subs} of updates){
-    const current=categories[cat];
-    if(!current) continue;
-    const existing=current.subs||[];
-    const toAdd=subs.filter(s=>!existing.includes(s));
-    if(toAdd.length===0) continue;
-    current.subs=[...existing,...toAdd];
-    await saveCategory(cat,current);
-    console.log('[SUBCAT] '+cat+': aggiunte '+toAdd.join(', '));
-  }
+  if(!isResp()) return; // solo i responsabili possono scrivere su categorie
+  try{
+    const updates=[
+      {cat:'Cavi',      subs:['Unipolari','Bipolari','Multipolari','Precordati','Videosorveglianza','Dati / Ethernet']},
+      {cat:'Accessori e Consumabili', subs:['Nastro','Vernice']},
+    ];
+    for(const {cat,subs} of updates){
+      const current=categories[cat];
+      if(!current) continue;
+      const existing=current.subs||[];
+      const toAdd=subs.filter(s=>!existing.includes(s));
+      if(toAdd.length===0) continue;
+      current.subs=[...existing,...toAdd];
+      await saveCategory(cat,current);
+      console.log('[SUBCAT] '+cat+': aggiunte '+toAdd.join(', '));
+    }
+  }catch(e){console.warn('[SUBCAT] Errore migrazione sottocategorie:',e.message);}
 }
 
 //  ADBLUE — migrazione one-shot
