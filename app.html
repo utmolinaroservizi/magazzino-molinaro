@@ -468,6 +468,31 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 
   .qr-page-break{break-before:page!important;page-break-before:always!important;height:0!important;display:block!important}
 }
+
+/* SOTTOCATEGORIE RESP */
+.resp-cat-block{border-bottom:1px solid var(--border-light);padding:10px 0}
+.resp-cat-subs{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px 32px}
+.resp-sub-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--bg-surface);border-radius:99px;font-size:11.5px;font-weight:600;border:1.5px solid var(--border)}
+.resp-sub-del{background:transparent;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:0;line-height:1}
+.resp-sub-del:hover{color:#B33A3A}
+.resp-add-sub-row{display:flex;gap:6px;margin:6px 0 0 32px}
+.resp-add-sub-input{flex:1;padding:7px 10px;border:1.5px dashed var(--border);border-radius:var(--radius-xs);font-size:12px;font-family:inherit;outline:none;background:transparent}
+.resp-add-sub-input:focus{border-color:var(--brand-400);border-style:solid;background:var(--bg-card)}
+.resp-add-sub-btn{padding:7px 12px;background:var(--brand-500);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}
+/* CANTIERE STATS */
+.cs-kpi-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.cs-kpi{background:var(--bg-surface);border-radius:var(--radius-sm);padding:12px 10px;text-align:center}
+.cs-kpi-val{font-size:20px;font-weight:800;color:var(--brand-600)}
+.cs-kpi-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-top:3px}
+.cs-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:12px 0 8px}
+.cs-cat-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cs-cat-label{font-size:12px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-cat-bar-wrap{flex:2;height:7px;background:var(--border);border-radius:99px;overflow:hidden}
+.cs-cat-bar{height:100%;border-radius:99px}
+.cs-cat-val{font-size:11px;font-weight:700;color:var(--text-muted);min-width:48px;text-align:right}
+.cs-prod-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-light);font-size:12px}
+.cs-prod-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-prod-cost{font-weight:700;color:var(--brand-600);margin-left:8px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -748,8 +773,26 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     </button>
   </div>
   <div class="resp-card">
-    <h3>🗂️ Gestione categorie</h3>
-    <p>Elimina una categoria. Verranno eliminati anche tutti i prodotti al suo interno.</p>
+    <h3>📊 Analisi costi per cantiere</h3>
+    <p>Costi sostenuti e ripartizione materiale per cantiere e periodo.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <select class="modal-cantiere-select" id="dash-cant-sel">
+        <option value="">— Tutti i cantieri —</option>
+      </select>
+      <select class="modal-cantiere-select" id="dash-cant-period">
+        <option value="7">Ultimi 7 giorni</option>
+        <option value="30" selected>Ultimo mese</option>
+        <option value="90">Ultimi 3 mesi</option>
+        <option value="365">Ultimo anno</option>
+        <option value="0">Tutto</option>
+      </select>
+    </div>
+    <button class="resp-btn resp-btn-green" onclick="renderCantiereStats()" style="margin-bottom:12px">🔍 Analizza</button>
+    <div id="cantiere-stats-panel"></div>
+  </div>
+  <div class="resp-card">
+    <h3>🗂️ Gestione categorie e sottocategorie</h3>
+    <p>Aggiungi sottocategorie o elimina categorie (azione irreversibile).</p>
     <div class="resp-cat-list" id="resp-cat-list"></div>
   </div>
   <div class="resp-card">
@@ -905,10 +948,10 @@ const DEFAULT_CATS = {
   "Sostegni e Accessori":   {prefix:"SA",label:"Sostegni e Accessori",   icon:"🔩",color:"#5e7236",bg:"#eef2e6"},
   "Cavidotti":              {prefix:"CD",label:"Cavidotti",              icon:"🔧",color:"#6b5e36",bg:"#f5f0e2"},
   "CLS":                    {prefix:"CL",label:"CLS",                   icon:"🏗️",color:"#4a6b72",bg:"#e4eff2"},
-  "Cavi":                   {prefix:"CV",label:"Cavi",                   icon:"🔌",color:"#a8780a",bg:"#fbf2dc"},
+  "Cavi":                   {prefix:"CV",label:"Cavi",                   icon:"🔌",color:"#a8780a",bg:"#fbf2dc",subs:["Unipolari","Bipolari","Multipolari","Precordati","Videosorveglianza","Dati / Ethernet"]},
   "Materiale Elettrico":    {prefix:"ME",label:"Materiale Elettrico",    icon:"⚡",color:"#823560",bg:"#f7e8f0"},
   "Fotovoltaico":           {prefix:"FV",label:"Fotovoltaico",           icon:"☀️",color:"#553687",bg:"#ede6f7",subs:["Impiantistica Fotovoltaica","Lampioni Fotovoltaici"]},
-  "Accessori e Consumabili":{prefix:"AC",label:"Accessori e Consumabili",icon:"📦",color:"#2f8472",bg:"#e6f3f0"},
+  "Accessori e Consumabili":{prefix:"AC",label:"Accessori e Consumabili",icon:"📦",color:"#2f8472",bg:"#e6f3f0",subs:["Nastro","Vernice"]},
   "Carburante":             {prefix:"CB",label:"Carburante",             icon:"⛽",color:"#8e5c3d",bg:"#f7f0eb"},
 };
 
@@ -1141,10 +1184,13 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   }
   const heroTitle=document.getElementById('hero-title');
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
-  await loadFromFirestore();
-  await migrateV2();
-  await migrateV3();
-  await deduplicaInventario();
+  try{
+    await loadFromFirestore();
+    await migrateV2();
+    if(isResp()) await migrateSubcategorie();
+    await migrateV3();
+    await deduplicaInventario();
+  }catch(initErr){console.error('[INIT]',initErr.message||initErr);}
   // Normalizza ordine categorie
   const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   const ordered=DESIRED_ORDER.filter(c=>categories[c]);
@@ -2194,19 +2240,34 @@ function renderResponsabile(){
   const withPrice=itemsList.filter(it=>it.prezzo!=null).length;
   document.getElementById('valore-sub').textContent=withPrice+'/'+itemsList.length+' prodotti con prezzo impostato';
 
-  // Categorie
+  // Categorie + sottocategorie + dropdown cantiere stats
   let html='';
   catOrder.forEach(cat=>{
     const cfg=categories[cat];if(!cfg) return;
     const ci=getItemsByCat(cat);
-    html+=`<div class="resp-cat-item">
-      <div class="resp-cat-icon" style="background:${cfg.bg}">${cfg.icon}</div>
-      <div class="resp-cat-info"><div class="resp-cat-name" style="color:${cfg.color}">${cfg.label}</div>
-      <div class="resp-cat-sub">${cfg.prefix} · ${ci.length} prodotti</div></div>
-      <button class="resp-cat-del" onclick="deleteCategory('${cat}')">✕</button>
-    </div>`;
+    const subs=cfg.subs||[];
+    const catKey=cat.replace(/[^a-zA-Z0-9]/g,'_');
+    let chips=subs.map(s=>
+      '<span class="resp-sub-chip">'+s+
+      ' <button class="resp-sub-del" onclick="delSubcat('+JSON.stringify(cat)+','+JSON.stringify(s)+')">✕</button></span>'
+    ).join('');
+    if(!chips) chips='<span style="font-size:11px;color:var(--text-light)">Nessuna sottocategoria</span>';
+    html+='<div class="resp-cat-block">'+
+      '<div style="display:flex;align-items:center;gap:8px">'+
+      '<div class="resp-cat-icon" style="background:'+cfg.bg+'">'+cfg.icon+'</div>'+
+      '<div class="resp-cat-info" style="flex:1"><div class="resp-cat-name" style="color:'+cfg.color+'">'+cfg.label+'</div>'+
+      '<div class="resp-cat-sub">'+cfg.prefix+' · '+ci.length+' prodotti</div></div>'+
+      '<button class="resp-cat-del" onclick="deleteCategory('+JSON.stringify(cat)+')">✕</button></div>'+
+      '<div class="resp-cat-subs">'+chips+'</div>'+
+      '<div class="resp-add-sub-row">'+
+      '<input class="resp-add-sub-input" id="nsi_'+catKey+'" placeholder="+ Nuova sottocategoria...">'+
+      '<button class="resp-add-sub-btn" onclick="addSubcat('+JSON.stringify(cat)+')">Aggiungi</button>'+
+      '</div></div>';
   });
   document.getElementById('resp-cat-list').innerHTML=html||'<p style="font-size:12px;color:var(--text-light);padding:10px 0">Nessuna categoria</p>';
+  // Popola select analisi cantiere
+  const dcs=document.getElementById('dash-cant-sel');
+  if(dcs){const prev=dcs.value;dcs.innerHTML='<option value="">— Tutti i cantieri —</option>'+cantieriList.map(c=>'<option value="'+c.nome+'">'+c.nome+'</option>').join('');if(prev)dcs.value=prev;}
 
   // Cantieri
   const cantHtml=cantieriList.length===0
@@ -3231,6 +3292,119 @@ window.exportByCantiere=async function(){
 // ═══════════════════════════════════════
 //  TOAST
 // ═══════════════════════════════════════
+
+// ═══════════════════════════════════
+//  MIGRAZIONE SOTTOCATEGORIE
+// ═══════════════════════════════════
+async function migrateSubcategorie(){
+  try{
+    var todo=[
+      {cat:'Cavi',subs:['Unipolari','Bipolari','Multipolari','Precordati','Videosorveglianza','Dati / Ethernet']},
+      {cat:'Accessori e Consumabili',subs:['Nastro','Vernice']}
+    ];
+    for(var ti=0;ti<todo.length;ti++){
+      var u=todo[ti];
+      var cfg=categories[u.cat]; if(!cfg) continue;
+      var existing=cfg.subs||[];
+      var toAdd=u.subs.filter(function(s){return existing.indexOf(s)===-1;});
+      if(toAdd.length===0) continue;
+      cfg.subs=existing.concat(toAdd);
+      await setDoc(doc(db,'categorie',u.cat),cfg);
+    }
+  }catch(e){console.warn('[SUBCAT]',e.message);}
+}
+// ═══════════════════════════════════
+//  CRUD SOTTOCATEGORIE
+// ═══════════════════════════════════
+window.addSubcat=async function(cat){
+  var catKey=cat.replace(/[^a-zA-Z0-9]/g,'_');
+  var inp=document.getElementById('nsi_'+catKey);
+  if(!inp) return;
+  var nome=inp.value.trim();
+  if(!nome){showToast('Inserisci il nome','toast-danger');inp.focus();return;}
+  var cfg=categories[cat]; if(!cfg) return;
+  cfg.subs=cfg.subs||[];
+  if(cfg.subs.indexOf(nome)!==-1){showToast('Gia presente','toast-danger');return;}
+  cfg.subs.push(nome);
+  try{
+    await setDoc(doc(db,'categorie',cat),cfg);
+    inp.value=''; renderResponsabile();
+    showToast('"'+nome+'" aggiunto','toast-return');
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+};
+window.delSubcat=async function(cat,sub){
+  var cfg=categories[cat]; if(!cfg) return;
+  if(!confirm('Eliminare la sottocategoria "'+sub+'"?')) return;
+  cfg.subs=(cfg.subs||[]).filter(function(s){return s!==sub;});
+  try{
+    await setDoc(doc(db,'categorie',cat),cfg);
+    renderResponsabile();
+    showToast('"'+sub+'" rimossa','toast-info');
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+};
+// ═══════════════════════════════════
+//  ANALISI COSTI CANTIERE
+// ═══════════════════════════════════
+window.renderCantiereStats=function(){
+  var panel=document.getElementById('cantiere-stats-panel');
+  if(!panel) return;
+  var cantFilter=document.getElementById('dash-cant-sel')&&document.getElementById('dash-cant-sel').value||'';
+  var days=parseInt(document.getElementById('dash-cant-period')&&document.getElementById('dash-cant-period').value||'30');
+  var cutoff=days>0?Date.now()-days*86400000:0;
+  var movs=actLog.filter(function(e){
+    if(cantFilter&&e.cantiere!==cantFilter) return false;
+    if(!cantFilter&&!e.cantiere) return false;
+    if(days>0&&e.time<cutoff) return false;
+    if(e.type==='load') return false;
+    return true;
+  });
+  if(movs.length===0){
+    panel.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Nessun movimento nel periodo.</div>';
+    return;
+  }
+  var netto={};
+  movs.forEach(function(e){
+    var it=itemsList.filter(function(i){return i.id===e.itemId;})[0]||itemsList.filter(function(i){return i.code===e.code;})[0];
+    if(!netto[e.code]) netto[e.code]={nome:e.name,cat:it&&it.cat||'',qty:0,prezzo:it&&it.prezzo!=null?it.prezzo:null,unit:it&&it.unit||''};
+    netto[e.code].qty+=e.delta;
+  });
+  var colori=['#4DAB3D','#2563EB','#E0A030','#A03A1E','#553687','#2f8472','#823560'];
+  var lista=Object.keys(netto).map(function(code){
+    var v=netto[code]; return {code:code,nome:v.nome,cat:v.cat,qtaFuori:-v.qty,prezzo:v.prezzo,unit:v.unit};
+  }).filter(function(v){return v.qtaFuori>0;}).sort(function(a,b){return ((b.prezzo||0)*b.qtaFuori)-((a.prezzo||0)*a.qtaFuori);});
+  var totCosto=lista.reduce(function(s,v){return s+(v.prezzo||0)*v.qtaFuori;},0);
+  var perCat={};
+  lista.forEach(function(v){
+    if(!perCat[v.cat]) perCat[v.cat]=0;
+    perCat[v.cat]+=(v.prezzo||0)*v.qtaFuori;
+  });
+  var catRank=Object.keys(perCat).map(function(c){return {cat:c,costo:perCat[c]};}).sort(function(a,b){return b.costo-a.costo;});
+  var label=(cantFilter||'Tutti')+(days>0?' — ultimi '+days+'gg':'');
+  var h='<div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:10px">📍 '+label+'</div>';
+  h+='<div class="cs-kpi-row">';
+  h+='<div class="cs-kpi"><div class="cs-kpi-val">€'+Math.round(totCosto).toLocaleString('it-IT')+'</div><div class="cs-kpi-label">Costo netto</div></div>';
+  h+='<div class="cs-kpi"><div class="cs-kpi-val">'+lista.length+'</div><div class="cs-kpi-label">Prodotti</div></div>';
+  h+='<div class="cs-kpi"><div class="cs-kpi-val">'+movs.length+'</div><div class="cs-kpi-label">Movimenti</div></div>';
+  h+='</div>';
+  if(catRank.length){
+    h+='<div class="cs-section-title">Per categoria</div>';
+    catRank.forEach(function(r,i){
+      var cfg=categories[r.cat];
+      var pct=Math.round(r.costo/Math.max(totCosto,1)*100);
+      var color=cfg&&cfg.color||colori[i%colori.length];
+      h+='<div class="cs-cat-row"><span class="cs-cat-label" style="color:'+color+'">'+(cfg&&cfg.icon||'')+' '+(cfg&&cfg.label||r.cat)+'</span>';
+      h+='<div class="cs-cat-bar-wrap"><div class="cs-cat-bar" style="width:'+pct+'%;background:'+color+'"></div></div>';
+      h+='<span class="cs-cat-val">€'+Math.round(r.costo).toLocaleString('it-IT')+'</span></div>';
+    });
+  }
+  h+='<div class="cs-section-title">Top prodotti</div>';
+  lista.slice(0,8).forEach(function(v){
+    var c=(v.prezzo||0)*v.qtaFuori;
+    h+='<div class="cs-prod-row"><span class="cs-prod-name">'+v.code+' — '+v.nome+'</span>';
+    h+='<span class="cs-prod-cost">'+(c>0?'€'+Math.round(c).toLocaleString('it-IT'):v.qtaFuori+' '+v.unit)+'</span></div>';
+  });
+  panel.innerHTML=h;
+};
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
