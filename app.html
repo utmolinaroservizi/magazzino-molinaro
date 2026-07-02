@@ -818,6 +818,13 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     </div>
     <!-- SEZIONE PREZZI: visibile solo responsabile -->
     <div class="modal-price-zone" id="modal-price-zone">
+      <!-- SOTTOCATEGORIA (solo responsabile) -->
+      <div id="modal-sub-zone" style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-light)">
+        <div class="modal-price-label" style="margin-bottom:5px">📂 Sottocategoria</div>
+        <select id="m-sub-select" class="modal-cantiere-select" onchange="saveSubcategoria()" style="border-color:var(--border)">
+          <option value="">— Nessuna —</option>
+        </select>
+      </div>
       <div class="modal-price-row">
         <div>
           <div class="modal-price-label">Prezzo unitario</div>
@@ -1714,12 +1721,19 @@ window.openModal=function(id){
     cantieriList.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
   cantSel.value='';
 
-  // Sezione prezzi: solo responsabili
+  // Sezione prezzi e sottocategoria: solo responsabili
   const priceZone=document.getElementById('modal-price-zone');
   if(isResp()){
     priceZone.classList.add('visible');
     renderPriceSection(item);
     document.getElementById('price-input-row').classList.remove('visible');
+    // Popola dropdown sottocategoria
+    const cfg2=categories[item.cat];
+    const subs=cfg2&&cfg2.subs&&cfg2.subs.length>0?cfg2.subs:[];
+    const subSel=document.getElementById('m-sub-select');
+    subSel.innerHTML='<option value="">— Nessuna —</option>'+
+      subs.map(function(s){return '<option value="'+s+'"'+(item.sub===s?' selected':'')+'>'+s+'</option>';}).join('');
+    document.getElementById('modal-sub-zone').style.display=subs.length>0?'block':'none';
   } else {
     priceZone.classList.remove('visible');
   }
@@ -3461,6 +3475,25 @@ async function migrateAssegnaSubcategorie(){
     if(count>0) showToast(count+' prodotti assegnati alle sottocategorie','toast-return');
   }catch(e){console.warn('[SUBCAT-ASSIGN]',e.message);}
 }
+// Salva la sottocategoria selezionata — tocca SOLO il campo sub
+window.saveSubcategoria=async function(){
+  if(!currentModalItem) return;
+  var newSub=document.getElementById('m-sub-select').value||null;
+  if(newSub===currentModalItem.sub) return;
+  var oldSub=currentModalItem.sub;
+  currentModalItem.sub=newSub;
+  try{
+    await saveItem(currentModalItem);
+    showToast('Sottocategoria aggiornata','toast-return');
+    // Aggiorna il badge nella lista materiali se visibile
+    if(document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
+  }catch(e){
+    currentModalItem.sub=oldSub; // rollback
+    document.getElementById('m-sub-select').value=oldSub||'';
+    showToast('Errore: '+e.message,'toast-danger');
+  }
+};
+
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
