@@ -327,6 +327,37 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .resp-btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
 .resp-cat-list{margin-top:4px}
 .resp-cat-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-light)}
+.resp-cat-block{border-bottom:1px solid var(--border-light);padding:10px 0}
+.resp-cat-header{display:flex;align-items:center;gap:8px;width:100%}
+.resp-cat-rename-row{display:none;gap:6px;margin:6px 0 2px;align-items:center}
+.resp-cat-rename-row.open{display:flex}
+.resp-cat-rename-input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;outline:none;background:var(--bg-card)}
+.resp-cat-rename-input:focus{border-color:var(--brand-500)}
+.resp-cat-subs{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px 32px}
+.resp-sub-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 11px;background:var(--bg-surface);border-radius:99px;font-size:11.5px;font-weight:600;border:1.5px solid var(--border)}
+.resp-sub-chip button{background:transparent;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:0;line-height:1;flex-shrink:0}
+.resp-sub-chip button:hover{color:#B33A3A}
+.resp-sub-edit-btn{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit}
+.resp-sub-edit-btn:hover{background:var(--brand-50);color:var(--brand-600);border-color:var(--brand-400)}
+.resp-add-sub-row{display:flex;gap:6px;margin:6px 0 0 32px;align-items:center}
+.resp-add-sub-input{flex:1;padding:7px 10px;border:1.5px dashed var(--border);border-radius:var(--radius-xs);font-size:12px;font-family:inherit;outline:none;background:transparent}
+.resp-add-sub-input:focus{border-color:var(--brand-400);border-style:solid;background:var(--bg-card)}
+.resp-add-sub-btn{padding:7px 12px;background:var(--brand-500);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap}
+
+/* ANALISI CANTIERE DASHBOARD */
+.cs-kpi-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.cs-kpi{background:var(--bg-surface);border-radius:var(--radius-sm);padding:12px 10px;text-align:center}
+.cs-kpi-val{font-size:20px;font-weight:800;color:var(--brand-600);font-variant-numeric:tabular-nums}
+.cs-kpi-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+.cs-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 8px}
+.cs-cat-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cs-cat-label{font-size:12px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-cat-bar-wrap{flex:2;height:7px;background:var(--border);border-radius:99px;overflow:hidden}
+.cs-cat-bar{height:100%;border-radius:99px;transition:width .4s ease}
+.cs-cat-val{font-size:11px;font-weight:700;color:var(--text-muted);min-width:48px;text-align:right}
+.cs-product-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border-light);font-size:12px}
+.cs-product-name{flex:1;color:var(--text);font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cs-product-cost{font-weight:700;color:var(--brand-600);flex-shrink:0;margin-left:8px}
 .resp-cat-item:last-child{border-bottom:none}
 .resp-cat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .resp-cat-info{flex:1}
@@ -849,8 +880,27 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     </button>
   </div>
   <div class="resp-card">
-    <h3>🗂️ Gestione categorie</h3>
-    <p>Elimina una categoria. Verranno eliminati anche tutti i prodotti al suo interno.</p>
+    <h3>📊 Analisi costi per cantiere</h3>
+    <p>Seleziona un cantiere e una finestra temporale per vedere i costi sostenuti e la ripartizione del materiale.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <select class="modal-cantiere-select" id="dash-cant-sel">
+        <option value="">— Tutti i cantieri —</option>
+      </select>
+      <select class="modal-cantiere-select" id="dash-cant-period">
+        <option value="7">Ultimi 7 giorni</option>
+        <option value="30" selected>Ultimo mese</option>
+        <option value="90">Ultimi 3 mesi</option>
+        <option value="180">Ultimi 6 mesi</option>
+        <option value="365">Ultimo anno</option>
+        <option value="0">Tutto</option>
+      </select>
+    </div>
+    <button class="resp-btn resp-btn-green" onclick="renderCantiereStats()" style="margin-bottom:14px">
+      🔍 Analizza
+    </button>
+    <div id="cantiere-stats-panel"></div>
+  </div>
+    <p>Rinomina categorie/sottocategorie o aggiungine di nuove. Elimina una categoria solo se sei sicuro: rimuove anche tutti i prodotti al suo interno.</p>
     <div class="resp-cat-list" id="resp-cat-list"></div>
   </div>
   <div class="resp-card">
@@ -1038,10 +1088,10 @@ const DEFAULT_CATS = {
   "Sostegni e Accessori":   {prefix:"SA",label:"Sostegni e Accessori",   icon:"🔩",color:"#5e7236",bg:"#eef2e6"},
   "Cavidotti":              {prefix:"CD",label:"Cavidotti",              icon:"🔧",color:"#6b5e36",bg:"#f5f0e2"},
   "CLS":                    {prefix:"CL",label:"CLS",                   icon:"🏗️",color:"#4a6b72",bg:"#e4eff2"},
-  "Cavi":                   {prefix:"CV",label:"Cavi",                   icon:"🔌",color:"#a8780a",bg:"#fbf2dc"},
+  "Cavi":                   {prefix:"CV",label:"Cavi",                   icon:"🔌",color:"#a8780a",bg:"#fbf2dc",subs:["Unipolari","Bipolari","Multipolari","Precordati","Videosorveglianza","Dati / Ethernet"]},
   "Materiale Elettrico":    {prefix:"ME",label:"Materiale Elettrico",    icon:"⚡",color:"#823560",bg:"#f7e8f0"},
   "Fotovoltaico":           {prefix:"FV",label:"Fotovoltaico",           icon:"☀️",color:"#553687",bg:"#ede6f7",subs:["Impiantistica Fotovoltaica","Lampioni Fotovoltaici"]},
-  "Accessori e Consumabili":{prefix:"AC",label:"Accessori e Consumabili",icon:"📦",color:"#2f8472",bg:"#e6f3f0"},
+  "Accessori e Consumabili":{prefix:"AC",label:"Accessori e Consumabili",icon:"📦",color:"#2f8472",bg:"#e6f3f0",subs:["Nastro","Vernice"]},
   "Carburante":             {prefix:"CB",label:"Carburante",             icon:"⛽",color:"#8e5c3d",bg:"#f7f0eb"},
 };
 
@@ -1278,6 +1328,9 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   await deduplicaInventario();
   await riparaQtaDopoDedup(); // Ripristina qtà sbagliate dalla dedup che sommava
   await migrateAdBlue();     // Aggiunge AdBlue se non presente
+
+  // Migrazione sottocategorie (one-shot via flag meta)
+  await migrateSubcategorie();
 
   // Migra i mezzi da costante a Firestore (una volta sola)
   if(mezziList.length===0){
@@ -2693,16 +2746,42 @@ function renderResponsabile(){
   const withPrice=itemsList.filter(it=>it.prezzo!=null).length;
   document.getElementById('valore-sub').textContent=withPrice+'/'+itemsList.length+' prodotti con prezzo impostato';
 
-  // Categorie
+  // Categorie + sottocategorie
   let html='';
   catOrder.forEach(cat=>{
     const cfg=categories[cat];if(!cfg) return;
     const ci=getItemsByCat(cat);
-    html+=`<div class="resp-cat-item">
-      <div class="resp-cat-icon" style="background:${cfg.bg}">${cfg.icon}</div>
-      <div class="resp-cat-info"><div class="resp-cat-name" style="color:${cfg.color}">${cfg.label}</div>
-      <div class="resp-cat-sub">${cfg.prefix} · ${ci.length} prodotti</div></div>
-      <button class="resp-cat-del" onclick="deleteCategory('${cat}')">✕</button>
+    const subs=cfg.subs||[];
+    const subChips=subs.map(s=>`
+      <span class="resp-sub-chip">
+        ${s}
+        <button onclick="startRenameSubcat('${cat}','${s}')" title="Rinomina">✏️</button>
+        <button onclick="deleteSubcat('${cat}','${s}')" title="Elimina">✕</button>
+      </span>`).join('');
+    html+=`<div class="resp-cat-block">
+      <div class="resp-cat-header">
+        <div class="resp-cat-icon" style="background:${cfg.bg}">${cfg.icon}</div>
+        <div class="resp-cat-info" style="flex:1">
+          <div class="resp-cat-name" style="color:${cfg.color}">${cfg.label}</div>
+          <div class="resp-cat-sub">${cfg.prefix} · ${ci.length} prodotti</div>
+        </div>
+        <button class="resp-sub-edit-btn" onclick="startRenameCat('${cat}')" title="Rinomina categoria">✏️</button>
+        <button class="resp-cat-del" onclick="deleteCategory('${cat}')">✕</button>
+      </div>
+      <div class="resp-cat-rename-row" id="rename-cat-row-${cat.replace(/\s/g,'_')}">
+        <input class="resp-cat-rename-input" id="rename-cat-input-${cat.replace(/\s/g,'_')}" value="${cfg.label}" placeholder="Nuovo nome categoria">
+        <button class="resp-entity-btn" style="padding:7px 12px;font-size:12px" onclick="saveCatRename('${cat}')">✓</button>
+        <button class="log-action-btn" onclick="cancelRenameCat('${cat}')">✕</button>
+      </div>
+      <div class="resp-cat-subs" id="subs-row-${cat.replace(/\s/g,'_')}">
+        ${subChips||'<span style="font-size:11px;color:var(--text-light)">Nessuna sottocategoria</span>'}
+      </div>
+      <div class="resp-add-sub-row">
+        <input class="resp-add-sub-input" id="new-sub-input-${cat.replace(/\s/g,'_')}"
+          placeholder="+ Nuova sottocategoria..."
+          onkeydown="if(event.key==='Enter') addSubcat('${cat}')">
+        <button class="resp-add-sub-btn" onclick="addSubcat('${cat}')">Aggiungi</button>
+      </div>
     </div>`;
   });
   document.getElementById('resp-cat-list').innerHTML=html||'<p style="font-size:12px;color:var(--text-light);padding:10px 0">Nessuna categoria</p>';
@@ -2770,6 +2849,15 @@ function renderResponsabile(){
   const expSel=document.getElementById('resp-cantiere-export');
   if(expSel) expSel.innerHTML='<option value="">Tutti i cantieri</option>'+
     cantieriList.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
+
+  // Popola dropdown analisi cantiere (preserva selezione)
+  const dashCant=document.getElementById('dash-cant-sel');
+  if(dashCant){
+    const prevVal=dashCant.value;
+    dashCant.innerHTML='<option value="">— Tutti i cantieri —</option>'+
+      cantieriList.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
+    if(prevVal) dashCant.value=prevVal;
+  }
 }
 // ═══════════════════════════════════════
 //  PIN CONFERMA — per azioni distruttive
@@ -2809,7 +2897,83 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(pinInput) pinInput.addEventListener('keydown',e=>{if(e.key==='Enter') confirmPinModal();});
 });
 
-window.deleteCategory=async function(cat){
+// ═══════════════════════════════════════
+//  SOTTOCATEGORIE — CRUD
+// ═══════════════════════════════════════
+window.addSubcat=async function(cat){
+  const key=cat.replace(/\s/g,'_');
+  const input=document.getElementById('new-sub-input-'+key);
+  if(!input) return;
+  const nome=input.value.trim();
+  if(!nome){showToast('Inserisci il nome della sottocategoria','toast-danger');input.focus();return;}
+  const cfg=categories[cat];if(!cfg) return;
+  cfg.subs=cfg.subs||[];
+  if(cfg.subs.includes(nome)){showToast('Sottocategoria già presente','toast-danger');return;}
+  cfg.subs.push(nome);
+  await saveCategory(cat,cfg);
+  input.value='';
+  renderResponsabile();
+  showToast('"'+nome+'" aggiunto a '+cfg.label,'toast-return');
+};
+
+window.deleteSubcat=async function(cat,sub){
+  const cfg=categories[cat];if(!cfg||!cfg.subs) return;
+  if(!confirm('Eliminare la sottocategoria "'+sub+'"?\n\nI prodotti che la usano rimarranno ma perderanno la sottocategoria.')) return;
+  cfg.subs=cfg.subs.filter(s=>s!==sub);
+  await saveCategory(cat,cfg);
+  renderResponsabile();
+  showToast('"'+sub+'" rimossa','toast-info');
+};
+
+// ── Rename sottocategoria ──
+window.startRenameSubcat=function(cat,sub){
+  const nome=prompt('Rinomina "'+sub+'" in:',sub);
+  if(!nome||nome.trim()===sub) return;
+  renameSubcat(cat,sub,nome.trim());
+};
+
+async function renameSubcat(cat,oldSub,newSub){
+  const cfg=categories[cat];if(!cfg||!cfg.subs) return;
+  if(cfg.subs.includes(newSub)){showToast('Nome già esistente','toast-danger');return;}
+  cfg.subs=cfg.subs.map(s=>s===oldSub?newSub:s);
+  await saveCategory(cat,cfg);
+  // Aggiorna tutti gli item che usano questa sottocategoria
+  const batch=writeBatch(db);let count=0;
+  itemsList.filter(it=>it.cat===cat&&it.sub===oldSub).forEach(it=>{
+    it.sub=newSub;const{id,...data}=it;batch.set(doc(db,'inventario',id),data);count++;
+  });
+  if(count>0) await batch.commit();
+  renderResponsabile();renderMateriali();
+  showToast('"'+oldSub+'" → "'+newSub+'" ('+count+' prodotti aggiornati)','toast-return');
+}
+
+// ── Rename categoria ──
+window.startRenameCat=function(cat){
+  const key=cat.replace(/\s/g,'_');
+  const row=document.getElementById('rename-cat-row-'+key);
+  if(row) row.classList.add('open');
+  const inp=document.getElementById('rename-cat-input-'+key);
+  if(inp) setTimeout(()=>inp.focus(),50);
+};
+window.cancelRenameCat=function(cat){
+  const key=cat.replace(/\s/g,'_');
+  const row=document.getElementById('rename-cat-row-'+key);
+  if(row) row.classList.remove('open');
+};
+window.saveCatRename=async function(cat){
+  const key=cat.replace(/\s/g,'_');
+  const inp=document.getElementById('rename-cat-input-'+key);
+  if(!inp) return;
+  const newLabel=inp.value.trim();
+  if(!newLabel||newLabel===categories[cat]?.label){cancelRenameCat(cat);return;}
+  // Il nome chiave Firestore (cat) resta invariato; cambia solo il label
+  const cfg=categories[cat];
+  cfg.label=newLabel;
+  await saveCategory(cat,cfg);
+  cancelRenameCat(cat);
+  renderResponsabile();renderDashboard();renderMateriali();
+  showToast('Categoria rinominata in "'+newLabel+'"','toast-return');
+};
   const cfg=categories[cat];if(!cfg) return;
   const ci=getItemsByCat(cat);
   if(!confirm('Eliminare "'+cfg.label+'"?\n\nVerranno eliminati anche '+ci.length+' prodotti.\nAzione irreversibile.')) return;
@@ -3414,6 +3578,24 @@ function handleUrlProductCode(){
 }
 
 // ═══════════════════════════════════════
+
+async function migrateSubcategorie(){
+  const updates=[
+    {cat:'Cavi',      subs:['Unipolari','Bipolari','Multipolari','Precordati','Videosorveglianza','Dati / Ethernet']},
+    {cat:'Accessori e Consumabili', subs:['Nastro','Vernice']},
+  ];
+  for(const {cat,subs} of updates){
+    const current=categories[cat];
+    if(!current) continue;
+    const existing=current.subs||[];
+    const toAdd=subs.filter(s=>!existing.includes(s));
+    if(toAdd.length===0) continue;
+    current.subs=[...existing,...toAdd];
+    await saveCategory(cat,current);
+    console.log('[SUBCAT] '+cat+': aggiunte '+toAdd.join(', '));
+  }
+}
+
 //  ADBLUE — migrazione one-shot
 // ═══════════════════════════════════════
 async function migrateAdBlue(){
@@ -4015,6 +4197,128 @@ window.deleteVolatile=async function(id){
 // ═══════════════════════════════════════
 //  EXCEL PER CANTIERE
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
+//  DASHBOARD ANALISI CANTIERE
+// ═══════════════════════════════════════
+const CAT_COLORS=['#4DAB3D','#2563EB','#E0A030','#A03A1E','#553687','#2f8472','#823560','#4a6b72','#8e5c3d'];
+
+window.renderCantiereStats=async function(){
+  const panel=document.getElementById('cantiere-stats-panel');
+  if(!panel) return;
+  panel.innerHTML='<div style="text-align:center;padding:20px 0;color:var(--text-muted);font-size:13px">⏳ Calcolo in corso...</div>';
+
+  const cantFilter=document.getElementById('dash-cant-sel')?.value||'';
+  const days=parseInt(document.getElementById('dash-cant-period')?.value||'30');
+  const cutoff=days>0?Date.now()-days*86400000:0;
+  const label=cantFilter||(days>0?'Tutti i cantieri — ultimi '+days+' giorni':'Tutti i cantieri — sempre');
+
+  // Recupera movimenti da Firestore
+  let movimenti=[];
+  try{
+    const snap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(3000)));
+    snap.forEach(d=>{
+      const e={id:d.id,...d.data()};
+      if(cantFilter && e.cantiere!==cantFilter) return;
+      if(!cantFilter && !e.cantiere) return;
+      if(days>0 && e.time<cutoff) return;
+      if(e.type==='load') return; // solo prelievi e restituzioni
+      movimenti.push(e);
+    });
+  }catch(err){
+    movimenti=actLog.filter(e=>{
+      if(cantFilter && e.cantiere!==cantFilter) return false;
+      if(!cantFilter && !e.cantiere) return false;
+      if(days>0 && e.time<cutoff) return false;
+      if(e.type==='load') return false;
+      return true;
+    });
+  }
+
+  if(movimenti.length===0){
+    panel.innerHTML=`<div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:13px">
+      Nessun movimento nel periodo selezionato${cantFilter?' per '+cantFilter:''}.
+    </div>`;
+    return;
+  }
+
+  const deduped=itemsListDeduped();
+  // Netto per prodotto (prelievi − restituzioni)
+  const netto={}; // code → {nome,cat,qty,prezzo,unit}
+  movimenti.forEach(e=>{
+    const item=deduped.find(i=>i.id===e.itemId)||deduped.find(i=>i.code===e.code);
+    const prezzo=item?.prezzo??null;
+    if(!netto[e.code]) netto[e.code]={nome:e.name,cat:item?.cat||'',qty:0,prezzo,unit:item?.unit||''};
+    netto[e.code].qty+=e.delta; // take=negativo → netto negativo = ancora fuori
+  });
+  // Solo prodotti con netto negativo (material still out / consumed)
+  const consumati=Object.entries(netto)
+    .map(([code,v])=>({code,...v,qtaFuori:-v.qty}))
+    .filter(v=>v.qtaFuori>0)
+    .sort((a,b)=>{
+      const ca=(b.prezzo??0)*b.qtaFuori-(a.prezzo??0)*a.qtaFuori;
+      return ca||b.qtaFuori-a.qtaFuori;
+    });
+
+  const totCosto=consumati.reduce((s,v)=>s+(v.prezzo??0)*v.qtaFuori,0);
+  const totProd=consumati.length;
+  const totMov=movimenti.length;
+
+  // Ripartizione per categoria
+  const perCat={};
+  consumati.forEach(v=>{
+    if(!perCat[v.cat]) perCat[v.cat]={costo:0,n:0};
+    perCat[v.cat].costo+=(v.prezzo??0)*v.qtaFuori;
+    perCat[v.cat].n++;
+  });
+  const catRank=Object.entries(perCat).sort((a,b)=>b[1].costo-a[1].costo);
+  const maxCat=catRank[0]?.[1]?.costo||1;
+
+  // ── Render HTML ──
+  let html=`
+  <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">📍 ${label}</div>
+  <div class="cs-kpi-row">
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">€${totCosto.toLocaleString('it-IT',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+      <div class="cs-kpi-label">Costo netto</div>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">${totProd}</div>
+      <div class="cs-kpi-label">Prodotti usati</div>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">${totMov}</div>
+      <div class="cs-kpi-label">Movimenti</div>
+    </div>
+  </div>`;
+
+  // Barre per categoria
+  if(catRank.length>0){
+    html+=`<div class="cs-section-title">Ripartizione per categoria</div>`;
+    catRank.forEach(([cat,v],i)=>{
+      const cfg=categories[cat];
+      const pct=Math.round(v.costo/Math.max(totCosto,1)*100);
+      const color=cfg?.color||CAT_COLORS[i%CAT_COLORS.length];
+      html+=`<div class="cs-cat-row">
+        <span class="cs-cat-label" style="color:${color}">${cfg?.icon||''} ${cfg?.label||cat}</span>
+        <div class="cs-cat-bar-wrap"><div class="cs-cat-bar" style="width:${pct}%;background:${color}"></div></div>
+        <span class="cs-cat-val">€${v.costo.toLocaleString('it-IT',{maximumFractionDigits:0})}</span>
+      </div>`;
+    });
+  }
+
+  // Top 10 prodotti per costo
+  html+=`<div class="cs-section-title">Top prodotti per costo</div>`;
+  consumati.slice(0,10).forEach(v=>{
+    const costo=(v.prezzo??0)*v.qtaFuori;
+    html+=`<div class="cs-product-row">
+      <span class="cs-product-name">${v.code} — ${v.nome}</span>
+      <span class="cs-product-cost">${costo>0?'€'+costo.toLocaleString('it-IT',{maximumFractionDigits:0}):v.qtaFuori+' '+v.unit}</span>
+    </div>`;
+  });
+
+  panel.innerHTML=html;
+};
+
 window.exportByCantiere=async function(){
   if(typeof XLSX==='undefined'){showToast('Libreria Excel non caricata','toast-danger');return;}
 
