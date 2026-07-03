@@ -505,6 +505,49 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .ddt-input:focus{border-color:var(--brand-500)}
 .ddt-date{width:140px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;outline:none;background:var(--bg-card)}
 .ddt-date:focus{border-color:var(--brand-500)}
+
+/* ══ RIEPILOGO DASHBOARD ══ */
+.rie-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.rie-kpi{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:14px 12px;position:relative;overflow:hidden}
+.rie-kpi-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.rie-kpi-val{font-size:26px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;margin-top:6px}
+.rie-kpi-label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.rie-kpi-sub{font-size:11px;color:var(--text-light);margin-top:2px}
+
+.rie-section-header{display:flex;align-items:center;gap:8px;margin:18px 0 10px}
+.rie-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;flex:1}
+
+/* Barre categoria */
+.rie-cat-item{margin-bottom:10px}
+.rie-cat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.rie-cat-name{font-size:12px;font-weight:700}
+.rie-cat-cost{font-size:12px;font-weight:700;color:var(--text-muted)}
+.rie-bar-bg{height:8px;background:var(--border);border-radius:99px;overflow:hidden}
+.rie-bar-fill{height:100%;border-radius:99px;transition:width .5s ease}
+
+/* Albero materiali */
+.rie-tree-cat{margin-bottom:8px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+.rie-tree-cat-header{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-surface);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rie-tree-cat-icon{font-size:16px}
+.rie-tree-cat-label{font-size:13px;font-weight:700;flex:1}
+.rie-tree-cat-toggle{font-size:12px;color:var(--text-muted);transition:transform .2s}
+.rie-tree-cat-toggle.open{transform:rotate(180deg)}
+.rie-tree-products{display:none;padding:0 12px 8px}
+.rie-tree-products.open{display:block}
+.rie-tree-prod{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-light)}
+.rie-tree-prod:last-child{border-bottom:none}
+.rie-tree-prod-code{font-size:10px;font-weight:700;color:var(--text-muted);min-width:44px}
+.rie-tree-prod-name{font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rie-tree-prod-qty{font-size:11px;font-weight:700;color:var(--brand-600);white-space:nowrap}
+
+/* Operatori */
+.rie-op-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)}
+.rie-op-row:last-child{border-bottom:none}
+.rie-op-avatar{width:32px;height:32px;border-radius:50%;background:var(--brand-500);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.rie-op-name{font-size:13px;font-weight:600;flex:1}
+.rie-op-count{font-size:11px;font-weight:700;color:var(--text-muted)}
+.rie-op-bar-wrap{width:60px;height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.rie-op-bar{height:100%;background:var(--brand-400);border-radius:99px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -549,6 +592,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   <button class="nav-btn hidden" onclick="showPage('carica')" id="nav-carica">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M5 12H3l9-9 9 9h-2"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/><path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/></svg>
     Carica
+  </button>
+  <button class="nav-btn hidden" onclick="showPage('riepilogo')" id="nav-riepilogo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Riepilogo
   </button>
   <button class="nav-btn hidden" onclick="showPage('responsabile')" id="nav-resp">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -733,6 +780,52 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     </div>
     <button class="modal-close" onclick="closeFuelModal()">Chiudi</button>
   </div>
+</div>
+
+
+<!-- RIEPILOGO (solo responsabili) -->
+<div class="page" id="page-riepilogo">
+  <div class="hero">
+    <div class="hero-eyebrow">Responsabile · Analisi</div>
+    <div class="hero-title" style="font-size:18px">📊 Riepilogo</div>
+    <div class="hero-meta">Statistiche e costi per cantiere</div>
+  </div>
+
+  <!-- Selettore cantiere + periodo -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+    <select class="modal-cantiere-select" id="rie-cant-sel" onchange="aggiornaRiepilogo()">
+      <option value="">— Tutti i cantieri —</option>
+    </select>
+    <select class="modal-cantiere-select" id="rie-period-sel" onchange="aggiornaRiepilogo()">
+      <option value="30" selected>Ultimo mese</option>
+      <option value="90">Ultimi 3 mesi</option>
+      <option value="180">Ultimi 6 mesi</option>
+      <option value="365">Ultimo anno</option>
+      <option value="0">Tutto</option>
+    </select>
+  </div>
+
+  <!-- KPI principali -->
+  <div class="rie-kpi-grid" id="rie-kpi-grid"></div>
+
+  <!-- Costi per categoria (barre) -->
+  <div class="rie-section-header">
+    <span class="rie-section-title">Materiali per categoria</span>
+  </div>
+  <div id="rie-cat-bars"></div>
+
+  <!-- Albero materiali (categoria → prodotti) -->
+  <div class="rie-section-header">
+    <span class="rie-section-title">Dettaglio materiali</span>
+  </div>
+  <div id="rie-tree"></div>
+
+  <!-- Operatori più attivi -->
+  <div class="rie-section-header">
+    <span class="rie-section-title">Attività operatori</span>
+  </div>
+  <div id="rie-operatori"></div>
+
 </div>
 
 <!-- RESPONSABILE -->
@@ -1220,6 +1313,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
   if(isResp()){
     document.getElementById('nav-resp').classList.remove('hidden');
     document.getElementById('nav-carica').classList.remove('hidden');
+    document.getElementById('nav-riepilogo').classList.remove('hidden');
   }
   const heroTitle=document.getElementById('hero-title');
   if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
@@ -1574,6 +1668,7 @@ function _showPage(id){
     renderQrPage();
   }
   if(id==='responsabile') renderResponsabile();
+  if(id==='riepilogo') renderRiepilogo();
   closeFab();
 }
 
@@ -3603,6 +3698,178 @@ window.exportDDT=async function(){
   var fname='DDT_Fatture_Molinaro_'+new Date().toISOString().slice(0,10)+'.xlsx';
   XLSX.writeFile(wb,fname);
   showToast('Excel DDT/Fatture scaricato','toast-return');
+};
+
+// ═══════════════════════════════════════════════════
+//  RIEPILOGO — renderizzazione dashboard
+// ═══════════════════════════════════════════════════
+var _rieOpen={};  // tiene traccia albero aperto/chiuso
+
+function renderRiepilogo(){
+  // Popola dropdown cantieri
+  var rieSel=document.getElementById('rie-cant-sel');
+  if(rieSel){
+    var prev=rieSel.value;
+    rieSel.innerHTML='<option value="">— Tutti i cantieri —</option>'+
+      cantieriList.map(function(c){return '<option value="'+c.nome+'">'+c.nome+'</option>';}).join('');
+    if(prev) rieSel.value=prev;
+  }
+  aggiornaRiepilogo();
+}
+
+window.aggiornaRiepilogo=function(){
+  var cantFilter=document.getElementById('rie-cant-sel')&&document.getElementById('rie-cant-sel').value||'';
+  var days=parseInt(document.getElementById('rie-period-sel')&&document.getElementById('rie-period-sel').value||'30');
+  var cutoff=days>0?Date.now()-days*86400000:0;
+  var CAT_COLORS=['#4DAB3D','#2563EB','#E0A030','#A03A1E','#553687','#2f8472','#823560','#4a6b72','#8e5c3d'];
+
+  // Filtra movimenti (prelievi + restituzioni con cantiere)
+  var movs=actLog.filter(function(e){
+    if(cantFilter&&e.cantiere!==cantFilter) return false;
+    if(!cantFilter&&!e.cantiere) return false;
+    if(days>0&&e.time<cutoff) return false;
+    if(e.type==='load') return false;
+    return true;
+  });
+
+  if(movs.length===0){
+    document.getElementById('rie-kpi-grid').innerHTML=
+      '<div style="grid-column:1/-1;text-align:center;padding:30px 0;color:var(--text-muted);font-size:13px">'+
+      'Nessun movimento trovato per i filtri selezionati.</div>';
+    document.getElementById('rie-cat-bars').innerHTML='';
+    document.getElementById('rie-tree').innerHTML='';
+    document.getElementById('rie-operatori').innerHTML='';
+    return;
+  }
+
+  // Netto per prodotto
+  var netto={};
+  movs.forEach(function(e){
+    var it=itemsList.filter(function(i){return i.id===e.itemId;})[0]||
+           itemsList.filter(function(i){return i.code===e.code;})[0];
+    var k=e.code;
+    if(!netto[k]) netto[k]={code:k,nome:e.name,cat:it&&it.cat||'',sub:it&&it.sub||'',qty:0,prezzo:it&&it.prezzo||0,unit:it&&it.unit||''};
+    netto[k].qty+=e.delta;
+  });
+  var consumati=Object.keys(netto).map(function(k){
+    var v=netto[k]; return Object.assign({},v,{qtaFuori:Math.max(0,-v.qty)});
+  }).filter(function(v){return v.qtaFuori>0;});
+
+  // Totali
+  var totCosto=consumati.reduce(function(s,v){return s+v.prezzo*v.qtaFuori;},0);
+  var totProd=consumati.length;
+  var topProd=consumati.slice().sort(function(a,b){return b.prezzo*b.qtaFuori-a.prezzo*a.qtaFuori;})[0];
+
+  // Operatori
+  var opCount={};
+  movs.forEach(function(e){
+    if(!opCount[e.operator]) opCount[e.operator]=0;
+    if(e.delta<0) opCount[e.operator]++;
+  });
+  var numOp=Object.keys(opCount).length;
+
+  // ── KPI ──
+  var kpiH='';
+  kpiH+='<div class="rie-kpi"><div class="rie-kpi-accent" style="background:#4DAB3D"></div>'+
+    '<div class="rie-kpi-label">Costo materiali</div>'+
+    '<div class="rie-kpi-val" style="color:#4DAB3D">€'+Math.round(totCosto).toLocaleString('it-IT')+'</div>'+
+    '<div class="rie-kpi-sub">materiale in cantiere</div></div>';
+  kpiH+='<div class="rie-kpi"><div class="rie-kpi-accent" style="background:#2563EB"></div>'+
+    '<div class="rie-kpi-label">Prodotti usati</div>'+
+    '<div class="rie-kpi-val" style="color:#2563EB">'+totProd+'</div>'+
+    '<div class="rie-kpi-sub">riferimenti diversi</div></div>';
+  kpiH+='<div class="rie-kpi"><div class="rie-kpi-accent" style="background:#E0A030"></div>'+
+    '<div class="rie-kpi-label">Movimenti</div>'+
+    '<div class="rie-kpi-val" style="color:#E0A030">'+movs.length+'</div>'+
+    '<div class="rie-kpi-sub">prelievi e resi</div></div>';
+  kpiH+='<div class="rie-kpi"><div class="rie-kpi-accent" style="background:#553687"></div>'+
+    '<div class="rie-kpi-label">Operatori</div>'+
+    '<div class="rie-kpi-val" style="color:#553687">'+numOp+'</div>'+
+    '<div class="rie-kpi-sub">hanno lavorato qui</div></div>';
+  document.getElementById('rie-kpi-grid').innerHTML=kpiH;
+
+  // ── BARRE CATEGORIA ──
+  var perCat={};
+  consumati.forEach(function(v){
+    if(!perCat[v.cat]) perCat[v.cat]={costo:0,n:0};
+    perCat[v.cat].costo+=v.prezzo*v.qtaFuori;
+    perCat[v.cat].n++;
+  });
+  var catRank=Object.keys(perCat).map(function(c){return {cat:c,costo:perCat[c].costo,n:perCat[c].n};})
+    .sort(function(a,b){return b.costo-a.costo;});
+  var maxCat=catRank[0]?catRank[0].costo:1;
+  var barH='';
+  catRank.forEach(function(r,i){
+    var cfg=categories[r.cat];
+    var color=cfg&&cfg.color||CAT_COLORS[i%CAT_COLORS.length];
+    var pct=Math.round(r.costo/Math.max(maxCat,1)*100);
+    barH+='<div class="rie-cat-item">'+
+      '<div class="rie-cat-top">'+
+      '<span class="rie-cat-name" style="color:'+color+'">'+(cfg&&cfg.icon||'📦')+' '+(cfg&&cfg.label||r.cat)+'</span>'+
+      '<span class="rie-cat-cost">€'+Math.round(r.costo).toLocaleString('it-IT')+' · '+r.n+' prod.</span>'+
+      '</div>'+
+      '<div class="rie-bar-bg"><div class="rie-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
+      '</div>';
+  });
+  document.getElementById('rie-cat-bars').innerHTML=barH||'<div style="color:var(--text-muted);font-size:12px;padding:8px 0">Nessun costo calcolabile (prezzi mancanti)</div>';
+
+  // ── ALBERO MATERIALI (cat → prodotti) ──
+  var bycat={};
+  consumati.forEach(function(v){
+    if(!bycat[v.cat]) bycat[v.cat]=[];
+    bycat[v.cat].push(v);
+  });
+  var treeH='';
+  Object.keys(bycat).sort().forEach(function(cat,ci){
+    var cfg=categories[cat];
+    var color=cfg&&cfg.color||CAT_COLORS[ci%CAT_COLORS.length];
+    var prods=bycat[cat].sort(function(a,b){return b.prezzo*b.qtaFuori-a.prezzo*a.qtaFuori;});
+    var catKey='rtree_'+cat.replace(/[^a-z0-9]/gi,'_');
+    var isOpen=_rieOpen[catKey];
+    treeH+='<div class="rie-tree-cat">'+
+      '<div class="rie-tree-cat-header" onclick="toggleRieTree(\''+catKey+'\')">'+
+      '<span class="rie-tree-cat-icon">'+(cfg&&cfg.icon||'📦')+'</span>'+
+      '<span class="rie-tree-cat-label" style="color:'+color+'">'+(cfg&&cfg.label||cat)+'</span>'+
+      '<span style="font-size:11px;color:var(--text-muted)">'+prods.length+' prodotti</span>'+
+      '<span class="rie-tree-cat-toggle'+(isOpen?' open':'')+'" id="tog_'+catKey+'">▼</span>'+
+      '</div>'+
+      '<div class="rie-tree-products'+(isOpen?' open':'')+'" id="'+catKey+'">';
+    prods.forEach(function(v){
+      var costo=v.prezzo*v.qtaFuori;
+      treeH+='<div class="rie-tree-prod">'+
+        '<span class="rie-tree-prod-code">'+v.code+'</span>'+
+        '<span class="rie-tree-prod-name">'+v.nome+'</span>'+
+        '<span class="rie-tree-prod-qty">'+v.qtaFuori+' '+v.unit+(costo>0?' · €'+Math.round(costo).toLocaleString('it-IT'):'')+'</span>'+
+        '</div>';
+    });
+    treeH+='</div></div>';
+  });
+  document.getElementById('rie-tree').innerHTML=treeH;
+
+  // ── OPERATORI ──
+  var opRank=Object.keys(opCount).map(function(op){return {op:op,n:opCount[op]};})
+    .sort(function(a,b){return b.n-a.n;});
+  var maxOp=opRank[0]?opRank[0].n:1;
+  var opH='';
+  opRank.forEach(function(r){
+    var initials=r.op.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2);
+    var pct=Math.round(r.n/maxOp*100);
+    opH+='<div class="rie-op-row">'+
+      '<div class="rie-op-avatar">'+initials+'</div>'+
+      '<span class="rie-op-name">'+r.op+'</span>'+
+      '<div class="rie-op-bar-wrap"><div class="rie-op-bar" style="width:'+pct+'%"></div></div>'+
+      '<span class="rie-op-count">'+r.n+' prelievi</span>'+
+      '</div>';
+  });
+  document.getElementById('rie-operatori').innerHTML=opH||'<div style="color:var(--text-muted);font-size:12px">Nessun operatore</div>';
+};
+
+window.toggleRieTree=function(key){
+  _rieOpen[key]=!_rieOpen[key];
+  var panel=document.getElementById(key);
+  var tog=document.getElementById('tog_'+key);
+  if(panel) panel.classList.toggle('open',_rieOpen[key]);
+  if(tog) tog.classList.toggle('open',_rieOpen[key]);
 };
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
