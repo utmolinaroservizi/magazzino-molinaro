@@ -1413,17 +1413,21 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
     if(isResp()) await migrateAssegnaSubcategorie();
     await migrateV3();
     await deduplicaInventario();
-  }catch(initErr){console.error('[INIT]',initErr.message||initErr);}
-  // Normalizza ordine categorie
-  const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
-  const ordered=DESIRED_ORDER.filter(c=>categories[c]);
-  const extra=catOrder.filter(c=>!DESIRED_ORDER.includes(c));
-  catOrder=[...ordered,...extra];
-  document.getElementById('loading-screen').style.display='none';
-  listenRealtime();
+    // Normalizza ordine categorie
+    const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
+    const ordered=DESIRED_ORDER.filter(c=>categories[c]);
+    const extra=catOrder.filter(c=>!DESIRED_ORDER.includes(c));
+    catOrder=[...ordered,...extra];
+  }catch(initErr){
+    console.error('[INIT]',initErr.message||initErr);
+  }finally{
+    // La loading screen sparisce SEMPRE, qualunque cosa succeda
+    document.getElementById('loading-screen').style.display='none';
+    listenRealtime();
+  }
 
   // Ripristina la pagina dall'hash URL (es. app.html#qrcode dopo tasto indietro)
-  const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile'];
+  const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo'];
   const hashPage=window.location.hash.replace('#','');
   const startPage=(VALID_PAGES.includes(hashPage)&&(hashPage!=='carica'&&hashPage!=='responsabile'||isResp()))
     ?hashPage:'dashboard';
