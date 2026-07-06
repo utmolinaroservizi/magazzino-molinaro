@@ -4314,28 +4314,33 @@ function renderPaginaRegistroPresenze(){
   if(meseEl&&!meseEl.value) meseEl.value=dataOggiIT().slice(0,7);
   if(panel) panel.innerHTML='<div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:13px">Caricamento dipendenti...</div>';
 
-  // Carica sempre fresh da Firestore — non dipende dal timing dell'onSnapshot
-  getDocs(collection(db,'operatori')).then(function(snap){
-    operatoriList=[];
-    snap.forEach(function(d){operatoriList.push({id:d.id,nome:d.data().nome||'',creato:d.data().creato||0});});
-    operatoriList.sort(function(a,b){return (a.nome||'').localeCompare(b.nome||'');});
+  // Legge direttamente da Firestore "utenti" — tutti gli account registrati
+  // Esclude i responsabili, mostra solo gli operai
+  getDocs(collection(db,'utenti')).then(function(snap){
+    var dipendenti=[];
+    snap.forEach(function(d){
+      var data=d.data();
+      // Mostra tutti, o esclude i resp se vuoi solo operai:
+      // if(data.ruolo==='responsabile') return;
+      dipendenti.push({id:d.id, nome:data.nome||data.email||d.id});
+    });
+    dipendenti.sort(function(a,b){return a.nome.localeCompare(b.nome);});
 
     if(sel){
       var prev=sel.value;
-      if(operatoriList.length===0){
-        sel.innerHTML='<option value="">— Nessun dipendente (aggiungi da Gestione Operai) —</option>';
-        if(panel) panel.innerHTML='<div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:13px">'+
-          'Nessun dipendente registrato.<br><small>Vai in <strong>Resp. → Gestione operai</strong> per aggiungere i dipendenti.</small></div>';
+      if(dipendenti.length===0){
+        sel.innerHTML='<option value="">— Nessun utente trovato —</option>';
+        if(panel) panel.innerHTML='<div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:13px">Nessun utente registrato in Firebase.</div>';
       } else {
         sel.innerHTML='<option value="">— Seleziona dipendente —</option>'+
-          operatoriList.map(function(o){return '<option value="'+o.id+'">'+o.nome+'</option>';}).join('');
+          dipendenti.map(function(o){return '<option value="'+o.id+'">'+o.nome+'</option>';}).join('');
         if(prev) sel.value=prev;
         if(panel&&!sel.value) panel.innerHTML='<div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:13px">Seleziona un dipendente per vedere il calendario</div>';
       }
     }
   }).catch(function(e){
-    console.error('[REGISTRO] Errore caricamento operatori:',e);
-    if(panel) panel.innerHTML='<div style="text-align:center;padding:30px;color:#B33A3A;font-size:13px">Errore caricamento: '+e.message+'</div>';
+    console.error('[REGISTRO] Errore lettura utenti:',e);
+    if(panel) panel.innerHTML='<div style="text-align:center;padding:30px;color:#B33A3A;font-size:13px">Errore: '+e.message+'<br><small>Verifica le Firestore Rules (utenti: allow read isResp)</small></div>';
   });
 }
 

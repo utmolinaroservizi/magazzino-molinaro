@@ -75,9 +75,9 @@ service cloud.firestore {
       allow read: if isAuth();
       allow write: if isAuth();
     }
-    // Utenti: ognuno legge solo il proprio, scrittura mai dal client
+    // Utenti: ognuno legge solo il proprio, responsabili leggono tutti (per registro presenze)
     match /utenti/{uid} {
-      allow read: if isOwner(uid);
+      allow read: if isOwner(uid) || isResp();
       allow write: if false;
     }
   }
