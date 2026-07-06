@@ -4264,10 +4264,27 @@ window.exportPresenzeExcel=async function(){
   var anno=parseInt(meseStr.split('-')[0]),mese=parseInt(meseStr.split('-')[1]);
   var giorniMese=new Date(anno,mese,0).getDate();
   var nomiM3=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-  if(!operatoriList.length){showToast('Nessun operaio in Gestione Operai','toast-danger');return;}
+
+  showToast('Caricamento dipendenti...','toast-sync');
+
+  // Carica utenti da Firestore (stessa fonte del registro presenze)
+  var utentiSnap;
+  try{utentiSnap=await getDocs(collection(db,'utenti'));}
+  catch(e){showToast('Errore lettura utenti: '+e.message,'toast-danger');return;}
+
+  var dipendenti=[];
+  utentiSnap.forEach(function(d){
+    var data=d.data();
+    dipendenti.push({id:d.id, nome:data.nome||data.email||d.id});
+  });
+  dipendenti.sort(function(a,b){return a.nome.localeCompare(b.nome);});
+
+  if(!dipendenti.length){showToast('Nessun utente trovato in Firebase','toast-danger');return;}
   showToast('Generazione Excel...','toast-sync');
+
+  // Carica presenze del mese per tutti gli utenti
   var promises=[];
-  operatoriList.forEach(function(op){
+  dipendenti.forEach(function(op){
     for(var g=1;g<=giorniMese;g++){
       var data=anno+'-'+String(mese).padStart(2,'0')+'-'+String(g).padStart(2,'0');
       var id=presDocId(op.id,data);
@@ -4276,6 +4293,8 @@ window.exportPresenzeExcel=async function(){
     }
   });
   await Promise.all(promises);
+
+  // Costruisci Excel
   var wb=XLSX.utils.book_new();
   var dowL=['L','M','M','G','V','S','D'];
   var header=['Dipendente'];
@@ -4285,7 +4304,7 @@ window.exportPresenzeExcel=async function(){
   }
   header.push('P','A','R');
   var rows=[['PRESENZE - '+nomiM3[mese-1].toUpperCase()+' '+anno],[],header];
-  operatoriList.forEach(function(op){
+  dipendenti.forEach(function(op){
     var row=[op.nome],cntP=0,cntA=0,cntR=0;
     for(var g=1;g<=giorniMese;g++){
       var data=anno+'-'+String(mese).padStart(2,'0')+'-'+String(g).padStart(2,'0');
