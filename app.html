@@ -4128,14 +4128,17 @@ function renderCalendarioResp(panel,uid,nome,anno,mese,byData){
     var colori={P:'pres-P',A:'pres-A',R:'pres-R',auto:'pres-auto'};
     var lab={P:'P',A:'A',R:'R',auto:'A*'};
     var cls='cal-day'+(isFuturo?' futuro':(pres?' '+colori[pres.stato]:''))+(isOggi?' oggi':'')+(isWeekend?' weekend':'');
-    var onclick=isFuturo?'':(' onclick="apriDettaglioGiorno(''+uid+'',''+nome.replace(/'/g,"\'")+(encodeURI(''))+"'"+',''+dataStr+'')"');
+    var onclick=isFuturo?'':(' onclick="apriDettaglioGiorno(\''+uid+'\',\''+dataStr+'\')"');
     h+='<div class="'+cls+'"'+onclick+'><div class="cal-day-num">'+g+'</div><div class="cal-day-stato">'+(pres?lab[pres.stato]:'')+'</div></div>';
   }
   h+='</div><div id="cal-dettaglio" style="margin-top:10px"></div>';
   panel.innerHTML=h;
 }
 
-window.apriDettaglioGiorno=function(uid,nome,data){
+window.apriDettaglioGiorno=function(uid,dataStr){
+  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var nome=opItem?opItem.nome:'Dipendente';
+  var data=dataStr;
   var id=presDocId(uid,data);
   var pres=presenzeCache[id]||null;
   var gg=new Date(data+'T12:00:00');
