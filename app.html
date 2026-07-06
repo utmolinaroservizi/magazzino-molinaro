@@ -1388,54 +1388,61 @@ function fmtPrice(p){return p!=null?'€ '+Number(p).toLocaleString('it-IT',{min
 //  AUTH
 // ═══════════════════════════════════════
 onAuthStateChanged(auth, async (firebaseUser)=>{
-  if(!firebaseUser){window.location.href='index.html';return}
+  if(!firebaseUser){window.location.href='index.html';return;}
   try{
-    const snap=await getDoc(doc(db,'utenti',firebaseUser.uid));
-    const data=snap.exists()?snap.data():{};
-    currentUser={uid:firebaseUser.uid,email:firebaseUser.email,nome:data.nome||firebaseUser.email.split('@')[0],ruolo:data.ruolo||'operaio'};
-  }catch(e){
-    currentUser={uid:firebaseUser.uid,email:firebaseUser.email,nome:firebaseUser.email.split('@')[0],ruolo:'operaio'};
-  }
-  const initials=currentUser.nome.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  document.getElementById('user-avatar').textContent=initials;
-  document.getElementById('user-name').textContent=currentUser.nome.split(' ')[0];
-  if(isResp()){
-    document.getElementById('nav-resp').classList.remove('hidden');
-    document.getElementById('nav-carica').classList.remove('hidden');
-    document.getElementById('nav-riepilogo').classList.remove('hidden');
-  }
-  const heroTitle=document.getElementById('hero-title');
-  if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
-  try{
-    await loadFromFirestore();
-    await migrateV2();
-    if(isResp()) await migrateSubcategorie();
-    if(isResp()) await migrateAssegnaSubcategorie();
-    await migrateV3();
-    await deduplicaInventario();
-    // Normalizza ordine categorie
-    const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
-    const ordered=DESIRED_ORDER.filter(c=>categories[c]);
-    const extra=catOrder.filter(c=>!DESIRED_ORDER.includes(c));
-    catOrder=[...ordered,...extra];
-  }catch(initErr){
-    console.error('[INIT]',initErr.message||initErr);
-  }finally{
-    // La loading screen sparisce SEMPRE, qualunque cosa succeda
-    document.getElementById('loading-screen').style.display='none';
+    // 1. Carica profilo utente
+    try{
+      const snap=await getDoc(doc(db,'utenti',firebaseUser.uid));
+      const data=snap.exists()?snap.data():{};
+      currentUser={uid:firebaseUser.uid,email:firebaseUser.email,nome:data.nome||firebaseUser.email.split('@')[0],ruolo:data.ruolo||'operaio'};
+    }catch(e){
+      currentUser={uid:firebaseUser.uid,email:firebaseUser.email,nome:firebaseUser.email.split('@')[0],ruolo:'operaio'};
+    }
+
+    // 2. Aggiorna UI header
+    const initials=currentUser.nome.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+    const avatarEl=document.getElementById('user-avatar');
+    const nameEl=document.getElementById('user-name');
+    if(avatarEl) avatarEl.textContent=initials;
+    if(nameEl) nameEl.textContent=currentUser.nome.split(' ')[0];
+    if(isResp()){
+      const nr=document.getElementById('nav-resp'); if(nr) nr.classList.remove('hidden');
+      const nc=document.getElementById('nav-carica'); if(nc) nc.classList.remove('hidden');
+      const nri=document.getElementById('nav-riepilogo'); if(nri) nri.classList.remove('hidden');
+    }
+    const heroTitle=document.getElementById('hero-title');
+    if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
+
+    // 3. Carica dati e migrazioni
+    try{
+      await loadFromFirestore();
+      await migrateV2();
+      if(isResp()) await migrateSubcategorie();
+      if(isResp()) await migrateAssegnaSubcategorie();
+      await migrateV3();
+      await deduplicaInventario();
+      const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
+      const ordered=DESIRED_ORDER.filter(c=>categories[c]);
+      const extra=catOrder.filter(c=>!DESIRED_ORDER.includes(c));
+      catOrder=[...ordered,...extra];
+    }catch(dataErr){console.error('[INIT-DATA]',dataErr.message||dataErr);}
+
+    // 4. Navigazione iniziale
     listenRealtime();
+    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo'];
+    const hashPage=window.location.hash.replace('#','');
+    const startPage=(VALID_PAGES.includes(hashPage)&&(hashPage!=='carica'&&hashPage!=='responsabile'&&hashPage!=='riepilogo'||isResp()))?hashPage:'dashboard';
+    history.replaceState({page:startPage},'','#'+startPage);
+    _showPage(startPage);
+    setTimeout(handleUrlProductCode,300);
+
+  }catch(fatalErr){
+    console.error('[INIT-FATAL]',fatalErr.message||fatalErr);
+  }finally{
+    // SEMPRE: nascondi la schermata di caricamento
+    const ls=document.getElementById('loading-screen');
+    if(ls) ls.style.display='none';
   }
-
-  // Ripristina la pagina dall'hash URL (es. app.html#qrcode dopo tasto indietro)
-  const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo'];
-  const hashPage=window.location.hash.replace('#','');
-  const startPage=(VALID_PAGES.includes(hashPage)&&(hashPage!=='carica'&&hashPage!=='responsabile'||isResp()))
-    ?hashPage:'dashboard';
-  // Sostituisce la voce corrente della history (non aggiunge una nuova)
-  history.replaceState({page:startPage},'','#'+startPage);
-  _showPage(startPage);
-
-  setTimeout(handleUrlProductCode,300);
 });
 
 window.doLogout=async function(){
