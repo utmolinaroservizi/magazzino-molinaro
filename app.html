@@ -738,13 +738,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   <div id="pres-stato-oggi"></div>
   <div id="pres-bottoni" style="display:flex;gap:12px;justify-content:center;padding:24px 0 16px">
     <button class="pres-btn pres-btn-P" onclick="segnaPresenza('P')">P</button>
-    <button class="pres-btn pres-btn-R" onclick="segnaPresenza('R')">
-      <span>R</span>
-      <span class="pres-btn-sub">Reperibile</span>
-    </button>
   </div>
   <div style="text-align:center;font-size:11px;color:var(--text-muted);padding-bottom:8px">
-    P = Presente &nbsp;·&nbsp; A = Assente &nbsp;·&nbsp; R = Reperibilità
+    P = Presente &nbsp;·&nbsp; R = Reperibilità
+  </div>
+  <div style="text-align:center;padding:0 0 20px">
+    <button class="pres-btn pres-btn-R" onclick="segnaPresenza('R')" style="width:160px;height:52px;border-radius:12px;margin:0 auto">
+      <span style="font-size:18px;font-weight:800">R — Reperibile</span>
+    </button>
   </div>
   <div id="pres-storico"></div>
 </div>
@@ -1181,6 +1182,10 @@ const MEZZI_AZIENDALI=[
 let catOrder       = [];
 let cantieriList   = [];
 let fornitoriList  = [];
+let operatoriList  = [];
+let mezziList      = [];
+let volatiliList   = [];
+let presenzeCache  = {};
 let presenzeCache  = {}; // {uid_YYYYMMDD: {...}}
 let openCats       = {};
 let editMode       = false;
@@ -1445,6 +1450,8 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
       const nc=document.getElementById('nav-carica'); if(nc) nc.classList.remove('hidden');
       const nri=document.getElementById('nav-riepilogo'); if(nri) nri.classList.remove('hidden');
       const nrp=document.getElementById('nav-reg-presenze'); if(nrp) nrp.classList.remove('hidden');
+      // I responsabili NON segnano le proprie presenze
+      const np=document.getElementById('nav-presenze'); if(np) np.classList.add('hidden');
     }
     const heroTitle=document.getElementById('hero-title');
     if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
@@ -1512,6 +1519,9 @@ async function loadFromFirestore(){
     fornitoriList=[];fornSnap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
     fornitoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
   }catch(e){console.error('Errore caricamento:',e);showToast('Errore caricamento dati','toast-danger')}
+  try{const opS=await getDocs(collection(db,'operatori'));operatoriList=[];opS.forEach(d=>operatoriList.push({id:d.id,...d.data()}));operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));}catch(e){console.warn('[load] operatori:',e.message);}
+  try{const mzS=await getDocs(collection(db,'mezzi'));mezziList=[];mzS.forEach(d=>mezziList.push({id:d.id,...d.data()}));mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));}catch(e){console.warn('[load] mezzi:',e.message);}
+  try{const vS=await getDocs(collection(db,'volatili'));volatiliList=[];vS.forEach(d=>volatiliList.push({id:d.id,...d.data()}));volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));}catch(e){console.warn('[load] volatili:',e.message);}
 }
 
 async function initDefaultData(){
@@ -4514,6 +4524,9 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
     window.location.reload();
   });
+  try{onSnapshot(collection(db,'operatori'),snap=>{operatoriList=[];snap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();if(document.getElementById('page-registro-presenze')?.classList.contains('active')) renderPaginaRegistroPresenze();},e=>console.warn('[snap] operatori:',e.message));}catch(e){}
+  try{onSnapshot(collection(db,'mezzi'),snap=>{mezziList=[];snap.forEach(d=>mezziList.push({id:d.id,...d.data()}));mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));},e=>console.warn('[snap] mezzi:',e.message));}catch(e){}
+  try{onSnapshot(collection(db,'volatili'),snap=>{volatiliList=[];snap.forEach(d=>volatiliList.push({id:d.id,...d.data()}));volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));},e=>console.warn('[snap] volatili:',e.message));}catch(e){}
 }
 </script>
 </body>
