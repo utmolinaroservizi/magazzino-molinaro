@@ -4160,14 +4160,16 @@ window.apriDettaglioGiorno=function(uid,dataStr){
     (oraStr?'<div style="font-size:11px;color:var(--text-light);margin-top:2px">'+oraStr+'</div>':'')+
     '<div style="font-size:11px;font-weight:600;color:var(--text-muted);margin:8px 0 4px">Modifica (responsabile):</div>'+
     '<div class="cal-azioni">'+
-    '<button class="cal-azione-btn cal-az-P" onclick="impostaPresenzaResp(''+uid+'',''+nome.replace(/'/g,"\'")+'',''+data+'','P')">Presente</button>'+
-    '<button class="cal-azione-btn cal-az-A" onclick="impostaPresenzaResp(''+uid+'',''+nome.replace(/'/g,"\'")+'',''+data+'','A')">Assente</button>'+
-    '<button class="cal-azione-btn cal-az-R" onclick="impostaPresenzaResp(''+uid+'',''+nome.replace(/'/g,"\'")+'',''+data+'','R')" style="background:#3b82f6;color:#fff">Reperibile</button>'+
+    '<button class="cal-azione-btn cal-az-P" onclick="impostaPresenzaResp(\''+uid+'\',\''+data+'\',\'P\')">Presente</button>'+
+    '<button class="cal-azione-btn cal-az-A" onclick="impostaPresenzaResp(\''+uid+'\',\''+data+'\',\'A\')">Assente</button>'+
+    '<button class="cal-azione-btn cal-az-R" onclick="impostaPresenzaResp(\''+uid+'\',\''+data+'\',\'R\')" style="background:#3b82f6;color:#fff">Reperibile</button>'+
     '</div></div>';
   det.scrollIntoView({behavior:'smooth',block:'nearest'});
 };
 
-window.impostaPresenzaResp=async function(uid,nome,data,stato){
+window.impostaPresenzaResp=async function(uid,data,stato){
+  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var nome=opItem?opItem.nome:'';
   var id=presDocId(uid,data);
   var dato={uid:uid,nome:nome,data:data,stato:stato,timestamp:Date.now(),segnato_da:'responsabile'};
   try{
