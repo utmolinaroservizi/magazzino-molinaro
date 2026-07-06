@@ -550,14 +550,12 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .rie-op-bar{height:100%;background:var(--brand-400);border-radius:99px}
 
 /* ══ PRESENZE ══ */
-.pres-btn{width:80px;height:80px;border-radius:50%;border:none;font-size:34px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.15);transition:transform .15s,box-shadow .15s;font-family:inherit;-webkit-tap-highlight-color:transparent}
-.pres-btn:active{transform:scale(.92);box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.pres-btn-P{background:#22c55e;color:#fff}
-.pres-btn-A{background:#ef4444;color:#fff}
-.pres-btn-R{background:#3b82f6;color:#fff}
-.pres-btn-P.active,.pres-btn-P:focus{box-shadow:0 0 0 4px rgba(34,197,94,.35),0 4px 16px rgba(34,197,94,.4)}
-.pres-btn-A.active,.pres-btn-A:focus{box-shadow:0 0 0 4px rgba(239,68,68,.35),0 4px 16px rgba(239,68,68,.4)}
-.pres-btn-R.active,.pres-btn-R:focus{box-shadow:0 0 0 4px rgba(59,130,246,.35),0 4px 16px rgba(59,130,246,.4)}
+.pres-btn-P{width:100px;height:100px;border-radius:50%;border:none;font-size:40px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(34,197,94,.35);transition:transform .15s,box-shadow .15s;font-family:inherit;-webkit-tap-highlight-color:transparent;background:#22c55e;color:#fff}
+.pres-btn-R{width:100px;height:100px;border-radius:16px;border:none;font-size:34px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 6px 20px rgba(59,130,246,.3);transition:transform .15s,box-shadow .15s;font-family:inherit;-webkit-tap-highlight-color:transparent;background:#3b82f6;color:#fff}
+.pres-btn-R .pres-btn-sub{font-size:9px;font-weight:700;letter-spacing:.05em;opacity:.9}
+.pres-btn-P:active{transform:scale(.92)}
+.pres-btn-R:active{transform:scale(.92)}
+.pres-btn-A{display:none}
 .pres-stato-badge{text-align:center;padding:12px 0 4px}
 .pres-stato-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:99px;font-size:14px;font-weight:700}
 .pres-stato-P{background:#dcfce7;color:#166534}
@@ -567,19 +565,30 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .pres-ora{font-size:11px;color:var(--text-muted);text-align:center;margin-top:4px}
 
 /* CALENDARIO PRESENZE */
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px}
-.cal-header{text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);padding:4px 0;text-transform:uppercase}
-.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid transparent;position:relative;-webkit-tap-highlight-color:transparent}
-.cal-day.empty{cursor:default;background:transparent}
-.cal-day.futuro{background:var(--bg-surface);color:var(--text-light);cursor:default}
-.cal-day.oggi{border-color:var(--brand-500)}
-.cal-day.pres-P{background:#dcfce7;color:#166534}
-.cal-day.pres-A{background:#fee2e2;color:#991b1b}
-.cal-day.pres-R{background:#dbeafe;color:#1e40af}
-.cal-day.pres-auto{background:#fef9c3;color:#854d0e}
-.cal-day.weekend{opacity:.65}
+.cal-wrap{background:var(--bg-card);border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-nav-title{font-size:16px;font-weight:800;color:var(--text)}
+.cal-nav-btn{background:var(--bg-surface);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-size:16px;cursor:pointer;color:var(--text)}
+.cal-nav-btn:active{background:var(--brand-50)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.cal-header{text-align:center;font-size:10px;font-weight:800;color:var(--text-muted);padding:6px 0;text-transform:uppercase;letter-spacing:.06em}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:transform .1s;-webkit-tap-highlight-color:transparent}
+.cal-day:active{transform:scale(.92)}
+.cal-day.empty{cursor:default;background:transparent;border:none}
+.cal-day.futuro{background:var(--bg-surface);color:var(--text-light);cursor:default;opacity:.5}
+.cal-day.nessuno{background:var(--bg-surface);color:var(--text-muted)}
+.cal-day.oggi{border-color:var(--brand-500)!important;box-shadow:0 0 0 1px var(--brand-500)}
+.cal-day.pres-P{background:#dcfce7;color:#166534;border-color:#86efac}
+.cal-day.pres-A{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.cal-day.pres-R{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+.cal-day.pres-auto{background:#fef9c3;color:#854d0e;border-color:#fde047}
+.cal-day.weekend.nessuno{opacity:.4}
 .cal-day-num{font-size:13px;font-weight:700;line-height:1}
-.cal-day-stato{font-size:8px;font-weight:800;line-height:1;margin-top:2px}
+.cal-day-stato{font-size:8px;font-weight:800;line-height:1;margin-top:2px;text-transform:uppercase}
+.cal-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.cal-stat{background:var(--bg-surface);border-radius:10px;padding:8px 6px;text-align:center}
+.cal-stat-val{font-size:18px;font-weight:800;line-height:1}
+.cal-stat-label{font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-top:3px}
 .cal-giorno-detail{background:var(--bg-surface);border-radius:10px;padding:12px 14px;margin-bottom:10px}
 .cal-azioni{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .cal-azione-btn{flex:1;min-width:60px;padding:8px;border:none;border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}
@@ -637,6 +646,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   <button class="nav-btn hidden" onclick="showPage('carica')" id="nav-carica">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M5 12H3l9-9 9 9h-2"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/><path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/></svg>
     Carica
+  </button>
+  <button class="nav-btn hidden" onclick="showPage('registro-presenze')" id="nav-reg-presenze">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" stroke-width="3" stroke-linecap="round"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18" stroke-width="3" stroke-linecap="round"/><line x1="12" y1="18" x2="16" y2="18"/></svg>
+    Registro
   </button>
   <button class="nav-btn hidden" onclick="showPage('riepilogo')" id="nav-riepilogo">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -725,13 +738,35 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   <div id="pres-stato-oggi"></div>
   <div id="pres-bottoni" style="display:flex;gap:12px;justify-content:center;padding:24px 0 16px">
     <button class="pres-btn pres-btn-P" onclick="segnaPresenza('P')">P</button>
-    <button class="pres-btn pres-btn-A" onclick="segnaPresenza('A')">A</button>
-    <button class="pres-btn pres-btn-R" onclick="segnaPresenza('R')">R</button>
+    <button class="pres-btn pres-btn-R" onclick="segnaPresenza('R')">
+      <span>R</span>
+      <span class="pres-btn-sub">Reperibile</span>
+    </button>
   </div>
   <div style="text-align:center;font-size:11px;color:var(--text-muted);padding-bottom:8px">
     P = Presente &nbsp;·&nbsp; A = Assente &nbsp;·&nbsp; R = Reperibilità
   </div>
   <div id="pres-storico"></div>
+</div>
+
+
+<!-- REGISTRO PRESENZE (solo responsabili) -->
+<div class="page" id="page-registro-presenze">
+  <div class="hero">
+    <div class="hero-eyebrow">Responsabile · Presenze</div>
+    <div class="hero-title" style="font-size:18px">🗓️ Registro presenze</div>
+    <div class="hero-meta">Visualizza e modifica le presenze dei dipendenti</div>
+  </div>
+
+  <!-- Selettore dipendente + mese -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+    <select class="modal-cantiere-select" id="rp-operatore" onchange="aggiornaCalendarioResp()">
+      <option value="">— Seleziona dipendente —</option>
+    </select>
+    <input type="month" class="modal-cantiere-select" id="rp-mese" onchange="aggiornaCalendarioResp()">
+  </div>
+
+  <div id="rp-panel"></div>
 </div>
 
 <!-- CARICA MERCE (solo responsabili) -->
@@ -1409,6 +1444,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
       const nr=document.getElementById('nav-resp'); if(nr) nr.classList.remove('hidden');
       const nc=document.getElementById('nav-carica'); if(nc) nc.classList.remove('hidden');
       const nri=document.getElementById('nav-riepilogo'); if(nri) nri.classList.remove('hidden');
+      const nrp=document.getElementById('nav-reg-presenze'); if(nrp) nrp.classList.remove('hidden');
     }
     const heroTitle=document.getElementById('hero-title');
     if(heroTitle) heroTitle.innerHTML='Ciao, '+currentUser.nome.split(' ')[0]+'!<br><span style="font-size:17px;font-weight:500;color:var(--text-muted)">Magazzino Molinaro</span>';
@@ -1429,7 +1465,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
 
     // 4. Navigazione iniziale
     listenRealtime();
-    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo'];
+    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo','registro-presenze'];
     const hashPage=window.location.hash.replace('#','');
     const startPage=(VALID_PAGES.includes(hashPage)&&(hashPage!=='carica'&&hashPage!=='responsabile'&&hashPage!=='riepilogo'||isResp()))?hashPage:'dashboard';
     history.replaceState({page:startPage},'','#'+startPage);
@@ -1770,6 +1806,7 @@ function _showPage(id){
   if(id==='responsabile') renderResponsabile();
   if(id==='riepilogo') renderRiepilogo();
   if(id==='presenze') renderPresenze();
+  if(id==='registro-presenze') renderPaginaRegistroPresenze();
   closeFab();
 }
 
@@ -4256,6 +4293,182 @@ window.exportPresenzeExcel=async function(){
   XLSX.utils.book_append_sheet(wb,ws,'Presenze');
   XLSX.writeFile(wb,'Presenze_'+nomiM3[mese-1]+'_'+anno+'.xlsx');
   showToast('Excel presenze scaricato','toast-return');
+};
+
+// ═══════════════════════════════════════════════
+//  REGISTRO PRESENZE — pagina dedicata resp
+// ═══════════════════════════════════════════════
+function renderPaginaRegistroPresenze(){
+  // Popola sempre il dropdown con operatoriList aggiornata
+  var sel=document.getElementById('rp-operatore');
+  if(sel){
+    var prev=sel.value;
+    sel.innerHTML='<option value="">— Seleziona dipendente —</option>'+
+      operatoriList.map(function(o){return '<option value="'+o.id+'">'+o.nome+'</option>';}).join('');
+    if(prev) sel.value=prev;
+  }
+  // Setta mese corrente se non impostato
+  var meseEl=document.getElementById('rp-mese');
+  if(meseEl&&!meseEl.value) meseEl.value=dataOggiIT().slice(0,7);
+  // Mostra placeholder
+  var panel=document.getElementById('rp-panel');
+  if(panel&&!sel.value) panel.innerHTML='<div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:13px">Seleziona un dipendente per vedere il calendario</div>';
+}
+
+window.aggiornaCalendarioResp=async function(){
+  var uid=document.getElementById('rp-operatore')&&document.getElementById('rp-operatore').value;
+  var mese=document.getElementById('rp-mese')&&document.getElementById('rp-mese').value;
+  if(!uid) return;
+  if(!mese){mese=dataOggiIT().slice(0,7);}
+  var panel=document.getElementById('rp-panel');
+  if(!panel) return;
+  panel.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Caricamento...</div>';
+
+  var anno=parseInt(mese.split('-')[0]),meseN=parseInt(mese.split('-')[1]);
+  await applicaAutoAssenze(uid,anno,meseN);
+
+  var giorniMese=new Date(anno,meseN,0).getDate();
+  var promises=[];
+  for(var g=1;g<=giorniMese;g++){
+    var data=anno+'-'+String(meseN).padStart(2,'0')+'-'+String(g).padStart(2,'0');
+    var id=presDocId(uid,data);
+    if(presenzeCache[id]!==undefined) continue;
+    (function(id2){promises.push(getDoc(doc(db,'presenze',id2)).then(function(s){presenzeCache[id2]=s.exists()?s.data():null;}).catch(function(){presenzeCache[id2]=null;}));})(id);
+  }
+  await Promise.all(promises);
+
+  var byData={};
+  for(var g2=1;g2<=giorniMese;g2++){
+    var d2=anno+'-'+String(meseN).padStart(2,'0')+'-'+String(g2).padStart(2,'0');
+    byData[d2]=presenzeCache[presDocId(uid,d2)]||null;
+  }
+
+  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var nomeDip=opItem?opItem.nome:'Dipendente';
+  renderCalendarioBello(panel,uid,nomeDip,anno,meseN,byData);
+};
+
+function renderCalendarioBello(panel,uid,nome,anno,mese,byData){
+  var oggi=dataOggiIT();
+  var primoGiorno=new Date(anno,mese-1,1).getDay();
+  var primoLun=primoGiorno===0?6:primoGiorno-1;
+  var giorniMese=new Date(anno,mese,0).getDate();
+  var nomiM=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+  // Calcola statistiche
+  var totP=0,totA=0,totR=0,totAuto=0,totNoSegnato=0;
+  for(var g=1;g<=giorniMese;g++){
+    var d=anno+'-'+String(mese).padStart(2,'0')+'-'+String(g).padStart(2,'0');
+    if(d>oggi) continue;
+    var dow=new Date(d+'T12:00:00').getDay();
+    if(dow===0||dow===6) continue; // weekend non conta
+    var p=byData[d];
+    if(!p) totNoSegnato++;
+    else if(p.stato==='P') totP++;
+    else if(p.stato==='A') totA++;
+    else if(p.stato==='R') totR++;
+    else if(p.stato==='auto') totAuto++;
+  }
+
+  var h='<div class="cal-wrap">';
+
+  // Header con nome e mese
+  var prevMese=mese===1?anno-1+'-12':anno+'-'+String(mese-1).padStart(2,'0');
+  var nextMese=mese===12?(anno+1)+'-01':anno+'-'+String(mese+1).padStart(2,'0');
+  h+='<div class="cal-nav">'+
+    '<button class="cal-nav-btn" onclick="cambiaMesseCalendario(\''+uid+'\',\''+prevMese+'\')">‹</button>'+
+    '<div><div class="cal-nav-title">'+nome+'</div><div style="font-size:11px;color:var(--text-muted);text-align:center;font-weight:600">'+nomiM[mese-1]+' '+anno+'</div></div>'+
+    '<button class="cal-nav-btn" onclick="cambiaMesseCalendario(\''+uid+'\',\''+nextMese+'\')">›</button>'+
+    '</div>';
+
+  // Stats
+  h+='<div class="cal-stats">'+
+    '<div class="cal-stat"><div class="cal-stat-val" style="color:#166534">'+totP+'</div><div class="cal-stat-label">Presenti</div></div>'+
+    '<div class="cal-stat"><div class="cal-stat-val" style="color:#991b1b">'+(totA+totAuto)+'</div><div class="cal-stat-label">Assenti</div></div>'+
+    '<div class="cal-stat"><div class="cal-stat-val" style="color:#1e40af">'+totR+'</div><div class="cal-stat-label">Reperibile</div></div>'+
+    '<div class="cal-stat"><div class="cal-stat-val" style="color:var(--text-muted)">'+totNoSegnato+'</div><div class="cal-stat-label">N/D</div></div>'+
+    '</div>';
+
+  // Griglia calendario
+  h+='<div class="cal-grid">';
+  ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'].forEach(function(n){
+    h+='<div class="cal-header">'+n+'</div>';
+  });
+  for(var e=0;e<primoLun;e++) h+='<div class="cal-day empty"></div>';
+
+  for(var g=1;g<=giorniMese;g++){
+    var dataStr=anno+'-'+String(mese).padStart(2,'0')+'-'+String(g).padStart(2,'0');
+    var dow2=new Date(dataStr+'T12:00:00').getDay();
+    var isWeekend=dow2===0||dow2===6;
+    var isFuturo=dataStr>oggi,isOggi=dataStr===oggi;
+    var pres=byData[dataStr];
+    var colori={P:'pres-P',A:'pres-A',R:'pres-R',auto:'pres-auto'};
+    var lab={P:'P',A:'A',R:'R',auto:'A*'};
+    var cls='cal-day'+(isWeekend?' weekend':'')+(isFuturo?' futuro':(!pres?' nessuno':(' '+colori[pres.stato])))+(isOggi?' oggi':'');
+    var onclick2=isFuturo?'':(' onclick="apriDettaglioGiornoRP(\''+uid+'\',\''+dataStr+'\')"');
+    h+='<div class="'+cls+'"'+onclick2+'>'+
+      '<div class="cal-day-num">'+g+'</div>'+
+      '<div class="cal-day-stato">'+(pres?lab[pres.stato]:'')+'</div>'+
+      '</div>';
+  }
+  h+='</div>';
+
+  // Dettaglio giorno
+  h+='<div id="rp-day-detail"></div>';
+  h+='</div>';
+
+  panel.innerHTML=h;
+}
+
+window.cambiaMesseCalendario=function(uid,mese){
+  var meseEl=document.getElementById('rp-mese');
+  if(meseEl) meseEl.value=mese;
+  aggiornaCalendarioResp();
+};
+
+window.apriDettaglioGiornoRP=function(uid,dataStr){
+  var id=presDocId(uid,dataStr);
+  var pres=presenzeCache[id]||null;
+  var gg=new Date(dataStr+'T12:00:00');
+  var nomiG=['Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato','Domenica'];
+  var nomiM2=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  var labelData=nomiG[gg.getDay()===0?6:gg.getDay()-1]+' '+gg.getDate()+' '+nomiM2[gg.getMonth()]+' '+gg.getFullYear();
+  var statoLabel={P:'Presente',A:'Assente',R:'Reperibile',auto:'Assente (automatico)'};
+  var oraStr='';
+  if(pres&&pres.timestamp){
+    var d2=new Date(pres.timestamp);
+    oraStr=d2.toLocaleDateString('it-IT')+' alle '+d2.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    if(pres.segnato_da==='responsabile') oraStr+=' (responsabile)';
+    else if(pres.segnato_da==='automatico') oraStr+=' (automatico)';
+  }
+  var det=document.getElementById('rp-day-detail');
+  if(!det) return;
+  det.innerHTML='<div class="cal-giorno-detail" style="margin-top:12px">'+
+    '<div style="font-size:13px;font-weight:700;margin-bottom:6px">'+labelData+'</div>'+
+    '<div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">'+
+    (pres?'Stato: <strong>'+(statoLabel[pres.stato]||pres.stato)+'</strong>':'Nessuna presenza registrata')+
+    '</div>'+
+    (oraStr?'<div style="font-size:11px;color:var(--text-light);margin-bottom:8px">'+oraStr+'</div>':'')+
+    '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px">Modifica come responsabile:</div>'+
+    '<div class="cal-azioni">'+
+    '<button class="cal-azione-btn cal-az-P" onclick="impostaPresenzaRespRP(\''+uid+'\',\''+dataStr+'\',\'P\')">Presente</button>'+
+    '<button class="cal-azione-btn cal-az-A" onclick="impostaPresenzaRespRP(\''+uid+'\',\''+dataStr+'\',\'A\')">Assente</button>'+
+    '<button class="cal-azione-btn cal-az-R" onclick="impostaPresenzaRespRP(\''+uid+'\',\''+dataStr+'\',\'R\')" style="background:#3b82f6;color:#fff">Reperibile</button>'+
+    '</div></div>';
+  det.scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+
+window.impostaPresenzaRespRP=async function(uid,data,stato){
+  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var nome=opItem?opItem.nome:'';
+  var id=presDocId(uid,data);
+  var dato={uid:uid,nome:nome,data:data,stato:stato,timestamp:Date.now(),segnato_da:'responsabile'};
+  try{
+    await setDoc(doc(db,'presenze',id),dato);
+    presenzeCache[id]=dato;
+    showToast(nome+' - '+stato+' salvato','toast-return');
+    aggiornaCalendarioResp();
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
 };
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
