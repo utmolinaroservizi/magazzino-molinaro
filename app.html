@@ -185,6 +185,9 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .counter-btn:active{transform:scale(.9);background:var(--brand-50);border-color:var(--brand-500)}
 .counter-display{font-size:48px;font-weight:700;min-width:80px;line-height:1;font-variant-numeric:tabular-nums;color:var(--brand-500);letter-spacing:-2px;transition:transform .15s ease,opacity .15s ease}
 .counter-display.bump{transform:scale(1.12);opacity:.7}
+.counter-input{font-size:48px;font-weight:700;width:110px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-2px;border:none;background:transparent;text-align:center;font-family:inherit;outline:none;border-radius:10px;padding:4px 6px;-moz-appearance:textfield;transition:background .15s}
+.counter-input::-webkit-outer-spin-button,.counter-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.counter-input:focus{background:var(--brand-50)}
 .counter-unit{font-size:12px;color:var(--text-muted);font-weight:500;margin-top:6px}
 .counter-step-hint{font-size:10px;color:var(--text-light);margin-top:4px;font-weight:500}
 .btn-take .action-icon{background:#FFF3D6;color:#9A6C1E}.btn-take .action-label{color:#9A6C1E}
@@ -863,7 +866,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <div class="counter-label">Litri da movimentare</div>
       <div class="counter-row">
         <button class="counter-btn" onclick="adjustFuelCounter(-1)">−</button>
-        <div class="counter-display" id="fm-counter" style="color:#9A6C1E">5</div>
+        <input class="counter-input" id="fm-counter" type="number" inputmode="numeric" min="1" value="5" style="color:#9A6C1E" onfocus="this.select()" oninput="onFuelCounterInput(this)" onblur="onFuelCounterBlur(this)">
         <button class="counter-btn" onclick="adjustFuelCounter(+1)">+</button>
       </div>
       <div class="counter-unit">litri</div>
@@ -1103,7 +1106,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <div class="counter-label">Quantità da movimentare</div>
       <div class="counter-row">
         <button class="counter-btn" onclick="adjustCounter(-1)">−</button>
-        <div class="counter-display" id="m-counter">1</div>
+        <input class="counter-input" id="m-counter" type="number" inputmode="numeric" min="1" value="1" style="color:var(--brand-500)" onfocus="this.select()" oninput="onCounterInput(this)" onblur="onCounterBlur(this)">
         <button class="counter-btn" onclick="adjustCounter(+1)">+</button>
       </div>
       <div class="counter-unit" id="m-counter-unit">pezzi</div>
@@ -1160,7 +1163,7 @@ let itemsList      = [];
 let actLog         = [];
 let logLastDoc     = null;   // cursore paginazione Firestore
 let logHasMore     = false;  // ci sono altri movimenti oltre quelli caricati
-const LOG_PAGE     = 100;    // voci per pagina
+const LOG_PAGE     = 5000;   // carica tutto lo storico
 
 // ── Mezzi aziendali (per rifornimento nafta) ──
 const MEZZI_AZIENDALI=[
@@ -1754,7 +1757,7 @@ function listenRealtime(){
       if(document.getElementById('page-carburante').classList.contains('active')) renderCarburante();
     }
   });
-  onSnapshot(query(collection(db,'movimenti'),orderBy('time','desc'),limit(LOG_PAGE)),snap=>{
+  onSnapshot(query(collection(db,'movimenti'),orderBy('time','desc'),limit(5000)),snap=>{
     // Aggiorna solo le voci già caricate (top), non azzera la paginazione
     const fresh=[];snap.forEach(d=>fresh.push({id:d.id,...d.data()}));
     // Mantieni le voci extra già caricate con "Carica altri" (più vecchie del cursore)
@@ -2018,7 +2021,7 @@ window.openModal=function(id){
 
 function updateCounterDisplay(){
   const el=document.getElementById('m-counter');
-  el.textContent=counterVal;
+  el.value=counterVal;
   el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
   const unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
   const un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
@@ -2030,7 +2033,7 @@ function updateCounterDisplay(){
 
 window.adjustCounter=function(dir){
   const newVal=counterVal+(dir*counterStep);
-  if(newVal<counterStep) return;
+  if(newVal<1) return;
   counterVal=newVal;
   updateCounterDisplay();
 };
@@ -2274,7 +2277,7 @@ function renderLog(){
     const moreBtn=document.createElement('button');
     moreBtn.id='log-load-more-btn';
     moreBtn.className='log-load-more-btn';
-    moreBtn.textContent='↓ Carica altri 100 movimenti';
+    moreBtn.textContent='↓ Carica movimenti più vecchi';
     moreBtn.onclick=loadMoreLog;
     container.appendChild(moreBtn);
   }
@@ -3125,7 +3128,7 @@ function getFuelItems(){return itemsList.filter(i=>i.cat==='Carburante')}
 
 function updateFuelCounterDisplay(){
   const el=document.getElementById('fm-counter');
-  el.textContent=fuelCounterVal;
+  el.value=fuelCounterVal;
   el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
   document.getElementById('fm-take-label').innerHTML='Preleva<br><b>'+fuelCounterVal+' lt</b>';
   document.getElementById('fm-return-label').innerHTML='Reinserisci<br><b>'+fuelCounterVal+' lt</b>';
@@ -3133,7 +3136,7 @@ function updateFuelCounterDisplay(){
 
 window.adjustFuelCounter=function(dir){
   const newVal=fuelCounterVal+(dir*FUEL_STEP);
-  if(newVal<FUEL_STEP) return;
+  if(newVal<1) return;
   fuelCounterVal=newVal;
   updateFuelCounterDisplay();
 };
@@ -4517,6 +4520,36 @@ window.impostaPresenzaRespRP=async function(uid,data,stato){
     showToast(nome+' - '+stato+' salvato','toast-return');
     aggiornaCalendarioResp();
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+};
+
+// ── Input manuale quantità da tastiera ──
+window.onCounterInput=function(el){
+  var raw=parseInt(el.value);
+  if(isNaN(raw)||raw<1) return;
+  counterVal=raw;
+  var unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
+  var un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
+  document.getElementById('m-take-label').innerHTML='Preleva<br><b>'+counterVal+' '+un+'</b>';
+  document.getElementById('m-return-label').innerHTML='Reinserisci<br><b>'+counterVal+' '+un+'</b>';
+};
+window.onCounterBlur=function(el){
+  var val=parseInt(el.value);
+  if(isNaN(val)||val<1) val=counterStep||1;
+  counterVal=val;
+  updateCounterDisplay();
+};
+window.onFuelCounterInput=function(el){
+  var raw=parseInt(el.value);
+  if(isNaN(raw)||raw<1) return;
+  fuelCounterVal=raw;
+  document.getElementById('fm-take-label').innerHTML='Preleva<br><b>'+fuelCounterVal+' lt</b>';
+  document.getElementById('fm-return-label').innerHTML='Reinserisci<br><b>'+fuelCounterVal+' lt</b>';
+};
+window.onFuelCounterBlur=function(el){
+  var val=parseInt(el.value);
+  if(isNaN(val)||val<1) val=FUEL_STEP;
+  fuelCounterVal=val;
+  updateFuelCounterDisplay();
 };
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
