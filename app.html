@@ -555,6 +555,8 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 /* ══ PRESENZE ══ */
 .pres-btn-P{width:100px;height:100px;border-radius:50%;border:none;font-size:40px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(34,197,94,.35);transition:transform .15s,box-shadow .15s;font-family:inherit;-webkit-tap-highlight-color:transparent;background:#22c55e;color:#fff}
 .pres-btn-R{width:100px;height:100px;border-radius:16px;border:none;font-size:34px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 6px 20px rgba(59,130,246,.3);transition:transform .15s,box-shadow .15s;font-family:inherit;-webkit-tap-highlight-color:transparent;background:#3b82f6;color:#fff}
+.pres-btn-F{width:100%;max-width:240px;height:52px;border-radius:12px;border:none;font-size:18px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(234,179,8,.3);transition:transform .15s;font-family:inherit;-webkit-tap-highlight-color:transparent;background:#eab308;color:#fff;margin:0 auto}
+.pres-btn-F:active{transform:scale(.97)}
 .pres-btn-R .pres-btn-sub{font-size:9px;font-weight:700;letter-spacing:.05em;opacity:.9}
 .pres-btn-P:active{transform:scale(.92)}
 .pres-btn-R:active{transform:scale(.92)}
@@ -564,6 +566,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .pres-stato-P{background:#dcfce7;color:#166534}
 .pres-stato-A{background:#fee2e2;color:#991b1b}
 .pres-stato-R{background:#dbeafe;color:#1e40af}
+.pres-stato-F{background:#fef9c3;color:#854d0e}
 .pres-stato-auto{background:#fef9c3;color:#854d0e}
 .pres-ora{font-size:11px;color:var(--text-muted);text-align:center;margin-top:4px}
 
@@ -584,6 +587,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .cal-day.pres-P{background:#dcfce7;color:#166534;border-color:#86efac}
 .cal-day.pres-A{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
 .cal-day.pres-R{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+.cal-day.pres-F{background:#fef9c3;color:#854d0e;border-color:#fde047}
 .cal-day.pres-auto{background:#fef9c3;color:#854d0e;border-color:#fde047}
 .cal-day.weekend.nessuno{opacity:.4}
 .cal-day-num{font-size:13px;font-weight:700;line-height:1}
@@ -743,11 +747,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <button class="pres-btn pres-btn-P" onclick="segnaPresenza('P')">P</button>
   </div>
   <div style="text-align:center;font-size:11px;color:var(--text-muted);padding-bottom:8px">
-    P = Presente &nbsp;·&nbsp; R = Reperibilità
+    P = Presente &nbsp;·&nbsp; R = Reperibilità &nbsp;·&nbsp; F = Ferie
   </div>
-  <div style="text-align:center;padding:0 0 20px">
-    <button class="pres-btn pres-btn-R" onclick="segnaPresenza('R')" style="width:160px;height:52px;border-radius:12px;margin:0 auto">
+  <div style="display:flex;flex-direction:column;gap:10px;padding:0 20px 20px;align-items:center">
+    <button class="pres-btn pres-btn-R" onclick="segnaPresenza('R')" style="width:200px;height:52px;border-radius:12px">
       <span style="font-size:18px;font-weight:800">R — Reperibile</span>
+    </button>
+    <button class="pres-btn-F" onclick="segnaPresenza('F')" style="width:200px">
+      🏖️ F — Ferie
     </button>
   </div>
   <div id="pres-storico"></div>
@@ -4060,8 +4067,8 @@ function mostraStatoOggi(dato){
     el.innerHTML='<div class="pres-stato-badge"><span style="font-size:13px;color:var(--text-muted)">Non ancora segnata per oggi</span></div>';
     if(btns) btns.style.display='flex';return;
   }
-  var colori={P:'pres-stato-P',A:'pres-stato-A',R:'pres-stato-R',auto:'pres-stato-auto'};
-  var label={P:'Presente','A':'Assente',R:'Reperibile',auto:'Assente (automatico)'};
+  var colori={P:'pres-stato-P',A:'pres-stato-A',R:'pres-stato-R',F:'pres-stato-F',auto:'pres-stato-auto'};
+  var label={P:'Presente','A':'Assente',R:'Reperibile',F:'🏖️ Ferie',auto:'Assente (automatico)'};
   var icon={P:'checkmark','A':'cross',R:'blue_circle',auto:'alarm_clock'};
   var stati={P:'checkmark',A:'cross',R:'blue_circle',auto:'clock3'};
   var lbl=label[dato.stato]||dato.stato;
@@ -4123,7 +4130,7 @@ window.segnaPresenza=async function(stato){
   try{
     await setDoc(doc(db,'presenze',docId),data);
     presenzeCache[docId]=data; mostraStatoOggi(data); caricaStoricoPersonale();
-    var lab={P:'Presente',A:'Assente',R:'Reperibile'};
+    var lab={P:'Presente',A:'Assente',R:'Reperibile',F:'Ferie 🏖️'};
     showToast(lab[stato]+' segnato','toast-return');
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
 };
@@ -4194,7 +4201,7 @@ window.apriDettaglioGiorno=function(uid,dataStr){
   var nomiG=['Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato','Domenica'];
   var nomiM2=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   var label=nomiG[gg.getDay()===0?6:gg.getDay()-1]+' '+gg.getDate()+' '+nomiM2[gg.getMonth()];
-  var statoLabel={P:'Presente',A:'Assente',R:'Reperibile',auto:'Assente (automatico)'};
+  var statoLabel={P:'Presente',A:'Assente',R:'Reperibile',F:'Ferie 🏖️',auto:'Assente (automatico)'};
   var oraStr='';
   if(pres&&pres.timestamp){
     var d2=new Date(pres.timestamp);
@@ -4305,7 +4312,7 @@ window.exportPresenzeExcel=async function(){
     var dow=new Date(anno+'-'+String(mese).padStart(2,'0')+'-'+String(g).padStart(2,'0')+'T12:00:00').getDay();
     header.push(g+'('+dowL[dow===0?6:dow-1]+')');
   }
-  header.push('P','A','R');
+  header.push('P','A','R','F');
   var rows=[['PRESENZE - '+nomiM3[mese-1].toUpperCase()+' '+anno],[],header];
   dipendenti.forEach(function(op){
     var row=[op.nome],cntP=0,cntA=0,cntR=0;
@@ -4313,10 +4320,10 @@ window.exportPresenzeExcel=async function(){
       var data=anno+'-'+String(mese).padStart(2,'0')+'-'+String(g).padStart(2,'0');
       var pres=presenzeCache[presDocId(op.id,data)];
       var stato=pres?pres.stato:'';
-      if(stato==='P') cntP++; else if(stato==='A'||stato==='auto') cntA++; else if(stato==='R') cntR++;
+      if(stato==='P') cntP++; else if(stato==='A'||stato==='auto') cntA++; else if(stato==='R') cntR++; else if(stato==='F') cntR++;
       row.push(stato==='auto'?'A*':(stato||''));
     }
-    row.push(cntP,cntA,cntR); rows.push(row);
+    var cntF=0; row.push(cntP,cntA,cntR,cntF); rows.push(row);
   });
   var ws=XLSX.utils.aoa_to_sheet(rows);
   ws['!cols']=[{wch:22}]; for(var i=0;i<=giorniMese+2;i++) ws['!cols'].push({wch:5});
@@ -4407,7 +4414,7 @@ function renderCalendarioBello(panel,uid,nome,anno,mese,byData){
   var nomiM=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
   // Calcola statistiche
-  var totP=0,totA=0,totR=0,totAuto=0,totNoSegnato=0;
+  var totP=0,totA=0,totR=0,totF=0,totAuto=0,totNoSegnato=0;
   for(var g=1;g<=giorniMese;g++){
     var d=anno+'-'+String(mese).padStart(2,'0')+'-'+String(g).padStart(2,'0');
     if(d>oggi) continue;
@@ -4418,6 +4425,7 @@ function renderCalendarioBello(panel,uid,nome,anno,mese,byData){
     else if(p.stato==='P') totP++;
     else if(p.stato==='A') totA++;
     else if(p.stato==='R') totR++;
+    else if(p.stato==='F') totF++;
     else if(p.stato==='auto') totAuto++;
   }
 
@@ -4433,10 +4441,11 @@ function renderCalendarioBello(panel,uid,nome,anno,mese,byData){
     '</div>';
 
   // Stats
-  h+='<div class="cal-stats">'+
+  h+='<div class="cal-stats" style="grid-template-columns:repeat(5,1fr)">'+
     '<div class="cal-stat"><div class="cal-stat-val" style="color:#166534">'+totP+'</div><div class="cal-stat-label">Presenti</div></div>'+
     '<div class="cal-stat"><div class="cal-stat-val" style="color:#991b1b">'+(totA+totAuto)+'</div><div class="cal-stat-label">Assenti</div></div>'+
     '<div class="cal-stat"><div class="cal-stat-val" style="color:#1e40af">'+totR+'</div><div class="cal-stat-label">Reperibile</div></div>'+
+    '<div class="cal-stat"><div class="cal-stat-val" style="color:#854d0e">'+totF+'</div><div class="cal-stat-label">Ferie</div></div>'+
     '<div class="cal-stat"><div class="cal-stat-val" style="color:var(--text-muted)">'+totNoSegnato+'</div><div class="cal-stat-label">N/D</div></div>'+
     '</div>';
 
@@ -4484,7 +4493,7 @@ window.apriDettaglioGiornoRP=function(uid,dataStr){
   var nomiG=['Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato','Domenica'];
   var nomiM2=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   var labelData=nomiG[gg.getDay()===0?6:gg.getDay()-1]+' '+gg.getDate()+' '+nomiM2[gg.getMonth()]+' '+gg.getFullYear();
-  var statoLabel={P:'Presente',A:'Assente',R:'Reperibile',auto:'Assente (automatico)'};
+  var statoLabel={P:'Presente',A:'Assente',R:'Reperibile',F:'Ferie 🏖️',auto:'Assente (automatico)'};
   var oraStr='';
   if(pres&&pres.timestamp){
     var d2=new Date(pres.timestamp);
@@ -4505,6 +4514,7 @@ window.apriDettaglioGiornoRP=function(uid,dataStr){
     '<button class="cal-azione-btn cal-az-P" onclick="impostaPresenzaRespRP(\''+uid+'\',\''+dataStr+'\',\'P\')">Presente</button>'+
     '<button class="cal-azione-btn cal-az-A" onclick="impostaPresenzaRespRP(\''+uid+'\',\''+dataStr+'\',\'A\')">Assente</button>'+
     '<button class="cal-azione-btn cal-az-R" onclick="impostaPresenzaRespRP(\''+uid+'\',\''+dataStr+'\',\'R\')" style="background:#3b82f6;color:#fff">Reperibile</button>'+
+    '<button class="cal-azione-btn" onclick="impostaPresenzaRespRP(\''+uid+'\',\''+dataStr+'\',\'F\')" style="background:#eab308;color:#fff">🏖️ Ferie</button>'+
     '</div></div>';
   det.scrollIntoView({behavior:'smooth',block:'nearest'});
 };
