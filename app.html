@@ -4102,8 +4102,8 @@ function caricaStoricoPersonale(){
   });
   Promise.all(promises).then(function(results){
     var el=document.getElementById('pres-storico');
-    var colori={P:'#22c55e',A:'#ef4444',R:'#3b82f6',auto:'#eab308'};
-    var lab={P:'P',A:'A',R:'R',auto:'A*'};
+    var colori={P:'#22c55e',A:'#ef4444',R:'#3b82f6',F:'#eab308',auto:'#f97316'};
+    var lab={P:'P',A:'A',R:'R',F:'F',auto:'A*'};
     var h='<div style="margin-top:8px"><div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Ultimi 14 giorni</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">';
     giorni.forEach(function(data,i){
@@ -4181,9 +4181,9 @@ function renderCalendarioResp(panel,uid,nome,anno,mese,byData){
     var isWeekend=dow===0||dow===6;
     var isFuturo=dataStr>oggi,isOggi=dataStr===oggi;
     var pres=byData[dataStr];
-    var colori={P:'pres-P',A:'pres-A',R:'pres-R',auto:'pres-auto'};
-    var lab={P:'P',A:'A',R:'R',auto:'A*'};
-    var cls='cal-day'+(isFuturo?' futuro':(pres?' '+colori[pres.stato]:''))+(isOggi?' oggi':'')+(isWeekend?' weekend':'');
+    var colori={P:'pres-P',A:'pres-A',R:'pres-R',F:'pres-F',auto:'pres-auto'};
+    var lab={P:'P',A:'A',R:'R',F:'F',auto:'A*'};
+    var cls='cal-day'+(isFuturo?' futuro':(pres?' '+(colori[pres.stato]||'nessuno'):''))+(isOggi?' oggi':'')+(isWeekend?' weekend':'');
     var onclick=isFuturo?'':(' onclick="apriDettaglioGiorno(\''+uid+'\',\''+dataStr+'\')"');
     h+='<div class="'+cls+'"'+onclick+'><div class="cal-day-num">'+g+'</div><div class="cal-day-stato">'+(pres?lab[pres.stato]:'')+'</div></div>';
   }
@@ -4462,9 +4462,9 @@ function renderCalendarioBello(panel,uid,nome,anno,mese,byData){
     var isWeekend=dow2===0||dow2===6;
     var isFuturo=dataStr>oggi,isOggi=dataStr===oggi;
     var pres=byData[dataStr];
-    var colori={P:'pres-P',A:'pres-A',R:'pres-R',auto:'pres-auto'};
-    var lab={P:'P',A:'A',R:'R',auto:'A*'};
-    var cls='cal-day'+(isWeekend?' weekend':'')+(isFuturo?' futuro':(!pres?' nessuno':(' '+colori[pres.stato])))+(isOggi?' oggi':'');
+    var colori={P:'pres-P',A:'pres-A',R:'pres-R',F:'pres-F',auto:'pres-auto'};
+    var lab={P:'P',A:'A',R:'R',F:'F',auto:'A*'};
+    var cls='cal-day'+(isWeekend?' weekend':'')+(isFuturo?' futuro':(!pres?' nessuno':(' '+(colori[pres.stato]||'nessuno'))))+(isOggi?' oggi':'');
     // Responsabili possono cliccare TUTTI i giorni (anche futuri, per assegnare ferie)
     var onclick2=' onclick="apriDettaglioGiornoRP(\''+uid+'\',\''+dataStr+'\')"';
     h+='<div class="'+cls+'"'+onclick2+'>'+
