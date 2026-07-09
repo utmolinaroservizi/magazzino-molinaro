@@ -4465,7 +4465,8 @@ function renderCalendarioBello(panel,uid,nome,anno,mese,byData){
     var colori={P:'pres-P',A:'pres-A',R:'pres-R',auto:'pres-auto'};
     var lab={P:'P',A:'A',R:'R',auto:'A*'};
     var cls='cal-day'+(isWeekend?' weekend':'')+(isFuturo?' futuro':(!pres?' nessuno':(' '+colori[pres.stato])))+(isOggi?' oggi':'');
-    var onclick2=isFuturo?'':(' onclick="apriDettaglioGiornoRP(\''+uid+'\',\''+dataStr+'\')"');
+    // Responsabili possono cliccare TUTTI i giorni (anche futuri, per assegnare ferie)
+    var onclick2=' onclick="apriDettaglioGiornoRP(\''+uid+'\',\''+dataStr+'\')"';
     h+='<div class="'+cls+'"'+onclick2+'>'+
       '<div class="cal-day-num">'+g+'</div>'+
       '<div class="cal-day-stato">'+(pres?lab[pres.stato]:'')+'</div>'+
