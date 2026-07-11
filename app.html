@@ -1050,7 +1050,13 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div id="cantiere-stats-panel"></div>
   </div>
   <div class="resp-card">
-    <h3>🗂️ Gestione categorie e sottocategorie</h3>
+    <h3>🔧 Ricalcola giacenze da movimenti</h3>
+    <p>Se le quantità risultano sbagliate (duplicate o errate), questo tool le ricalcola usando lo storico dei movimenti. Tocca solo la quantità, nient'altro.</p>
+    <button class="resp-btn" style="background:#B33A3A;color:#fff" onclick="ricalcolaGiacenze()">
+      🔄 Ricalcola giacenze
+    </button>
+    <div id="ricalcola-result" style="margin-top:10px;font-size:12px;color:var(--text-muted)"></div>
+  </div>
     <p>Aggiungi sottocategorie o elimina categorie (azione irreversibile).</p>
     <div class="resp-cat-list" id="resp-cat-list"></div>
   </div>
@@ -1470,6 +1476,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
       await loadFromFirestore();
       await migrateV2();
       if(isResp()) await migrateSubcategorie();
+      if(isResp()) await ripristinaGiacenze2Luglio();
       if(isResp()) await migrateAssegnaSubcategorie();
       await migrateV3();
       await deduplicaInventario();
@@ -3744,13 +3751,11 @@ async function migrateAssegnaSubcategorie(){
     var count=0;
     itemsList.forEach(function(it){
       var sub=mappa[it.code];
-      if(!sub) return;              // codice non in mappa → lascia invariato
-      if(it.sub===sub) return;      // già assegnato correttamente
-      // Crea una copia dell'item con solo "sub" modificato
-      var updated=Object.assign({},it,{sub:sub});
-      var id=updated.id; delete updated.id;
-      batch.set(doc(db,'inventario',id),updated);
-      it.sub=sub; // aggiorna anche in memoria
+      if(!sub) return;
+      if(it.sub===sub) return;
+      // Aggiorna SOLO il campo sub — non toccare qty, prezzo o altro
+      batch.update(doc(db,'inventario',it.id),{sub:sub});
+      it.sub=sub;
       count++;
     });
 
@@ -4562,6 +4567,325 @@ window.onFuelCounterBlur=function(el){
   fuelCounterVal=val;
   updateFuelCounterDisplay();
 };
+// ═══════════════════════════════════════════════
+//  RICALCOLA GIACENZE DA MOVIMENTI STORICI
+//  Algoritmo: per ogni prodotto, prende il prevQty
+//  del movimento più vecchio (= qtà iniziale) e
+//  somma tutti i delta successivi.
+//  Aggiorna SOLO il campo qty in Firestore.
+// ═══════════════════════════════════════════════
+window.ricalcolaGiacenze=async function(){
+  var panel=document.getElementById('ricalcola-result');
+  if(!confirm('Ricalcola le giacenze usando lo storico movimenti?\n\nQuesta operazione aggiorna la quantità di ogni prodotto basandosi sui carichi e prelievi registrati.\n\nProcedere?')) return;
+  if(panel) panel.innerHTML='⏳ Caricamento movimenti...';
+
+  try{
+    // Carica TUTTI i movimenti
+    var snap=await getDocs(query(collection(db,'movimenti'),orderBy('time','asc'),limit(10000)));
+    var movAll=[];
+    snap.forEach(function(d){movAll.push({id:d.id,...d.data()});});
+
+    // Raggruppa per itemId
+    var perItem={};
+    movAll.forEach(function(m){
+      if(!m.itemId) return;
+      if(!perItem[m.itemId]) perItem[m.itemId]=[];
+      perItem[m.itemId].push(m);
+    });
+
+    var batch=writeBatch(db);
+    var count=0;
+    var log=[];
+
+    itemsList.forEach(function(it){
+      var movs=perItem[it.id]||[];
+      if(movs.length===0) return; // nessun movimento: lascia invariato
+      // Ordina per time crescente
+      movs.sort(function(a,b){return a.time-b.time;});
+      // Qtà iniziale = prevQty del primo movimento
+      var qtaIniziale=movs[0].prevQty||0;
+      // Somma tutti i delta
+      var deltaTotale=movs.reduce(function(s,m){return s+(m.delta||0);},0);
+      var qtaCorretta=qtaIniziale+deltaTotale;
+      if(qtaCorretta<0) qtaCorretta=0;
+      if(qtaCorretta===it.qty) return; // già corretta
+      log.push(it.code+': '+it.qty+' → '+qtaCorretta);
+      batch.update(doc(db,'inventario',it.id),{qty:qtaCorretta});
+      it.qty=qtaCorretta;
+      count++;
+    });
+
+    if(count>0){
+      await batch.commit();
+      if(panel) panel.innerHTML='✅ Corrette '+count+' giacenze:<br>'+log.slice(0,20).join('<br>')+(log.length>20?'<br>...e altri '+(log.length-20):'');
+      showToast('Giacenze ricalcolate: '+count+' prodotti aggiornati','toast-return');
+      renderMateriali();
+    } else {
+      if(panel) panel.innerHTML='✅ Nessuna correzione necessaria — le giacenze sono già corrette.';
+      showToast('Giacenze già corrette','toast-info');
+    }
+  }catch(e){
+    if(panel) panel.innerHTML='❌ Errore: '+e.message;
+    showToast('Errore ricalcolo: '+e.message,'toast-danger');
+  }
+};
+
+
+// ═══════════════════════════════════════════════
+//  RIPRISTINO GIACENZE — riferimento 2 Luglio 2026
+//  Legge i movimenti SUCCESSIVI al 2/7 ore 09:28
+//  e li applica alle quantità di riferimento.
+//  Tocca SOLO il campo qty. One-shot via flag.
+// ═══════════════════════════════════════════════
+const QTY_REF_2LUGLIO = {
+  "AC.001": 53,
+  "AC.002": 11,
+  "AC.003": 27,
+  "AC.004": 65,
+  "AC.005": 3,
+  "AC.006": 9,
+  "AC.007": 5,
+  "AC.008": 5,
+  "AC.009": 9,
+  "AC.010": 2,
+  "AC.011": 8,
+  "AC.012": 4,
+  "AC.013": 2,
+  "AC.014": 2,
+  "AC.015": 2,
+  "AC.016": 1,
+  "AC.017": 9,
+  "CB.001": 1098,
+  "CB.002": 0,
+  "CB.003": 680,
+  "CD.001": 1,
+  "CD.002": 25,
+  "CD.003": 200,
+  "CD.004": 0,
+  "CV.001": 1000,
+  "CV.002": 1040,
+  "CV.003": 720,
+  "CV.004": 550,
+  "CV.005": 230,
+  "CV.006": 200,
+  "CV.007": 500,
+  "CV.008": 400,
+  "CV.009": 400,
+  "CV.010": 100,
+  "CV.011": 200,
+  "CV.012": 100,
+  "CV.013": 300,
+  "CV.014": 300,
+  "CV.015": 100,
+  "CV.016": 100,
+  "CV.017": 400,
+  "CV.018": 200,
+  "CV.019": 500,
+  "CV.020": 600,
+  "CV.021": 500,
+  "CV.022": 120,
+  "CV.023": 100,
+  "CV.024": 100,
+  "CV.025": 100,
+  "CV.026": 300,
+  "CV.027": 100,
+  "CV.028": 100,
+  "CV.029": 100,
+  "CV.030": 100,
+  "CV.031": 100,
+  "CV.032": 80,
+  "CV.033": 80,
+  "CV.034": 30,
+  "CV.035": 100,
+  "CV.036": 148,
+  "CV.037": 0,
+  "CV.038": 0,
+  "CV.039": 70,
+  "CV.040": 0,
+  "CV.041": 0,
+  "CV.042": 0,
+  "CV.043": 0,
+  "FV.001": 4,
+  "FV.002": 3,
+  "FV.003": 0,
+  "FV.004": 0,
+  "FV.005": 0,
+  "FV.006": 0,
+  "IL.001": 20,
+  "IL.002": 1,
+  "IL.003": 25,
+  "IL.004": 8,
+  "IL.005": 12,
+  "IL.006": 15,
+  "IL.007": 2,
+  "IL.008": 18,
+  "IL.009": 31,
+  "IL.010": 0,
+  "IL.011": 100,
+  "IL.012": 2,
+  "IL.013": 8,
+  "IL.014": 94,
+  "IL.015": 2,
+  "IL.016": 1,
+  "IL.017": 26,
+  "IL.018": 8,
+  "IL.019": 6,
+  "IL.020": 6,
+  "IL.021": 3,
+  "IL.022": 8,
+  "IL.023": 4,
+  "IL.024": 3,
+  "IL.025": 1,
+  "IL.026": 4,
+  "IL.027": 1,
+  "IL.028": 3,
+  "IL.029": 10,
+  "IL.030": 4,
+  "IL.031": 2,
+  "IL.032": 7,
+  "IL.033": 0,
+  "IL.034": 4,
+  "IL.035": 10,
+  "IL.036": 389,
+  "IL.037": 83,
+  "IL.038": 20,
+  "IL.039": 3,
+  "IL.040": 8,
+  "IL.041": 3,
+  "IL.042": 112,
+  "IL.043": 55,
+  "IL.044": 146,
+  "IL.045": 0,
+  "IL.047": 10,
+  "IL.048": 15,
+  "IL.049": 3,
+  "IL.050": 2,
+  "IL.051": 3,
+  "INT.001": 0,
+  "ME.001": 12,
+  "ME.002": 3,
+  "ME.003": 14,
+  "ME.004": 7,
+  "ME.005": 10,
+  "ME.006": 26,
+  "ME.007": 1,
+  "ME.008": 2,
+  "ME.009": 1,
+  "ME.010": 4,
+  "ME.011": 3,
+  "ME.012": 13,
+  "ME.013": 1,
+  "ME.014": 1,
+  "ME.015": 0,
+  "ME.016": 1,
+  "ME.017": 2,
+  "ME.018": 3,
+  "ME.019": 2,
+  "ME.020": 18,
+  "ME.021": 1,
+  "ME.022": 2,
+  "ME.023": 22,
+  "ME.024": 7,
+  "ME.025": 53,
+  "ME.026": 90,
+  "MNC.001": 80,
+  "SA.001": 2000,
+  "SA.002": 480,
+  "SA.003": 90,
+  "SA.004": 61,
+  "SA.005": 65,
+  "SA.006": 38,
+  "SA.007": 37,
+  "SA.008": 73,
+  "SA.009": 4,
+  "SA.010": 41,
+  "SA.011": 32,
+  "SA.012": 0,
+  "SA.013": 10,
+  "SA.014": 14,
+  "SA.015": 32,
+  "SA.016": 8,
+  "SA.017": 7,
+  "SA.018": 0,
+  "SA.019": 8,
+  "SA.020": 3,
+  "SA.021": 20,
+  "SA.022": 2,
+  "SA.023": 5,
+  "SA.024": 3,
+  "SA.025": 2,
+  "SA.026": 256,
+  "SA.027": 69,
+  "SA.028": 58,
+  "SA.029": 49,
+  "SA.030": 4,
+  "SA.031": 28,
+  "SA.032": 32,
+  "SA.033": 1,
+  "SA.034": 20,
+  "SA.035": 0,
+};
+
+const QTY_REF_TIMESTAMP = 1751449680; // 2 luglio 2026 09:28 CEST
+
+async function ripristinaGiacenze2Luglio(){
+  try{
+    var flag=await getDoc(doc(db,'meta','ripristino_2luglio_v1'));
+    if(flag.exists()) return;
+
+    // Verifica campione: se IL.001 è già ~20 (corretto), salta
+    var campione=itemsList.find(function(i){return i.code==='IL.001';});
+    if(campione && campione.qty<=22) {
+      // Quantità già plausibili, salta il ripristino ma segna il flag
+      await setDoc(doc(db,'meta','ripristino_2luglio_v1'),{eseguita:true,saltata:true,data:Date.now()});
+      return;
+    }
+
+    console.log('[RIPRISTINO] Avvio ripristino giacenze al 2 luglio...');
+    showToast('Ripristino giacenze in corso...','toast-sync');
+
+    // Carica movimenti SUCCESSIVI al riferimento
+    var movSnap=await getDocs(query(
+      collection(db,'movimenti'),
+      orderBy('time','asc'),
+      limit(5000)
+    ));
+    var movPost={};  // code → delta totale dopo il 2/7
+    movSnap.forEach(function(d){
+      var m=d.data();
+      if(!m.time || m.time <= QTY_REF_TIMESTAMP) return; // prima del ref
+      var code=m.code;
+      if(!code) return;
+      if(!movPost[code]) movPost[code]=0;
+      movPost[code]+=(m.delta||0);
+    });
+
+    // Calcola quantità corrette = ref + movimenti post-ref
+    var batch=writeBatch(db);
+    var count=0;
+    var log=[];
+    itemsList.forEach(function(it){
+      var refQty=QTY_REF_2LUGLIO[it.code];
+      if(refQty===undefined) return; // codice non nel riferimento: lascia
+      var deltaPost=movPost[it.code]||0;
+      var qtaCorretta=Math.max(0, refQty+deltaPost);
+      if(qtaCorretta===it.qty) return; // già corretto
+      log.push(it.code+': '+it.qty+' → '+qtaCorretta+' (ref='+refQty+', Δpost='+deltaPost+')');
+      batch.update(doc(db,'inventario',it.id),{qty:qtaCorretta});
+      it.qty=qtaCorretta;
+      count++;
+    });
+
+    batch.set(doc(db,'meta','ripristino_2luglio_v1'),{eseguita:true,count:count,data:Date.now()});
+    if(count>0 || true) await batch.commit();
+
+    console.log('[RIPRISTINO] Corretti '+count+' prodotti:', log);
+    if(count>0) showToast('Giacenze ripristinate: '+count+' prodotti','toast-return');
+    else showToast('Giacenze già corrette','toast-info');
+  }catch(e){
+    console.error('[RIPRISTINO]',e);
+  }
+}
 window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
