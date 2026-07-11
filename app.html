@@ -4885,7 +4885,9 @@ window.impostaQtaCarburante=async function(id){
     renderCarburante();
     showToast(item.name+': '+vecchiaQty+' → '+nuovaQty+' lt','toast-return');
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
-};const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
+};
+
+window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
 <script>
