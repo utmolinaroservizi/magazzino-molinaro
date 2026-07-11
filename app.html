@@ -2380,11 +2380,11 @@ window.toggleNascondiMovimento=async function(logId){
   if(!entry) return;
   const nuovoStato=!entry.nascosto;
   try{
-    // Aggiorna solo il campo nascosto — no spread operator per compatibilità
-    await setDoc(doc(db,'movimenti',logId),Object.assign({},entry,{id:undefined,nascosto:nuovoStato}));
+    const movRef=doc(db,'movimenti',logId);
+    await setDoc(movRef,{nascosto:nuovoStato},{merge:true});
     entry.nascosto=nuovoStato;
     renderLog();
-    showToast(nuovoStato?'Movimento nascosto agli operai':'Movimento visibile a tutti','toast-info');
+    showToast(nuovoStato?'Nascosto agli operai':'Visibile a tutti','toast-info');
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
 };
 
