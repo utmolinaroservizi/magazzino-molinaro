@@ -3163,15 +3163,17 @@ function renderCarburante(){
   if(meta) meta.textContent=totalLt+' litri totali · '+fuels.length+' tipi';
 
   fuelGrid.innerHTML=fuels.map(f=>{
-    const icon=f.name.toLowerCase().includes('nafta')?'🛢️':'⛽';
-    const color=f.name.toLowerCase().includes('nafta')?'#8e5c3d':'#3d6b8e';
+    const icon=f.name.toLowerCase().includes('nafta')?'🛢️':f.name.toLowerCase().includes('adblue')?'💧':'⛽';
+    const color=f.name.toLowerCase().includes('nafta')?'#8e5c3d':f.name.toLowerCase().includes('adblue')?'#2f6b8e':'#3d6b8e';
     const priceHTML=isResp()&&f.prezzo!=null?`<div class="fuel-card-price">€ ${Number(f.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}/lt</div>`:'';
+    const editBtn=isResp()?`<button onclick="event.stopPropagation();impostaQtaCarburante('${f.id}')" style="margin-top:8px;padding:5px 12px;background:transparent;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;color:var(--text-muted)">✏️ Imposta quantità</button>`:''
     return `<div class="fuel-card" style="border-top:3px solid ${color}" onclick="openFuelModal('${f.id}')">
       <div class="fuel-card-icon">${icon}</div>
       <div class="fuel-card-name" style="color:${color}">${f.name}</div>
       <div class="fuel-card-qty" style="color:${color}">${f.qty}</div>
       <div class="fuel-card-unit">litri</div>
       ${priceHTML}
+      ${editBtn}
     </div>`;
   }).join('');
 
@@ -4830,63 +4832,60 @@ const QTY_REF_TIMESTAMP = 1751449680; // 2 luglio 2026 09:28 CEST
 
 async function ripristinaGiacenze2Luglio(){
   try{
-    var flag=await getDoc(doc(db,'meta','ripristino_2luglio_v1'));
+    // Usa flag v2 (v1 era la versione buggata con timestamp sbagliato)
+    var flag=await getDoc(doc(db,'meta','ripristino_2luglio_v2'));
     if(flag.exists()) return;
 
-    // Verifica campione: se IL.001 è già ~20 (corretto), salta
-    var campione=itemsList.find(function(i){return i.code==='IL.001';});
-    if(campione && campione.qty<=22) {
-      // Quantità già plausibili, salta il ripristino ma segna il flag
-      await setDoc(doc(db,'meta','ripristino_2luglio_v1'),{eseguita:true,saltata:true,data:Date.now()});
-      return;
-    }
-
-    console.log('[RIPRISTINO] Avvio ripristino giacenze al 2 luglio...');
+    console.log('[RIPRISTINO] Ripristino diretto dai valori Excel del 2 luglio...');
     showToast('Ripristino giacenze in corso...','toast-sync');
 
-    // Carica movimenti SUCCESSIVI al riferimento
-    var movSnap=await getDocs(query(
-      collection(db,'movimenti'),
-      orderBy('time','asc'),
-      limit(5000)
-    ));
-    var movPost={};  // code → delta totale dopo il 2/7
-    movSnap.forEach(function(d){
-      var m=d.data();
-      if(!m.time || m.time <= QTY_REF_TIMESTAMP) return; // prima del ref
-      var code=m.code;
-      if(!code) return;
-      if(!movPost[code]) movPost[code]=0;
-      movPost[code]+=(m.delta||0);
-    });
-
-    // Calcola quantità corrette = ref + movimenti post-ref
+    // Imposta DIRETTAMENTE i valori dell'Excel — no calcoli delta
     var batch=writeBatch(db);
     var count=0;
-    var log=[];
     itemsList.forEach(function(it){
       var refQty=QTY_REF_2LUGLIO[it.code];
-      if(refQty===undefined) return; // codice non nel riferimento: lascia
-      var deltaPost=movPost[it.code]||0;
-      var qtaCorretta=Math.max(0, refQty+deltaPost);
-      if(qtaCorretta===it.qty) return; // già corretto
-      log.push(it.code+': '+it.qty+' → '+qtaCorretta+' (ref='+refQty+', Δpost='+deltaPost+')');
-      batch.update(doc(db,'inventario',it.id),{qty:qtaCorretta});
-      it.qty=qtaCorretta;
+      if(refQty===undefined) return;
+      if(refQty===it.qty) return;
+      batch.update(doc(db,'inventario',it.id),{qty:refQty});
+      it.qty=refQty;
       count++;
     });
 
-    batch.set(doc(db,'meta','ripristino_2luglio_v1'),{eseguita:true,count:count,data:Date.now()});
-    if(count>0 || true) await batch.commit();
+    batch.set(doc(db,'meta','ripristino_2luglio_v2'),{eseguita:true,count:count,data:Date.now()});
+    await batch.commit();
 
-    console.log('[RIPRISTINO] Corretti '+count+' prodotti:', log);
-    if(count>0) showToast('Giacenze ripristinate: '+count+' prodotti','toast-return');
-    else showToast('Giacenze già corrette','toast-info');
+    console.log('[RIPRISTINO] Corretti '+count+' prodotti ai valori del 2 luglio');
+    if(count>0) showToast('Giacenze ripristinate al 2 luglio: '+count+' prodotti','toast-return');
+    else showToast('Giacenze già ai valori di riferimento','toast-info');
   }catch(e){
     console.error('[RIPRISTINO]',e);
+    showToast('Errore ripristino: '+e.message,'toast-danger');
   }
 }
-window.showToast=function(msg,cls){const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
+window.impostaQtaCarburante=async function(id){
+  const item=itemsList.find(i=>i.id===id);
+  if(!item) return;
+  const input=prompt(
+    '✏️ Imposta quantità disponibile per:\n'+item.name+'\n\nQuantità attuale: '+item.qty+' lt\n\nInserisci la nuova quantità (litri):',
+    item.qty
+  );
+  if(input===null) return;
+  const nuovaQty=parseInt(input);
+  if(isNaN(nuovaQty)||nuovaQty<0){showToast('Quantità non valida','toast-danger');return;}
+  const vecchiaQty=item.qty;
+  try{
+    await setDoc(doc(db,'inventario',id),{...item,qty:nuovaQty});
+    item.qty=nuovaQty;
+    // Registra il movimento di rettifica nel log
+    const entry={id:genId(),itemId:id,code:item.code,name:item.name,
+      delta:nuovaQty-vecchiaQty,prevQty:vecchiaQty,
+      operator:currentUser.nome,operatorUid:currentUser.uid,
+      time:Date.now(),type:'load',note:'Rettifica manuale responsabile'};
+    await setDoc(doc(db,'movimenti',entry.id),entry);
+    renderCarburante();
+    showToast(item.name+': '+vecchiaQty+' → '+nuovaQty+' lt','toast-return');
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+};const t=document.getElementById('toast');t.className='toast '+cls;t.textContent=msg;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),2400)};
 function showToast(msg,cls){window.showToast(msg,cls)}
 </script>
 <script>
