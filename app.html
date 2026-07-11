@@ -2380,8 +2380,8 @@ window.toggleNascondiMovimento=async function(logId){
   if(!entry) return;
   const nuovoStato=!entry.nascosto;
   try{
-    const{id,...data}=entry;
-    await setDoc(doc(db,'movimenti',logId),{...data,nascosto:nuovoStato});
+    // Aggiorna solo il campo nascosto — no spread operator per compatibilità
+    await setDoc(doc(db,'movimenti',logId),Object.assign({},entry,{id:undefined,nascosto:nuovoStato}));
     entry.nascosto=nuovoStato;
     renderLog();
     showToast(nuovoStato?'Movimento nascosto agli operai':'Movimento visibile a tutti','toast-info');
