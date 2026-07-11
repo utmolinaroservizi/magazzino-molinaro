@@ -2387,6 +2387,8 @@ window.toggleNascondiMovimento=async function(logId){
     showToast(nuovoStato?'Movimento nascosto agli operai':'Movimento visibile a tutti','toast-info');
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
 };
+
+window.undoLog=async function(logId){
   const entry=actLog.find(e=>e.id===logId);if(!entry) return;
   const isTake=entry.delta<0;
   const amt=Math.abs(entry.delta);
