@@ -1106,7 +1106,15 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="modal-top">
       <span class="modal-cat-badge" id="m-badge"></span>
       <div class="modal-product-code" id="m-code"></div>
-      <div class="modal-product-name" id="m-name"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="modal-product-name" id="m-name"></div>
+        <button class="modal-price-edit-btn" id="m-name-edit-btn" onclick="toggleNameEdit()" style="display:none;flex-shrink:0" title="Modifica nome">✏️</button>
+      </div>
+      <div class="modal-price-input-row" id="name-input-row">
+        <input type="text" class="modal-price-input" id="name-input" style="text-transform:uppercase;font-variant-numeric:normal">
+        <button class="modal-price-save" onclick="saveName()">Salva</button>
+        <button class="modal-price-cancel" onclick="toggleNameEdit()">✕</button>
+      </div>
     </div>
     <div class="modal-qty-zone">
       <div class="modal-qty-label">Disponibilità in magazzino</div>
@@ -1240,6 +1248,7 @@ let currentModalItem = null;
 let fabOpen        = false;
 let html5QrCodeInstance = null;
 let priceEditOpen  = false;
+let nameEditOpen   = false;
 let counterVal     = 1;
 let counterStep    = 1;
 
@@ -2023,7 +2032,7 @@ window.openModal=function(id){
   if(editMode) return;
   const item=itemsList.find(i=>i.id===id);if(!item) return;
   if(item.cat==='Carburante'){showPage('carburante');showToast('Per il carburante usa la sezione dedicata','toast-info');return;}
-  currentModalItem=item;priceEditOpen=false;
+  currentModalItem=item;priceEditOpen=false;nameEditOpen=false;
   const cfg=categories[item.cat];
   document.getElementById('m-badge').textContent=cfg.label;
   document.getElementById('m-badge').style.background=cfg.bg;
@@ -2034,6 +2043,11 @@ window.openModal=function(id){
   document.getElementById('modal-operator-name').textContent=currentUser.nome;
   const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili',lt:'litri disponibili'};
   document.getElementById('m-unit').textContent=um[item.unit]||'disponibili';
+
+  // Modifica nome: solo responsabili
+  const nameEditBtn=document.getElementById('m-name-edit-btn');
+  if(nameEditBtn) nameEditBtn.style.display=isResp()?'inline-flex':'none';
+  document.getElementById('name-input-row').classList.remove('visible');
 
   // Inizializza contatore
   counterStep=item.step||1;
@@ -2118,10 +2132,37 @@ window.savePrice=async function(){
   showToast('Prezzo aggiornato','toast-info');
 };
 
+window.toggleNameEdit=function(){
+  if(!currentModalItem||!isResp()) return;
+  nameEditOpen=!nameEditOpen;
+  const row=document.getElementById('name-input-row');
+  row.classList.toggle('visible',nameEditOpen);
+  if(nameEditOpen){
+    const inp=document.getElementById('name-input');
+    inp.value=currentModalItem.name;
+    inp.focus();
+    inp.select();
+  }
+};
+window.saveName=async function(){
+  if(!currentModalItem) return;
+  const val=(document.getElementById('name-input').value||'').trim().toUpperCase();
+  if(!val){showToast('Il nome non può essere vuoto','toast-danger');return}
+  currentModalItem.name=val;
+  await saveItem(currentModalItem);
+  document.getElementById('m-name').textContent=currentModalItem.name;
+  document.getElementById('name-input-row').classList.remove('visible');
+  nameEditOpen=false;
+  // Aggiorna la vista corrente senza toccare prezzo, codice o QR
+  if(document.getElementById('page-materiali').classList.contains('active')) renderMateriali();
+  if(document.getElementById('page-carica').classList.contains('active')) renderCaricaList();
+  showToast('Nome prodotto aggiornato','toast-info');
+};
+
 window.closeModal=function(e){
   if(e&&e.target&&e.target.id!=='modal-backdrop') return;
   document.getElementById('modal-backdrop').classList.remove('open');
-  document.body.style.overflow='';currentModalItem=null;priceEditOpen=false;
+  document.body.style.overflow='';currentModalItem=null;priceEditOpen=false;nameEditOpen=false;
 };
 window.doAdjust=async function(sign){
   if(!currentModalItem) return;
