@@ -3480,7 +3480,6 @@ function renderCaricaList(){
     cfg=categories[caricaActiveCat];
     items=getItemsByCat(caricaActiveCat);
   }
-
   // ── Form nuovo prodotto — in cima, solo fuori dalla ricerca ─────────────────────
   let addHtml='';
   if(!isSearch){
@@ -3580,6 +3579,9 @@ function renderCaricaList(){
 
   list.innerHTML=addHtml+itemsHtml;
 }
+// Esposta su window per l'attributo inline oninput="renderCaricaList()"
+// (le funzioni dichiarate in <script type="module"> non sono globali)
+window.renderCaricaList=renderCaricaList;
 
 let _submitNuovoProdottoCaricaBusy=false;
 window.submitNuovoProdottoCarica=async function(){
