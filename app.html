@@ -1588,6 +1588,17 @@ async function initDefaultData(){
   categories=JSON.parse(JSON.stringify(DEFAULT_CATS));
   catOrder=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
   for(const [id,data] of Object.entries(categories)) batch.set(doc(db,'categorie',id),data);
+  // SAFETY: se `categorie` era vuota ma `inventario` no (es. cancellazione accidentale
+  // da consolle Firebase), NON ricreare i DEFAULT_ITEMS: causerebbe doppioni per ogni
+  // codice seed. Ricreo solo le categorie e riuso l'inventario esistente.
+  const invSnap=await getDocs(collection(db,'inventario'));
+  if(!invSnap.empty){
+    itemsList=[];invSnap.forEach(d=>itemsList.push({id:d.id,...d.data()}));
+    await batch.commit();actLog=[];
+    console.warn('[initDefaultData] Categorie ripristinate; inventario esistente ('+itemsList.length+' item) conservato.');
+    showToast('Categorie ripristinate — inventario conservato','toast-return');
+    return;
+  }
   itemsList=[];
   DEFAULT_ITEMS.forEach(([name,cat,qty,unit,code,prezzo,sub,step])=>{
     const id=genId();
@@ -1745,8 +1756,10 @@ async function migrateV3(){
 
 // ═══════════════════════════════════════
 //  DEDUPLICAZIONE INVENTARIO
-//  Trova item con stesso codice, somma le
-//  qty nei duplicati, tiene un solo doc.
+//  Trova item con stesso codice e tiene un
+//  solo doc (quello con qty maggiore).
+//  NON somma le qty (bug storico: causava
+//  raddoppiamento della giacenza a ogni run).
 //  NON tocca i movimenti.
 // ═══════════════════════════════════════
 async function deduplicaInventario(){
@@ -1769,16 +1782,12 @@ async function deduplicaInventario(){
 
   codesWithDups.forEach(code=>{
     const group=byCode[code];
-    // Keeper = quello con qty maggiore (o il primo se tutti uguali)
+    // Keeper = quello con qty maggiore (o il primo se tutti uguali).
+    // La qty del keeper viene TENUTA COSÌ COM'È: non si sommano le qty
+    // dei duplicati, perché i doc doppioni rappresentano lo stesso
+    // stock replicato per errore, non stock aggiuntivo.
     group.sort((a,b)=>b.qty-a.qty);
     const keeper=group[0];
-    // Somma le qty degli altri nel keeper
-    const totalQty=group.reduce((s,it)=>s+it.qty,0);
-    if(keeper.qty!==totalQty){
-      keeper.qty=totalQty;
-      const{id,...data}=keeper;
-      batch.set(doc(db,'inventario',id),data);
-    }
     // Elimina i duplicati (tutti tranne il keeper)
     group.slice(1).forEach(dup=>{
       batch.delete(doc(db,'inventario',dup.id));
@@ -2620,7 +2629,9 @@ window.updateSubSelect=function(){
     grp.style.display='none';sel.innerHTML='';
   }
 };
+let _submitProductBusy=false;
 window.submitProduct=async function(){
+  if(_submitProductBusy) return; // Anti doppio-click
   const cat=document.getElementById('fp-cat').value;
   const name=document.getElementById('fp-name').value.trim().toUpperCase();
   const qty=parseInt(document.getElementById('fp-qty').value)||0;
@@ -2632,12 +2643,20 @@ window.submitProduct=async function(){
   const step=unit==='m'?10:1;
   if(!cat){alert('Seleziona una categoria');return}
   if(!name){alert('Inserisci un nome');return}
-  const cfg=categories[cat];
-  const code=nextCodeForCat(cat);
-  const id=genId();
-  const item={id,name,cat,qty,unit,code,prezzo,sub,step};
-  itemsList.push(item);await saveItem(item);closeForm();openCats[cat]=true;
-  renderMateriali();renderDashboard();showToast('Prodotto '+code+' aggiunto','toast-info');
+  _submitProductBusy=true;
+  try{
+    const cfg=categories[cat];
+    const code=nextCodeForCat(cat);
+    // Guard: se il code esiste già (race o rerun), esco senza creare doppioni
+    if(itemsList.some(it=>it.code===code)){
+      showToast('Codice '+code+' già presente — annullato per evitare doppioni','toast-danger');
+      return;
+    }
+    const id=genId();
+    const item={id,name,cat,qty,unit,code,prezzo,sub,step};
+    itemsList.push(item);await saveItem(item);closeForm();openCats[cat]=true;
+    renderMateriali();renderDashboard();showToast('Prodotto '+code+' aggiunto','toast-info');
+  } finally { _submitProductBusy=false; }
 };
 window.closeForm=(e)=>{if(e&&e.target&&e.target.id!=='form-backdrop') return;document.getElementById('form-backdrop').classList.remove('open')};
 
@@ -3562,7 +3581,9 @@ function renderCaricaList(){
   list.innerHTML=addHtml+itemsHtml;
 }
 
+let _submitNuovoProdottoCaricaBusy=false;
 window.submitNuovoProdottoCarica=async function(){
+  if(_submitNuovoProdottoCaricaBusy) return; // Anti doppio-click
   const name=(document.getElementById('na-name')?.value||'').trim().toUpperCase();
   const qty=parseInt(document.getElementById('na-qty')?.value)||0;
   const unit=document.getElementById('na-unit')?.value||'pz';
@@ -3573,21 +3594,29 @@ window.submitNuovoProdottoCarica=async function(){
   if(!name){showToast('Inserisci il nome del prodotto','toast-danger');document.getElementById('na-name')?.focus();return;}
   const fornitore=document.getElementById('na-fornitore')?.value||'';
   const cat=caricaActiveCat;
-  const code=nextCodeForCat(cat);
-  const step=unit==='m'?10:1;
-  const id=genId();
-  const item={id,name,cat,qty,unit,code,prezzo,sub,step};
-  itemsList.push(item);
-  await saveItem(item);
-  // Log carico iniziale se qty > 0
-  if(qty>0){
-    const entry={id:genId(),itemId:id,code,name,delta:qty,prevQty:0,
-      operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:'load',fornitore};
-    await saveMovimento(entry);
-  }
-  renderCarica();
-  renderDashboard();
-  showToast(code+' — '+name+' aggiunto','toast-return');
+  _submitNuovoProdottoCaricaBusy=true;
+  try{
+    const code=nextCodeForCat(cat);
+    // Guard: se il code esiste già (race o rerun), esco senza creare doppioni
+    if(itemsList.some(it=>it.code===code)){
+      showToast('Codice '+code+' già presente — annullato per evitare doppioni','toast-danger');
+      return;
+    }
+    const step=unit==='m'?10:1;
+    const id=genId();
+    const item={id,name,cat,qty,unit,code,prezzo,sub,step};
+    itemsList.push(item);
+    await saveItem(item);
+    // Log carico iniziale se qty > 0
+    if(qty>0){
+      const entry={id:genId(),itemId:id,code,name,delta:qty,prevQty:0,
+        operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:'load',fornitore};
+      await saveMovimento(entry);
+    }
+    renderCarica();
+    renderDashboard();
+    showToast(code+' — '+name+' aggiunto','toast-return');
+  } finally { _submitNuovoProdottoCaricaBusy=false; }
 };
 
 window.confirmCarico=async function(itemId){
