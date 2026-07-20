@@ -889,6 +889,8 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
         </div>
       </div>
     </div>
+    <!-- Slot retrodatazione (solo responsabili — riempito in openFuelModal) -->
+    <div id="bd-slot-fuel"></div>
     <div class="counter-zone">
       <div class="counter-label">Litri da movimentare</div>
       <div class="counter-row">
@@ -1056,6 +1058,21 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     </div>
   </div>
   <div class="resp-card">
+    <h3>🚛 Gestione mezzi aziendali</h3>
+    <p>Aggiungi i mezzi con il relativo combustibile. Appariranno automaticamente nell'elenco per il rifornimento in Carburante.</p>
+    <div class="resp-entity-list" id="resp-mezzi-list"></div>
+    <div class="resp-entity-add" style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <input class="resp-entity-input" id="new-mezzo-nome" placeholder="Modello (es. Fiat Panda)" style="grid-column:1 / span 2">
+      <input class="resp-entity-input" id="new-mezzo-targa" placeholder="Targa (es. AB 123 CD)">
+      <select class="resp-entity-input" id="new-mezzo-comb" style="cursor:pointer">
+        <option value="nafta">Nafta</option>
+        <option value="benzina">Benzina</option>
+        <option value="adblue">AdBlue</option>
+      </select>
+      <button class="resp-entity-btn" onclick="addMezzo()" style="grid-column:1 / span 2">+ Aggiungi mezzo</button>
+    </div>
+  </div>
+  <div class="resp-card">
     <h3>🏗️ Excel movimentazioni per cantiere</h3>
     <p>Scarica un Excel con tutte le movimentazioni di materiale associate ad un cantiere specifico (o tutti).</p>
     <select class="modal-cantiere-select" id="resp-cantiere-export" style="margin-bottom:10px">
@@ -1155,6 +1172,8 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
         <option value="">— Seleziona cantiere —</option>
       </select>
     </div>
+    <!-- Slot retrodatazione (solo responsabili — riempito in openModal) -->
+    <div id="bd-slot-mat"></div>
     <div class="counter-zone">
       <div class="counter-label">Quantità da movimentare</div>
       <div class="counter-row">
@@ -1478,6 +1497,52 @@ function nextCodeForCat(cat){
   return prefix+String(maxNum+1).padStart(3,'0');
 }
 function isResp(){return currentUser&&currentUser.ruolo==='responsabile'}
+
+// ═══════════════════════════════════════
+//  RETRODATAZIONE MOVIMENTI (solo responsabili)
+//  Se il resp spunta la checkbox "Retrodata movimento" nel blocco
+//  backdate presente nel form, il timestamp letto viene usato al
+//  posto di Date.now() per il campo `time` del movimento.
+// ═══════════════════════════════════════
+function getBackdatedTime(prefix){
+  if(!isResp()) return Date.now();
+  const chk=document.getElementById('bd-'+prefix+'-toggle');
+  if(!chk||!chk.checked) return Date.now();
+  const inp=document.getElementById('bd-'+prefix+'-input');
+  if(!inp||!inp.value) return Date.now();
+  const t=new Date(inp.value).getTime();
+  if(!isFinite(t)||t<=0) return Date.now();
+  if(t>Date.now()+60000){
+    showToast('⚠️ Data futura non ammessa, uso ora attuale','toast-danger');
+    return Date.now();
+  }
+  return t;
+}
+function backdateBlockHtml(prefix){
+  if(!isResp()) return '';
+  return '<div class="backdate-zone" style="margin:10px 0;padding:10px 12px;background:#fff8dc;border:1px dashed #d4a017;border-radius:8px">'+
+    '<label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#7a5c00;cursor:pointer;font-weight:600">'+
+      '<input type="checkbox" id="bd-'+prefix+'-toggle" onchange="toggleBackdate(\''+prefix+'\')" style="width:16px;height:16px;cursor:pointer">'+
+      '🕒 Retrodata movimento (data/ora precedenti)'+
+    '</label>'+
+    '<input type="datetime-local" id="bd-'+prefix+'-input" disabled '+
+      'style="margin-top:8px;width:100%;padding:8px 10px;border:1px solid #d4a017;border-radius:6px;font-size:13px;background:#fff;color:#5a4200;font-weight:500;box-sizing:border-box">'+
+  '</div>';
+}
+window.toggleBackdate=function(prefix){
+  const chk=document.getElementById('bd-'+prefix+'-toggle');
+  const inp=document.getElementById('bd-'+prefix+'-input');
+  if(!chk||!inp) return;
+  inp.disabled=!chk.checked;
+  if(chk.checked){
+    const d=new Date();
+    d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+    inp.value=d.toISOString().slice(0,16);
+    inp.focus();
+  } else {
+    inp.value='';
+  }
+};
 function fmtPrice(p){return p!=null?'€ '+Number(p).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}):'N/D'}
 
 // ═══════════════════════════════════════
@@ -1522,6 +1587,7 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
       if(isResp()) await migrateAssegnaSubcategorie();
       await migrateV3();
       await deduplicaInventario();
+      if(isResp()) await seedMezziIfEmpty();
       const DESIRED_ORDER=["Illuminazione","Sostegni e Accessori","Cavidotti","CLS","Cavi","Materiale Elettrico","Fotovoltaico","Accessori e Consumabili","Carburante"];
       const ordered=DESIRED_ORDER.filter(c=>categories[c]);
       const extra=catOrder.filter(c=>!DESIRED_ORDER.includes(c));
@@ -2088,6 +2154,9 @@ window.openModal=function(id){
 
   document.getElementById('modal-backdrop').classList.add('open');
   document.body.style.overflow='hidden';
+  // Retrodatazione — riempi lo slot (vuoto se non responsabile)
+  const bdSlotM=document.getElementById('bd-slot-mat');
+  if(bdSlotM) bdSlotM.innerHTML=backdateBlockHtml('mat');
 };
 
 function updateCounterDisplay(){
@@ -2202,7 +2271,7 @@ window.doAdjust=async function(sign){
   currentModalItem.qty=next;
   await saveItem(currentModalItem);
   const movType=actualDelta<0?'take':'return';
-  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:movType,cantiere};
+  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('mat'),type:movType,cantiere};
   await saveMovimento(entry);
   document.getElementById('m-qty').textContent=next;
   if(isResp()) renderPriceSection(currentModalItem);
@@ -2715,6 +2784,24 @@ function renderResponsabile(){
         <button class="resp-entity-del" onclick="deleteFornitore('${f.id}')">✕ Elimina</button>
       </div>`).join('');
   document.getElementById('resp-fornitori-list').innerHTML=fornHtml;
+
+  // Mezzi aziendali
+  const combLabel={nafta:'⛽ Nafta',benzina:'⛽ Benzina',adblue:'💧 AdBlue'};
+  const combColor={nafta:'#c26e0f',benzina:'#1e7a3a',adblue:'#1e4a7a'};
+  const mezziEl=document.getElementById('resp-mezzi-list');
+  if(mezziEl){
+    const mezziHtml=mezziList.length===0
+      ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun mezzo. Aggiungine uno.</p>'
+      :mezziList.map(m=>{
+          const c=(m.combustibile||'nafta').toLowerCase();
+          const tag='<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:'+(combColor[c]||'#666')+'25;color:'+(combColor[c]||'#666')+';margin-left:6px">'+(combLabel[c]||c)+'</span>';
+          return `<div class="resp-entity-item">
+            <span class="resp-entity-name">🚛 ${m.mezzo} · <strong style="font-family:monospace">${m.targa||'—'}</strong>${tag}</span>
+            <button class="resp-entity-del" onclick="deleteMezzo('${m.id}')">✕ Elimina</button>
+          </div>`;
+        }).join('');
+    mezziEl.innerHTML=mezziHtml;
+  }
 
   // Popola dropdown export cantiere
   const expSel=document.getElementById('resp-cantiere-export');
@@ -3324,6 +3411,31 @@ function renderCarburante(){
   logC.innerHTML=html;
 }
 
+// Mappa codice carburante → chiave combustibile per filtrare mezzi
+function fuelCodeToCombustibile(code){
+  if(code==='CB.001') return 'nafta';
+  if(code==='CB.002') return 'benzina';
+  if(code==='CB.003') return 'adblue';
+  return null;
+}
+// Popola le due select mezzo/targa filtrando mezziList per il combustibile
+// del carburante attualmente aperto. Ritorna il numero di mezzi disponibili.
+function populateFuelVehicleSelects(){
+  if(!currentFuelItem) return 0;
+  const comb=fuelCodeToCombustibile(currentFuelItem.code);
+  const mSel=document.getElementById('fm-mezzo');
+  const tSel=document.getElementById('fm-targa');
+  if(!mSel||!tSel) return 0;
+  const filtered=mezziList.filter(m=>((m.combustibile||'nafta').toLowerCase())===comb);
+  const prev=mSel.value;
+  mSel.innerHTML='<option value="">— Seleziona mezzo —</option>'+
+    filtered.map(v=>`<option value="${v.id}">${v.mezzo}</option>`).join('');
+  tSel.innerHTML='<option value="">— Seleziona targa —</option>'+
+    filtered.map(v=>`<option value="${v.id}">${v.targa}</option>`).join('');
+  if(filtered.find(v=>v.id===prev)){mSel.value=prev;tSel.value=prev;}
+  return filtered.length;
+}
+
 window.openFuelModal=function(id){
   const item=itemsList.find(i=>i.id===id);if(!item) return;
   currentFuelItem=item;fuelPriceEditOpen=false;
@@ -3339,11 +3451,7 @@ window.openFuelModal=function(id){
   const isNafta=item.code==='CB.001';
   vZone.style.display=isNafta?'block':'none';
   if(isNafta){
-    const mSel=document.getElementById('fm-mezzo');
-    const tSel=document.getElementById('fm-targa');
-    mSel.innerHTML='<option value="">— Seleziona mezzo —</option>'+MEZZI_AZIENDALI.map((v,i)=>`<option value="${i}">${v.mezzo}</option>`).join('');
-    tSel.innerHTML='<option value="">— Seleziona targa —</option>'+MEZZI_AZIENDALI.map((v,i)=>`<option value="${i}">${v.targa}</option>`).join('');
-    mSel.value='';tSel.value='';
+    populateFuelVehicleSelects();
   }
   const priceZone=document.getElementById('fuel-price-zone');
   if(isResp()){
@@ -3357,6 +3465,9 @@ window.openFuelModal=function(id){
   }
   document.getElementById('fuel-modal-backdrop').classList.add('open');
   document.body.style.overflow='hidden';
+  // Retrodatazione — riempi lo slot (vuoto se non responsabile)
+  const bdSlotF=document.getElementById('bd-slot-fuel');
+  if(bdSlotF) bdSlotF.innerHTML=backdateBlockHtml('fuel');
 };
 
 window.closeFuelModal=function(e){
@@ -3374,9 +3485,9 @@ window.syncVehicle=function(from){
 
 function getSelectedVehicle(){
   if(!currentFuelItem||currentFuelItem.code!=='CB.001') return null;
-  const idx=document.getElementById('fm-mezzo')?.value;
-  if(idx===''||idx==null) return null;
-  const v=MEZZI_AZIENDALI[parseInt(idx)];
+  const id=document.getElementById('fm-mezzo')?.value;
+  if(!id) return null;
+  const v=mezziList.find(m=>m.id===id);
   return v?{mezzo:v.mezzo,targa:v.targa}:null;
 }
 
@@ -3396,7 +3507,7 @@ window.doFuelAdjust=async function(sign){
   currentFuelItem.qty=next;
   await saveItem(currentFuelItem);
   const vehicle=getSelectedVehicle();
-  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:actualDelta<0?'take':'return'};
+  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('fuel'),type:actualDelta<0?'take':'return'};
   if(vehicle){entry.mezzo=vehicle.mezzo;entry.targa=vehicle.targa;}
   await saveMovimento(entry);
   document.getElementById('fm-qty').textContent=next;
@@ -3522,6 +3633,7 @@ function renderCaricaList(){
           </select>
         </div>
       </div>
+      ${backdateBlockHtml('carnew')}
       <button class="carica-add-btn" onclick="submitNuovoProdottoCarica()">
         ✚ Crea prodotto e carica
       </button>
@@ -3573,6 +3685,7 @@ function renderCaricaList(){
               </div>
             </div>
           </div>
+          ${backdateBlockHtml('car-'+it.id)}
           <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
         </div>`;
       }).join('');
@@ -3612,7 +3725,7 @@ window.submitNuovoProdottoCarica=async function(){
     // Log carico iniziale se qty > 0
     if(qty>0){
       const entry={id:genId(),itemId:id,code,name,delta:qty,prevQty:0,
-        operator:currentUser.nome,operatorUid:currentUser.uid,time:Date.now(),type:'load',fornitore};
+        operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('carnew'),type:'load',fornitore};
       await saveMovimento(entry);
     }
     renderCarica();
@@ -3641,7 +3754,7 @@ window.confirmCarico=async function(itemId){
   var ddtInfo=getDdtInfoItem(itemId);
   const entry={id:genId(),itemId:item.id,code:item.code,name:item.name,
     delta:qty,prevQty,operator:currentUser.nome,operatorUid:currentUser.uid,
-    time:Date.now(),type:'load',fornitore,
+    time:getBackdatedTime('car-'+itemId),type:'load',fornitore,
     tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc};
   await saveMovimento(entry);
 
@@ -3702,6 +3815,51 @@ window.deleteFornitore=async function(id){
   setTimeout(()=>renderResponsabile(),300);
   showToast('Fornitore eliminato','toast-info');
 };
+
+// ═══════════════════════════════════════
+//  MEZZI AZIENDALI — CRUD + SEED
+// ═══════════════════════════════════════
+window.addMezzo=async function(){
+  const nomeEl=document.getElementById('new-mezzo-nome');
+  const targaEl=document.getElementById('new-mezzo-targa');
+  const combEl=document.getElementById('new-mezzo-comb');
+  const nome=(nomeEl?.value||'').trim();
+  const targa=(targaEl?.value||'').trim().toUpperCase();
+  const combustibile=(combEl?.value||'nafta').toLowerCase();
+  if(!nome){showToast('Inserisci il modello del mezzo','toast-danger');nomeEl?.focus();return;}
+  if(!targa){showToast('Inserisci la targa','toast-danger');targaEl?.focus();return;}
+  if(mezziList.find(m=>(m.targa||'').toUpperCase()===targa)){
+    showToast('Targa già presente','toast-danger');return;
+  }
+  const id=genId();
+  await setDoc(doc(db,'mezzi',id),{mezzo:nome,targa,combustibile,creato:Date.now()});
+  nomeEl.value='';targaEl.value='';combEl.value='nafta';
+  setTimeout(()=>renderResponsabile(),300);
+  showToast('Mezzo "'+nome+' ('+targa+')" aggiunto','toast-return');
+};
+window.deleteMezzo=async function(id){
+  const m=mezziList.find(x=>x.id===id);
+  if(!m||!confirm('Eliminare il mezzo "'+m.mezzo+' — '+(m.targa||'')+'"?')) return;
+  await deleteDoc(doc(db,'mezzi',id));
+  setTimeout(()=>renderResponsabile(),300);
+  showToast('Mezzo eliminato','toast-info');
+};
+
+// Migrazione idempotente: se la collezione `mezzi` è vuota, popola dai
+// MEZZI_AZIENDALI hardcoded (tutti con combustibile='nafta').
+async function seedMezziIfEmpty(){
+  try{
+    const snap=await getDocs(collection(db,'mezzi'));
+    if(!snap.empty) return;
+    const batch=writeBatch(db);
+    MEZZI_AZIENDALI.forEach(v=>{
+      const id=genId();
+      batch.set(doc(db,'mezzi',id),{mezzo:v.mezzo,targa:v.targa,combustibile:'nafta',creato:Date.now(),seed:true});
+    });
+    await batch.commit();
+    console.log('[seedMezzi] Inseriti '+MEZZI_AZIENDALI.length+' mezzi iniziali');
+  }catch(e){console.warn('[seedMezzi]',e.message);}
+}
 
 // ═══════════════════════════════════════
 //  EXCEL PER CANTIERE
@@ -5175,7 +5333,15 @@ if('serviceWorker' in navigator){
     window.location.reload();
   });
   try{onSnapshot(collection(db,'operatori'),snap=>{operatoriList=[];snap.forEach(d=>operatoriList.push({id:d.id,...d.data()}));operatoriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();if(document.getElementById('page-registro-presenze')?.classList.contains('active')) renderPaginaRegistroPresenze();},e=>console.warn('[snap] operatori:',e.message));}catch(e){}
-  try{onSnapshot(collection(db,'mezzi'),snap=>{mezziList=[];snap.forEach(d=>mezziList.push({id:d.id,...d.data()}));mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));},e=>console.warn('[snap] mezzi:',e.message));}catch(e){}
+  try{onSnapshot(collection(db,'mezzi'),snap=>{
+    mezziList=[];snap.forEach(d=>mezziList.push({id:d.id,...d.data()}));
+    mezziList.sort((a,b)=>(a.mezzo||'').localeCompare(b.mezzo||''));
+    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
+    // Se il modal carburante è aperto per la nafta, aggiorna le select
+    if(currentFuelItem && document.getElementById('fuel-modal-backdrop')?.classList.contains('open')){
+      populateFuelVehicleSelects();
+    }
+  },e=>console.warn('[snap] mezzi:',e.message));}catch(e){}
   try{onSnapshot(collection(db,'volatili'),snap=>{volatiliList=[];snap.forEach(d=>volatiliList.push({id:d.id,...d.data()}));volatiliList.sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));},e=>console.warn('[snap] volatili:',e.message));}catch(e){}
 }
 </script>
