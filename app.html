@@ -658,6 +658,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="11.5" cy="15.5" r="2.5"/><line x1="13.3" y1="17.3" x2="15" y2="19"/></svg>
     Ricerca DDT/Fatture
   </button>
+  <button class="hamburger-menu-item" onclick="showPage('rettifica');closeHamburgerMenu()" style="color:#b91c1c">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-linecap="round" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Rettifica giacenza
+  </button>
 </div>
 
 <div class="nav">
@@ -974,6 +978,23 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   </div>
   <button class="carica-add-btn" style="margin-bottom:16px" onclick="eseguiRicercaDdt()">🔍 Cerca</button>
   <div id="ricerca-ddt-results"></div>
+</div>
+
+<!-- RETTIFICA GIACENZA D'EMERGENZA (solo responsabili) -->
+<div class="page" id="page-rettifica">
+  <div class="hero" style="background:linear-gradient(135deg,#7f1d1d,#b91c1c)">
+    <div class="hero-eyebrow" style="color:#fecaca">Responsabile · Emergenza</div>
+    <div class="hero-title" style="font-size:18px;color:#fff">⚠️ Rettifica giacenza</div>
+    <div class="hero-meta" style="color:#fecaca">Correggi manualmente la giacenza di un prodotto</div>
+  </div>
+  <div style="background:#fff8dc;border:1px dashed #d4a017;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:#7a5c00;line-height:1.5">
+    <strong>⚠️ Da usare solo in caso di emergenza</strong> o conteggio errato. Questa funzione imposta direttamente la giacenza al valore che indichi, senza passare per un carico o prelievo. Le movimentazioni passate <strong>non</strong> vengono toccate. Ogni rettifica viene registrata nel registro con nota "Rettifica manuale".
+  </div>
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Cerca prodotto per nome o codice..." id="rettifica-search-input" oninput="renderRettificaList()">
+  </div>
+  <div id="rettifica-list" style="margin-top:12px"></div>
 </div>
 
 <!-- RESPONSABILE -->
@@ -1596,9 +1617,9 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
 
     // 4. Navigazione iniziale
     listenRealtime();
-    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo','registro-presenze','ricerca-ddt'];
+    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo','registro-presenze','ricerca-ddt','rettifica'];
     const hashPage=window.location.hash.replace('#','');
-    const startPage=(VALID_PAGES.includes(hashPage)&&(hashPage!=='carica'&&hashPage!=='responsabile'&&hashPage!=='riepilogo'&&hashPage!=='ricerca-ddt'||isResp()))?hashPage:'dashboard';
+    const startPage=(VALID_PAGES.includes(hashPage)&&(hashPage!=='carica'&&hashPage!=='responsabile'&&hashPage!=='riepilogo'&&hashPage!=='ricerca-ddt'&&hashPage!=='rettifica'||isResp()))?hashPage:'dashboard';
     history.replaceState({page:startPage},'','#'+startPage);
     _showPage(startPage);
     setTimeout(handleUrlProductCode,300);
@@ -1971,6 +1992,10 @@ function _showPage(id){
   if(id==='riepilogo') renderRiepilogo();
   if(id==='presenze') renderPresenze();
   if(id==='registro-presenze') renderPaginaRegistroPresenze();
+  if(id==='rettifica'){
+    if(!isResp()){_showPage('dashboard');return;}
+    renderRettificaList();
+  }
   closeFab();
   closeHamburgerMenu();
 }
@@ -2476,11 +2501,11 @@ function renderLogItem(entry,isTake,ts){
   const item=itemsList.find(i=>i.id===entry.itemId);
   const un=item?item.unit:'';
   const t=entry.type||(isTake?'take':'return');
-  const typeLabel={take:'Prelievo',return:'Restituzione',load:'Carico merce'}[t]||'Movimento';
-  const typeCls={take:'log-type-take',return:'log-type-return',load:'log-type-load'}[t]||'log-type-return';
-  const icon={take:'📤',return:'↩️',load:'📦'}[t]||'↔️';
-  const iconCls={take:'take',return:'ret',load:'ret'}[t]||'ret';
-  const action={take:'Prelevati',return:'Restituiti',load:'Caricati'}[t]||'Mossi';
+  const typeLabel={take:'Prelievo',return:'Restituzione',load:'Carico merce',adjust:'⚠️ Rettifica manuale'}[t]||'Movimento';
+  const typeCls={take:'log-type-take',return:'log-type-return',load:'log-type-load',adjust:'log-type-take'}[t]||'log-type-return';
+  const icon={take:'📤',return:'↩️',load:'📦',adjust:'⚙️'}[t]||'↔️';
+  const iconCls={take:'take',return:'ret',load:'ret',adjust:'ret'}[t]||'ret';
+  const action={take:'Prelevati',return:'Restituiti',load:'Caricati',adjust:'Rettifica di'}[t]||'Mossi';
 
   // Determina quali azioni mostrare
   let actionsHTML='';
@@ -2844,6 +2869,89 @@ window.clearAllLogs=async function(){
 };
 
 // ═══════════════════════════════════════
+//  RETTIFICA GIACENZA D'EMERGENZA (solo responsabili)
+//  Imposta direttamente la giacenza di un prodotto al valore
+//  indicato. NON tocca le movimentazioni passate. Registra un
+//  movimento di tipo 'adjust' con delta = nuova - vecchia, così
+//  il registro resta coerente e tracciabile.
+// ═══════════════════════════════════════
+function renderRettificaList(){
+  const list=document.getElementById('rettifica-list');
+  if(!list) return;
+  if(!isResp()){list.innerHTML='';return;}
+  const searchEl=document.getElementById('rettifica-search-input');
+  const q=((searchEl&&searchEl.value)||'').toLowerCase().trim();
+  if(!q){
+    list.innerHTML='<div style="text-align:center;padding:24px 12px;color:var(--text-muted);font-size:13px">Digita il nome o il codice del prodotto da rettificare.</div>';
+    return;
+  }
+  const items=itemsList.filter(it=>it.name.toLowerCase().includes(q)||it.code.toLowerCase().includes(q))
+    .sort((a,b)=>a.code.localeCompare(b.code)).slice(0,40);
+  if(items.length===0){
+    list.innerHTML='<div style="text-align:center;padding:24px 12px;color:var(--text-muted);font-size:13px">Nessun prodotto trovato per «'+q+'».</div>';
+    return;
+  }
+  list.innerHTML=items.map(it=>{
+    const cfg=categories[it.cat]||{bg:'#eee',color:'#333',label:it.cat};
+    return `<div class="carica-item">
+      <div class="carica-item-top">
+        <span class="carica-item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
+        <span class="carica-item-name">${it.name} <span style="font-weight:500;color:var(--text-muted);font-size:11px">· ${cfg.label}</span></span>
+        <span class="carica-item-qty">${it.qty} ${it.unit}</span>
+      </div>
+      <div class="carica-inputs">
+        <div class="carica-input-wrap">
+          <div class="carica-input-label">Giacenza attuale</div>
+          <input class="carica-input" type="number" value="${it.qty}" disabled style="background:#f3f4f6;color:#6b7280">
+        </div>
+        <div class="carica-input-wrap">
+          <div class="carica-input-label" style="color:#b91c1c;font-weight:700">Nuova giacenza reale</div>
+          <input class="carica-input" type="number" min="0" step="any" placeholder="Conteggio corretto"
+            id="rett-${it.id}" value="" inputmode="numeric" style="border-color:#b91c1c">
+        </div>
+        <div class="carica-input-wrap carica-add-full">
+          <div class="carica-input-label">Motivo (opzionale)</div>
+          <input class="carica-input" type="text" id="rett-note-${it.id}" placeholder="Es. conteggio errato, rottura, ammanco..." style="text-align:left">
+        </div>
+      </div>
+      <button class="carica-confirm-btn" style="background:#b91c1c" onclick="applicaRettifica('${it.id}')">⚙️ Applica rettifica</button>
+    </div>`;
+  }).join('');
+}
+window.renderRettificaList=renderRettificaList;
+
+let _rettificaBusy=false;
+window.applicaRettifica=async function(itemId){
+  if(!isResp()){showToast('Solo i responsabili possono rettificare','toast-danger');return;}
+  if(_rettificaBusy) return;
+  const item=itemsList.find(i=>i.id===itemId);if(!item) return;
+  const inp=document.getElementById('rett-'+itemId);
+  const noteEl=document.getElementById('rett-note-'+itemId);
+  if(!inp||inp.value===''){showToast('Inserisci la nuova giacenza','toast-danger');inp?.focus();return;}
+  const nuova=parseFloat(inp.value);
+  if(isNaN(nuova)||nuova<0){showToast('Valore non valido','toast-danger');inp.focus();return;}
+  const vecchia=item.qty;
+  if(nuova===vecchia){showToast('La giacenza è già '+vecchia+' '+item.unit,'toast-info');return;}
+  const motivo=(noteEl?.value||'').trim();
+  if(!confirm('Confermi la rettifica di "'+item.name+'" ('+item.code+')?\n\n'+
+      'Da '+vecchia+' a '+nuova+' '+item.unit+' (differenza '+(nuova-vecchia>0?'+':'')+(nuova-vecchia)+').\n\n'+
+      'Le movimentazioni passate NON verranno toccate.')) return;
+  _rettificaBusy=true;
+  try{
+    const delta=nuova-vecchia;
+    item.qty=nuova;
+    await saveItem(item);
+    const entry={id:genId(),itemId:item.id,code:item.code,name:item.name,
+      delta,prevQty:vecchia,operator:currentUser.nome,operatorUid:currentUser.uid,
+      time:Date.now(),type:'adjust',note:'Rettifica manuale'+(motivo?': '+motivo:'')};
+    await saveMovimento(entry);
+    renderRettificaList();
+    renderDashboard();
+    showToast('Giacenza '+item.code+' rettificata: '+vecchia+' → '+nuova+' '+item.unit,'toast-return');
+  } finally { _rettificaBusy=false; }
+};
+
+// ═══════════════════════════════════════
 //  EXPORT
 // ═══════════════════════════════════════
 // ─────────────────────────────────────────────
@@ -2985,7 +3093,8 @@ window.exportExcel=function(){
     const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     const item=itemsList.find(i=>i.id===e.itemId);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
-    csv+=`"${data}","${ora}","${e.code}","${e.name.replace(/"/g,'""')}","${catLabel}","${e.delta<0?'Prelievo':'Reimmissione'}","${Math.abs(e.delta)}","${e.operator||'N/D'}"\n`;
+    const opLabel=e.type==='adjust'?'Rettifica manuale':(e.type==='load'?'Carico':(e.delta<0?'Prelievo':'Reimmissione'));
+    csv+=`"${data}","${ora}","${e.code}","${e.name.replace(/"/g,'""')}","${catLabel}","${opLabel}","${e.delta}","${e.operator||'N/D'}"\n`;
   });
   downloadCSV(csv,'Report_Movimentazioni_'+dateStr()+'.csv');showToast('Report scaricato','toast-info');
 };
@@ -3604,9 +3713,16 @@ function renderCaricaList(){
   const q=((searchEl&&searchEl.value)||'').toLowerCase().trim();
   const isSearch=!!q;
 
+  // Durante la ricerca nascondi il selettore di categoria: la ricerca è
+  // globale su tutte le categorie, il dropdown creerebbe solo confusione.
+  const catWrap=document.querySelector('.carica-cat-select-wrap');
+  if(catWrap) catWrap.style.display=isSearch?'none':'';
+
   let items,cfg;
   if(isSearch){
-    items=itemsList.filter(it=>it.cat!=='Carburante'&&(it.name.toLowerCase().includes(q)||it.code.toLowerCase().includes(q)));
+    // Ricerca ESTESA A TUTTE LE CATEGORIE, carburante incluso.
+    items=itemsList.filter(it=>it.name.toLowerCase().includes(q)||it.code.toLowerCase().includes(q))
+      .sort((a,b)=>a.code.localeCompare(b.code));
   } else {
     if(!caricaActiveCat){list.innerHTML='';return;}
     cfg=categories[caricaActiveCat];
@@ -3670,6 +3786,21 @@ function renderCaricaList(){
         const icfg=isSearch?(categories[it.cat]||{bg:'',color:'var(--text)'}):cfg;
         const catTag=isSearch&&categories[it.cat]?` <span style="font-weight:500;color:var(--text-muted);font-size:11px">· ${categories[it.cat].label}</span>`:'';
         const priceVal=it.prezzo!=null?it.prezzo:'';
+        // I prodotti Carburante hanno un flusso dedicato (mezzo + litri):
+        // in ricerca mostriamo una scheda ridotta che apre il modal carburante.
+        if(it.cat==='Carburante'){
+          return `<div class="carica-item">
+            <div class="carica-item-top">
+              <span class="carica-item-code" style="background:${icfg.bg};color:${icfg.color}">${it.code}</span>
+              <span class="carica-item-name">${it.name}${catTag}</span>
+              <span class="carica-item-qty">${it.qty} ${it.unit}</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);padding:2px 2px 10px">
+              Il carburante si gestisce dalla sezione dedicata (rifornimento con mezzo e litri).
+            </div>
+            <button class="carica-confirm-btn" style="background:#c26e0f" onclick="openFuelModal('${it.id}')">⛽ Apri gestione carburante</button>
+          </div>`;
+        }
         return `<div class="carica-item">
           <div class="carica-item-top">
             <span class="carica-item-code" style="background:${icfg.bg};color:${icfg.color}">${it.code}</span>
