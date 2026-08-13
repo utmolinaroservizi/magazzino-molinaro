@@ -2331,7 +2331,7 @@ window.doAdjust=async function(sign){
   currentModalItem.qty=next;
   await saveItem(currentModalItem);
   const movType=actualDelta<0?'take':'return';
-  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('mat'),backdated:isBackdated('mat'),type:movType,cantiere};
+  const entry={id:genId(),itemId:currentModalItem.id,code:currentModalItem.code,name:currentModalItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('mat'),backdated:isBackdated('mat'),createdAt:Date.now(),type:movType,cantiere};
   await saveMovimento(entry);
   document.getElementById('m-qty').textContent=next;
   if(isResp()) renderPriceSection(currentModalItem);
@@ -2547,16 +2547,23 @@ function renderLogItem(entry,isTake,ts){
   const nascondiStyle=entry.nascosto?'opacity:.5;background:var(--bg-surface)':'';
   const nascondiLabel=entry.nascosto?'<span style="font-size:9px;font-weight:700;color:#B33A3A;background:#FDF0EE;padding:2px 6px;border-radius:99px;margin-left:4px">Solo resp.</span>':'';
 
-  // Movimento retrodatato: box giallo + badge, così è subito riconoscibile
-  // scorrendo il registro. Vale solo per i movimenti creati con il flag
-  // `backdated` (da ora in poi); i vecchi restano bianchi.
-  const backdatedStyle=entry.backdated?'background:#fff8dc;border-color:#e6c200':'';
-  const backdatedLabel=entry.backdated?'<span style="font-size:9px;font-weight:700;color:#7a5c00;background:#fdf3c4;padding:2px 6px;border-radius:99px;margin-left:4px">🕒 Retrodatato</span>':'';
+  // Movimento retrodatato: rilevato in due modi (robusto).
+  // 1) flag esplicito `backdated` salvato al momento della creazione;
+  // 2) fallback: se `createdAt` (ora reale di creazione) esiste ed è
+  //    più di 2 minuti DOPO `time`, il movimento è stato retrodatato.
+  // I vecchi movimenti (senza flag né createdAt) restano bianchi.
+  const isBackdatedEntry = entry.backdated===true ||
+    (entry.createdAt && entry.time && (entry.createdAt - entry.time) > 120000);
+  const backdatedStyle=isBackdatedEntry?'background:#fff8dc;border:1.5px solid #e6c200':'';
+  const backdatedBanner=isBackdatedEntry
+    ? '<div style="display:inline-block;font-size:12px;font-weight:800;letter-spacing:.5px;color:#7a5c00;background:#ffe867;padding:3px 10px;border-radius:6px;margin-bottom:5px;text-transform:uppercase">🕒 Retrodatato</div>'
+    : '';
 
   return `<div class="log-item" style="${nascondiStyle}${backdatedStyle}">
     <div class="log-icon ${iconCls}">${icon}</div>
     <div class="log-info">
-      <div class="log-text"><strong>${entry.code}</strong> — ${entry.name}${nascondiLabel}${backdatedLabel}</div>
+      ${backdatedBanner}
+      <div class="log-text"><strong>${entry.code}</strong> — ${entry.name}${nascondiLabel}</div>
       <div class="log-operator" style="display:flex;align-items:center;gap:6px">
         <span>👷 ${entry.operator||'N/D'}</span>
         <span class="log-type-badge ${typeCls}">${typeLabel}</span>
@@ -3657,7 +3664,7 @@ window.doFuelAdjust=async function(sign){
   currentFuelItem.qty=next;
   await saveItem(currentFuelItem);
   const vehicle=getSelectedVehicle();
-  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('fuel'),backdated:isBackdated('fuel'),type:actualDelta<0?'take':'return'};
+  const entry={id:genId(),itemId:currentFuelItem.id,code:currentFuelItem.code,name:currentFuelItem.name,delta:actualDelta,prevQty:next-actualDelta,operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('fuel'),backdated:isBackdated('fuel'),createdAt:Date.now(),type:actualDelta<0?'take':'return'};
   if(vehicle){entry.mezzo=vehicle.mezzo;entry.targa=vehicle.targa;}
   await saveMovimento(entry);
   document.getElementById('fm-qty').textContent=next;
@@ -3897,7 +3904,7 @@ window.submitNuovoProdottoCarica=async function(){
     // Log carico iniziale se qty > 0
     if(qty>0){
       const entry={id:genId(),itemId:id,code,name,delta:qty,prevQty:0,
-        operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('carnew'),backdated:isBackdated('carnew'),type:'load',fornitore};
+        operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('carnew'),backdated:isBackdated('carnew'),createdAt:Date.now(),type:'load',fornitore};
       await saveMovimento(entry);
     }
     renderCarica();
@@ -3926,7 +3933,7 @@ window.confirmCarico=async function(itemId){
   var ddtInfo=getDdtInfoItem(itemId);
   const entry={id:genId(),itemId:item.id,code:item.code,name:item.name,
     delta:qty,prevQty,operator:currentUser.nome,operatorUid:currentUser.uid,
-    time:getBackdatedTime('car-'+itemId),backdated:isBackdated('car-'+itemId),type:'load',fornitore,
+    time:getBackdatedTime('car-'+itemId),backdated:isBackdated('car-'+itemId),createdAt:Date.now(),type:'load',fornitore,
     tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc};
   await saveMovimento(entry);
 
