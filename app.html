@@ -399,6 +399,8 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .cant-group-body.open{display:flex}
 .resp-entity-archive{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;white-space:nowrap}
 .resp-entity-archive:hover{background:#fff3e2;color:#b9640a;border-color:#f3c886}
+.resp-entity-move{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:var(--brand-600);cursor:pointer;font-family:inherit;white-space:nowrap}
+.resp-entity-move:hover{background:var(--brand-50);border-color:var(--brand-200)}
 .resp-entity-restore{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:#2f8137;cursor:pointer;font-family:inherit;white-space:nowrap}
 .resp-entity-restore:hover{background:#eef7ec;border-color:#bfe0b6}
 .cant-group-tag{font-size:10px;font-weight:700;color:var(--brand-600);background:var(--brand-50);border-radius:8px;padding:1px 7px;margin-left:2px}
@@ -3030,6 +3032,7 @@ function renderResponsabile(){
           <div class="cant-group-body ${isOpen?'open':''}" id="body-${gkey}">
             ${list.map(c=>`<div class="resp-entity-item">
               <span class="resp-entity-name">🏗️ ${c.nome}</span>
+              <button class="resp-entity-move" onclick="moveCantiereGruppo('${c.id}')">📂 Sposta</button>
               <button class="resp-entity-archive" onclick="archiveCantiere('${c.id}')">🗄️ Archivia</button>
               <button class="resp-entity-del" onclick="deleteCantiere('${c.id}')">✕</button>
             </div>`).join('')}
@@ -4165,6 +4168,24 @@ window.addCantiere=async function(){
   // Il listener onSnapshot aggiornerà cantieriList automaticamente
   setTimeout(()=>renderResponsabile(),300);
   showToast('Cantiere "'+nome+'" aggiunto','toast-return');
+};
+
+window.moveCantiereGruppo=async function(id){
+  const c=cantieriList.find(x=>x.id===id);
+  if(!c) return;
+  const gruppiEsistenti=[...new Set(cantieriList.map(x=>(x.gruppo||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const hint=gruppiEsistenti.length?'\n\nGruppi esistenti: '+gruppiEsistenti.join(', '):'';
+  const attuale=(c.gruppo||'').trim();
+  const nuovo=prompt('Sposta "'+c.nome+'" in quale gruppo?\nLascia vuoto per toglierlo dal gruppo (Senza gruppo).'+hint,attuale);
+  if(nuovo===null) return; // annullato
+  const gruppo=nuovo.trim();
+  if(gruppo===attuale){showToast('Gruppo invariato','toast-info');return;}
+  await setDoc(doc(db,'cantieri',id),{gruppo},{merge:true});
+  if(c) c.gruppo=gruppo; // feedback immediato
+  // Tieni aperta la linguetta di destinazione così vedi subito lo spostamento
+  cantGroupOpen[gruppo||'Senza gruppo']=true;
+  setTimeout(()=>renderResponsabile(),300);
+  showToast(gruppo?'Spostato in "'+gruppo+'"':'Rimosso dal gruppo','toast-return');
 };
 
 // Stato apertura linguette gruppi cantieri (in memoria, non persistito)
