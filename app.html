@@ -85,6 +85,20 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .stat-label{font-size:10px;color:var(--text-light);margin-top:6px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}
 .stat-card.value-card .stat-val{font-size:18px}
 
+/* Dashboard — riquadri di stato (nafta, prodotti provvisori) */
+.dash-alerts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.dash-alert{border-radius:var(--radius-sm);padding:12px 12px;border:1.5px solid;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-xs);min-height:58px}
+.dash-alert-ok{background:#eef7ec;border-color:#bfe0b6}
+.dash-alert-warn{background:#fff3e2;border-color:#f3c886}
+.dash-alert-icon{font-size:22px;line-height:1;flex-shrink:0}
+.dash-alert-body{min-width:0}
+.dash-alert-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-light);margin-bottom:2px}
+.dash-alert-ok .dash-alert-val{font-size:15px;font-weight:700;color:#2f8137;line-height:1.15}
+.dash-alert-warn .dash-alert-val{font-size:13px;font-weight:700;color:#b9640a;line-height:1.2}
+.dash-alert-warn .dash-alert-icon{animation:dashPulse 1.6s ease-in-out infinite}
+@keyframes dashPulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media(max-width:380px){.dash-alerts{grid-template-columns:1fr}}
+
 .tree-wrap{background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);padding:22px 16px 18px;box-shadow:var(--shadow-sm);margin-bottom:20px}
 .tree-root-label{background:var(--brand-500);color:#fff;font-size:12.5px;font-weight:600;padding:9px 18px;border-radius:99px;text-align:center;margin:0 auto;width:fit-content;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-brand)}
 .tree-connector{width:2px;height:18px;margin:0 auto;background:var(--border)}
@@ -374,6 +388,20 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .resp-entity-input{flex:1;padding:9px 10px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:13px;font-family:inherit;background:var(--bg-card);color:var(--text);outline:none}
 .resp-entity-input:focus{border-color:var(--brand-500)}
 .resp-entity-btn{padding:9px 14px;background:var(--brand-500);color:#fff;border:none;border-radius:var(--radius-xs);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap}
+/* Cantieri raggruppati + archiviazione */
+.cant-group{border:1px solid var(--border);border-radius:var(--radius-xs);margin-bottom:8px;overflow:hidden;background:var(--bg-card)}
+.cant-group-head{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg-surface);cursor:pointer;user-select:none;font-size:12.5px;font-weight:700;color:var(--text)}
+.cant-group-head:hover{background:var(--border-light,#eee)}
+.cant-group-arrow{transition:transform .2s;flex-shrink:0}
+.cant-group-arrow.open{transform:rotate(90deg)}
+.cant-group-count{margin-left:auto;font-size:11px;font-weight:600;color:var(--text-light);background:var(--bg-card);border:1px solid var(--border);border-radius:99px;padding:1px 9px}
+.cant-group-body{display:none;flex-direction:column;gap:6px;padding:8px}
+.cant-group-body.open{display:flex}
+.resp-entity-archive{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;white-space:nowrap}
+.resp-entity-archive:hover{background:#fff3e2;color:#b9640a;border-color:#f3c886}
+.resp-entity-restore{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:#2f8137;cursor:pointer;font-family:inherit;white-space:nowrap}
+.resp-entity-restore:hover{background:#eef7ec;border-color:#bfe0b6}
+.cant-group-tag{font-size:10px;font-weight:700;color:var(--brand-600);background:var(--brand-50);border-radius:8px;padding:1px 7px;margin-left:2px}
 
 /* CANTIERE SELECTOR (nella modale prodotto) */
 .modal-cantiere-zone{padding:10px 16px;background:var(--bg-surface);border-radius:var(--radius-sm);margin:6px 0}
@@ -383,6 +411,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 
 /* CARICA MERCE — selettore categoria */
 .carica-cat-select-wrap{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+/* Carico massivo su stesso DDT/Fattura */
+.batch-ddt-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;margin-bottom:12px;border:1.5px dashed var(--brand-300,#9ecb95);border-radius:var(--radius-xs);background:var(--brand-50);color:var(--brand-600);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:var(--transition)}
+.batch-ddt-toggle:active{transform:scale(.98)}
+.batch-ddt-toggle.active{background:var(--brand-500);color:#fff;border-style:solid;border-color:var(--brand-500)}
+.batch-ddt-banner{background:var(--brand-50);border:1.5px solid var(--brand-200);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px}
+.batch-ddt-banner-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-600);margin-bottom:9px}
+.batch-ddt-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.batch-ddt-hint{font-size:11px;color:var(--text-muted);margin-top:9px;line-height:1.45}
 .carica-cat-select{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;background:var(--bg-card);color:var(--text);outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
 .carica-cat-select:focus{border-color:var(--brand-500)}
 .carica-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px}
@@ -658,6 +694,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="11.5" cy="15.5" r="2.5"/><line x1="13.3" y1="17.3" x2="15" y2="19"/></svg>
     Ricerca DDT/Fatture
   </button>
+  <button class="hamburger-menu-item" onclick="showPage('cantieri-archiviati');closeHamburgerMenu()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+    Cantieri archiviati
+  </button>
   <button class="hamburger-menu-item" onclick="showPage('rettifica');closeHamburgerMenu()" style="color:#b91c1c">
     <svg viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-linecap="round" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     Rettifica giacenza
@@ -709,6 +749,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   </div>
   <div class="section-label">Panoramica</div>
   <div class="stats-grid" id="stats-grid"></div>
+  <div class="dash-alerts" id="dash-alerts"></div>
   <div class="section-label">Struttura magazzino</div>
   <div class="tree-wrap"><div class="tree-root-label">🏭 Magazzino</div><div class="tree-connector"></div><div class="tree-h-line"></div><div class="tree-branches" id="tree-branches"></div></div>
 </div>
@@ -818,6 +859,22 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="hero-eyebrow">Responsabile · Magazzino</div>
     <div class="hero-title" style="font-size:18px">📦 Carica Merce</div>
     <div class="hero-meta">Nuovo acquisto — aggiorna giacenze e prezzi</div>
+  </div>
+  <button class="batch-ddt-toggle" id="batch-ddt-toggle" onclick="toggleBatchDdt()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="12" y1="12" x2="12" y2="18"/></svg>
+    <span id="batch-ddt-toggle-label">Carico massivo su stesso DDT / Fattura</span>
+  </button>
+  <div class="batch-ddt-banner" id="batch-ddt-banner" style="display:none">
+    <div class="batch-ddt-banner-title">📄 Documento fissato per tutti i carichi</div>
+    <div class="batch-ddt-row">
+      <div class="ddt-type-btns">
+        <button type="button" class="ddt-type-btn active" id="batch-ddt-btn-ddt" onclick="setBatchDdtType('DDT')">DDT</button>
+        <button type="button" class="ddt-type-btn" id="batch-ddt-btn-fat" onclick="setBatchDdtType('Fattura')">Fattura</button>
+      </div>
+      <input class="ddt-input" id="batch-ddt-num" placeholder="N° documento..." type="text" oninput="syncBatchDdt()">
+      <input class="ddt-date" id="batch-ddt-date" type="date" oninput="syncBatchDdt()">
+    </div>
+    <div class="batch-ddt-hint" id="batch-ddt-hint">Imposta numero e data: verranno applicati automaticamente ad ogni "Conferma carico" finché la modalità resta attiva.</div>
   </div>
   <div class="search-bar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -997,6 +1054,19 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   <div id="rettifica-list" style="margin-top:12px"></div>
 </div>
 
+<!-- CANTIERI ARCHIVIATI (solo responsabili) -->
+<div class="page" id="page-cantieri-archiviati">
+  <div class="hero">
+    <div class="hero-eyebrow">Responsabile · Archivio</div>
+    <div class="hero-title" style="font-size:18px">🗄️ Cantieri archiviati</div>
+    <div class="hero-meta">Cantieri conclusi — restano a sistema per storico e report</div>
+  </div>
+  <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--text-muted);line-height:1.5">
+    I cantieri archiviati non appaiono più nei menu di selezione (prelievi, carichi, report), ma <strong>tutti i dati e le movimentazioni collegate restano intatti</strong>. Puoi ripristinarli in qualsiasi momento.
+  </div>
+  <div id="cantieri-archiviati-list"></div>
+</div>
+
 <!-- RESPONSABILE -->
 <div class="page" id="page-responsabile">
   <div class="section-label">Area responsabile</div>
@@ -1062,12 +1132,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   </div>
   <div class="resp-card">
     <h3>🏗️ Gestione cantieri</h3>
-    <p>Aggiungi i cantieri attivi. Gli operai li selezioneranno ad ogni prelievo e restituzione.</p>
+    <p>Aggiungi i cantieri attivi. Gli operai li selezioneranno ad ogni prelievo e restituzione. Puoi raggrupparli (es. "Manutenzione") e archiviare quelli conclusi — restano a sistema e sono consultabili dal menu ☰.</p>
     <div class="resp-entity-list" id="resp-cantieri-list"></div>
-    <div class="resp-entity-add">
-      <input class="resp-entity-input" id="new-cantiere-input" placeholder="Nome cantiere...">
+    <div class="resp-entity-add" style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <input class="resp-entity-input" id="new-cantiere-input" placeholder="Nome cantiere..." style="grid-column:1 / span 2">
+      <input class="resp-entity-input" id="new-cantiere-gruppo" placeholder="Gruppo (opzionale, es. Manutenzione)" list="cantiere-gruppi-datalist">
       <button class="resp-entity-btn" onclick="addCantiere()">+ Aggiungi</button>
     </div>
+    <datalist id="cantiere-gruppi-datalist"></datalist>
   </div>
   <div class="resp-card">
     <h3>🏭 Gestione fornitori</h3>
@@ -1520,6 +1592,22 @@ function nextCodeForCat(cat){
 function isResp(){return currentUser&&currentUser.ruolo==='responsabile'}
 
 // ═══════════════════════════════════════
+//  CODICE DI SBLOCCO AZIONI DISTRUTTIVE
+//  Non è una vera protezione di sicurezza: serve solo a evitare che
+//  qualcuno prema per sbaglio eliminazioni / ricalcoli / rettifiche.
+// ═══════════════════════════════════════
+const UNLOCK_CODE='21071999';
+function requireUnlockCode(){
+  const val=prompt('⚠️ Azione delicata.\nInserisci il codice di sblocco per procedere:');
+  if(val===null) return false; // annullato
+  if(val.trim()!==UNLOCK_CODE){
+    showToast('Codice errato — azione annullata','toast-danger');
+    return false;
+  }
+  return true;
+}
+
+// ═══════════════════════════════════════
 //  RETRODATAZIONE MOVIMENTI (solo responsabili)
 //  Se il resp spunta la checkbox "Retrodata movimento" nel blocco
 //  backdate presente nel form, il timestamp letto viene usato al
@@ -1631,9 +1719,10 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
 
     // 4. Navigazione iniziale
     listenRealtime();
-    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo','registro-presenze','ricerca-ddt','rettifica'];
+    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo','registro-presenze','ricerca-ddt','rettifica','cantieri-archiviati'];
+    const RESP_ONLY_PAGES=['carica','responsabile','riepilogo','ricerca-ddt','rettifica','cantieri-archiviati'];
     const hashPage=window.location.hash.replace('#','');
-    const startPage=(VALID_PAGES.includes(hashPage)&&(hashPage!=='carica'&&hashPage!=='responsabile'&&hashPage!=='riepilogo'&&hashPage!=='ricerca-ddt'&&hashPage!=='rettifica'||isResp()))?hashPage:'dashboard';
+    const startPage=(VALID_PAGES.includes(hashPage)&&(!RESP_ONLY_PAGES.includes(hashPage)||isResp()))?hashPage:'dashboard';
     history.replaceState({page:startPage},'','#'+startPage);
     _showPage(startPage);
     setTimeout(handleUrlProductCode,300);
@@ -1939,6 +2028,7 @@ function listenRealtime(){
     cantieriList=[];snap.forEach(d=>cantieriList.push({id:d.id,...d.data()}));
     cantieriList.sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
     if(document.getElementById('page-responsabile')?.classList.contains('active')) renderResponsabile();
+    if(document.getElementById('page-cantieri-archiviati')?.classList.contains('active')) renderCantieriArchiviati();
   });
   onSnapshot(collection(db,'fornitori'),snap=>{
     fornitoriList=[];snap.forEach(d=>fornitoriList.push({id:d.id,...d.data()}));
@@ -2010,6 +2100,10 @@ function _showPage(id){
     if(!isResp()){_showPage('dashboard');return;}
     renderRettificaList();
   }
+  if(id==='cantieri-archiviati'){
+    if(!isResp()){_showPage('dashboard');return;}
+    renderCantieriArchiviati();
+  }
   closeFab();
   closeHamburgerMenu();
 }
@@ -2042,6 +2136,63 @@ function renderDashboard(){
     <div class="stat-card"><div class="stat-val">${tq.toLocaleString('it')}</div><div class="stat-label">Totale stock</div></div>`;
 
   document.getElementById('stats-grid').innerHTML=statsHTML;
+
+  // ── Riquadri di stato: livello nafta + prodotti provvisori ──
+  const alertsEl=document.getElementById('dash-alerts');
+  if(alertsEl){
+    let alertsHTML='';
+
+    // Livello nafta (item NAFTA, tipicamente CB.001)
+    const naftaItem=itemsList.find(it=>it.code==='CB.001')
+      || itemsList.find(it=>it.cat==='Carburante'&&(it.name||'').toUpperCase().includes('NAFTA'));
+    if(naftaItem){
+      const litri=naftaItem.qty;
+      if(litri>200){
+        alertsHTML+=`<div class="dash-alert dash-alert-ok">
+          <div class="dash-alert-icon">⛽</div>
+          <div class="dash-alert-body">
+            <div class="dash-alert-title">Livello nafta</div>
+            <div class="dash-alert-val">${litri.toLocaleString('it')} litri disponibili</div>
+          </div>
+        </div>`;
+      } else {
+        alertsHTML+=`<div class="dash-alert dash-alert-warn">
+          <div class="dash-alert-icon">⚠️</div>
+          <div class="dash-alert-body">
+            <div class="dash-alert-title">Livello nafta · ${litri.toLocaleString('it')} lt</div>
+            <div class="dash-alert-val">Fare nuovo ordine Gasolio</div>
+          </div>
+        </div>`;
+      }
+    }
+
+    // Prodotti Provvisori: alert se una qualunque voce ha qty > 0
+    const provItems=itemsList.filter(it=>it.cat==='Prodotti Provvisori');
+    if(provItems.length>0){
+      const attivi=provItems.filter(it=>it.qty>0);
+      if(attivi.length>0){
+        const tot=attivi.reduce((s,it)=>s+it.qty,0);
+        alertsHTML+=`<div class="dash-alert dash-alert-warn">
+          <div class="dash-alert-icon">📦</div>
+          <div class="dash-alert-body">
+            <div class="dash-alert-title">Prodotti Provvisori</div>
+            <div class="dash-alert-val">${attivi.length} voce${attivi.length===1?'':'i'} in giacenza (${tot.toLocaleString('it')})</div>
+          </div>
+        </div>`;
+      } else {
+        alertsHTML+=`<div class="dash-alert dash-alert-ok">
+          <div class="dash-alert-icon">✅</div>
+          <div class="dash-alert-body">
+            <div class="dash-alert-title">Prodotti Provvisori</div>
+            <div class="dash-alert-val">Nessuna voce in giacenza</div>
+          </div>
+        </div>`;
+      }
+    }
+
+    alertsEl.innerHTML=alertsHTML;
+    alertsEl.style.display=alertsHTML?'grid':'none';
+  }
 
   let th='';
   catOrder.forEach(cat=>{
@@ -2155,6 +2306,7 @@ window.toggleEditMode=function(){
 window.deleteItem=async function(id){
   const it=itemsList.find(i=>i.id===id);if(!it) return;
   if(!confirm('Eliminare "'+it.name+'"?\n\nIl codice '+it.code+' andrà in pensione e non verrà riassegnato.\nI QR già stampati resteranno validi.')) return;
+  if(!requireUnlockCode()) return;
   itemsList=itemsList.filter(i=>i.id!==id);
   await deleteItemFromDB(id);
   renderMateriali();showToast('Prodotto '+it.code+' eliminato','toast-danger');
@@ -2189,10 +2341,10 @@ window.openModal=function(id){
   counterVal=counterStep;
   updateCounterDisplay();
 
-  // Popola dropdown cantieri
+  // Popola dropdown cantieri (solo attivi, non archiviati)
   const cantSel=document.getElementById('m-cantiere');
   cantSel.innerHTML='<option value="">— Seleziona cantiere —</option>'+
-    cantieriList.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
+    cantieriList.filter(c=>!c.archiviato).map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
   cantSel.value='';
 
   // Sezione prezzi e sottocategoria: solo responsabili
@@ -2836,18 +2988,57 @@ function renderResponsabile(){
       '</div></div>';
   });
   document.getElementById('resp-cat-list').innerHTML=html||'<p style="font-size:12px;color:var(--text-light);padding:10px 0">Nessuna categoria</p>';
-  // Popola select analisi cantiere
+  // Popola select analisi cantiere (solo cantieri ATTIVI, non archiviati)
+  const cantieriAttivi=cantieriList.filter(c=>!c.archiviato);
   const dcs=document.getElementById('dash-cant-sel');
-  if(dcs){const prev=dcs.value;dcs.innerHTML='<option value="">— Tutti i cantieri —</option>'+cantieriList.map(c=>'<option value="'+c.nome+'">'+c.nome+'</option>').join('');if(prev)dcs.value=prev;}
+  if(dcs){const prev=dcs.value;dcs.innerHTML='<option value="">— Tutti i cantieri —</option>'+cantieriAttivi.map(c=>'<option value="'+c.nome+'">'+c.nome+'</option>').join('');if(prev)dcs.value=prev;}
 
-  // Cantieri
-  const cantHtml=cantieriList.length===0
-    ?'<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun cantiere. Aggiungine uno.</p>'
-    :cantieriList.map(c=>`<div class="resp-entity-item">
-        <span class="resp-entity-name">🏗️ ${c.nome}</span>
-        <button class="resp-entity-del" onclick="deleteCantiere('${c.id}')">✕ Elimina</button>
-      </div>`).join('');
-  document.getElementById('resp-cantieri-list').innerHTML=cantHtml;
+  // Datalist gruppi esistenti (per autocomplete nel campo "Gruppo")
+  const gruppiEsistenti=[...new Set(cantieriList.map(c=>(c.gruppo||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const dl=document.getElementById('cantiere-gruppi-datalist');
+  if(dl) dl.innerHTML=gruppiEsistenti.map(g=>'<option value="'+g+'">').join('');
+
+  // Cantieri ATTIVI raggruppati per gruppo, con linguette comprimibili
+  const cantEl=document.getElementById('resp-cantieri-list');
+  if(cantEl){
+    if(cantieriAttivi.length===0){
+      cantEl.innerHTML='<p style="font-size:12px;color:var(--text-light);padding:6px 0">Nessun cantiere attivo. Aggiungine uno.</p>';
+    } else {
+      // Raggruppa: chiave gruppo (vuoto => "Senza gruppo")
+      const groups=new Map();
+      cantieriAttivi.forEach(c=>{
+        const g=(c.gruppo||'').trim()||'Senza gruppo';
+        if(!groups.has(g)) groups.set(g,[]);
+        groups.get(g).push(c);
+      });
+      const groupKeys=[...groups.keys()].sort((a,b)=>{
+        if(a==='Senza gruppo') return 1;
+        if(b==='Senza gruppo') return -1;
+        return a.localeCompare(b);
+      });
+      let cantHtml='';
+      groupKeys.forEach(g=>{
+        const list=groups.get(g).slice().sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+        const gkey='cg_'+g.replace(/[^a-zA-Z0-9]/g,'_');
+        const isOpen=cantGroupOpen[g]!==false; // default aperto
+        cantHtml+=`<div class="cant-group">
+          <div class="cant-group-head" onclick="toggleCantGroup('${g.replace(/'/g,"\\'")}')">
+            <svg class="cant-group-arrow ${isOpen?'open':''}" id="arrow-${gkey}" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <span>${g==='Senza gruppo'?'📁 '+g:'🏷️ '+g}</span>
+            <span class="cant-group-count">${list.length}</span>
+          </div>
+          <div class="cant-group-body ${isOpen?'open':''}" id="body-${gkey}">
+            ${list.map(c=>`<div class="resp-entity-item">
+              <span class="resp-entity-name">🏗️ ${c.nome}</span>
+              <button class="resp-entity-archive" onclick="archiveCantiere('${c.id}')">🗄️ Archivia</button>
+              <button class="resp-entity-del" onclick="deleteCantiere('${c.id}')">✕</button>
+            </div>`).join('')}
+          </div>
+        </div>`;
+      });
+      cantEl.innerHTML=cantHtml;
+    }
+  }
 
   // Fornitori
   const fornHtml=fornitoriList.length===0
@@ -2876,15 +3067,16 @@ function renderResponsabile(){
     mezziEl.innerHTML=mezziHtml;
   }
 
-  // Popola dropdown export cantiere
+  // Popola dropdown export cantiere (solo attivi)
   const expSel=document.getElementById('resp-cantiere-export');
   if(expSel) expSel.innerHTML='<option value="">Tutti i cantieri</option>'+
-    cantieriList.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
+    cantieriAttivi.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
 }
 window.deleteCategory=async function(cat){
   const cfg=categories[cat];if(!cfg) return;
   const ci=getItemsByCat(cat);
   if(!confirm('Eliminare "'+cfg.label+'"?\n\nVerranno eliminati anche '+ci.length+' prodotti.\nAzione irreversibile.')) return;
+  if(!requireUnlockCode()) return;
   for(const it of ci) await deleteItemFromDB(it.id);
   itemsList=itemsList.filter(i=>i.cat!==cat);delete categories[cat];catOrder=catOrder.filter(c=>c!==cat);
   await deleteCategoryFromDB(cat);renderResponsabile();renderDashboard();showToast('Categoria eliminata','toast-danger');
@@ -2963,6 +3155,7 @@ window.applicaRettifica=async function(itemId){
   if(!confirm('Confermi la rettifica di "'+item.name+'" ('+item.code+')?\n\n'+
       'Da '+vecchia+' a '+nuova+' '+item.unit+' (differenza '+(nuova-vecchia>0?'+':'')+(nuova-vecchia)+').\n\n'+
       'Le movimentazioni passate NON verranno toccate.')) return;
+  if(!requireUnlockCode()) return;
   _rettificaBusy=true;
   try{
     const delta=nuova-vecchia;
@@ -3852,7 +4045,9 @@ function renderCaricaList(){
                 ${fornitoriList.map(f=>'<option value="'+f.nome+'">'+f.nome+'</option>').join('')}
               </select>
             </div>
-            <div class="carica-input-wrap carica-add-full">
+            ${batchDdt.active?`<div class="carica-input-wrap carica-add-full">
+              <div style="font-size:11.5px;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-200);border-radius:8px;padding:7px 10px">📄 Verrà associato al documento fissato in alto (${batchDdt.tipo}${batchDdt.num?' n° '+batchDdt.num:''})</div>
+            </div>`:`<div class="carica-input-wrap carica-add-full">
               <div class="carica-input-label">DDT / Fattura (opzionale)</div>
               <div class="ddt-row" style="margin-top:2px">
                 <div class="ddt-type-btns">
@@ -3862,7 +4057,7 @@ function renderCaricaList(){
                 <input class="ddt-input" id="ddt-num-${it.id}" placeholder="N° documento..." type="text">
                 <input class="ddt-date" id="ddt-date-${it.id}" type="date">
               </div>
-            </div>
+            </div>`}
           </div>
           ${backdateBlockHtml('car-'+it.id)}
           <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
@@ -3930,7 +4125,10 @@ window.confirmCarico=async function(itemId){
 
   await saveItem(item);
 
-  var ddtInfo=getDdtInfoItem(itemId);
+  // DDT/Fattura: dal documento fissato (carico massivo) oppure dai campi del prodotto
+  var ddtInfo=batchDdt.active
+    ? {tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data}
+    : getDdtInfoItem(itemId);
   const entry={id:genId(),itemId:item.id,code:item.code,name:item.name,
     delta:qty,prevQty,operator:currentUser.nome,operatorUid:currentUser.uid,
     time:getBackdatedTime('car-'+itemId),backdated:isBackdated('car-'+itemId),createdAt:Date.now(),type:'load',fornitore,
@@ -3939,7 +4137,7 @@ window.confirmCarico=async function(itemId){
 
   qtyEl.value='';
   priceEl.value='';
-  resetDdtItem(itemId);
+  if(!batchDdt.active) resetDdtItem(itemId);
 
   // Feedback visivo
   const btn=document.querySelector(`button[onclick="confirmCarico('${itemId}')"]`);
@@ -3955,21 +4153,97 @@ window.confirmCarico=async function(itemId){
 // ═══════════════════════════════════════
 window.addCantiere=async function(){
   const input=document.getElementById('new-cantiere-input');
+  const gruppoEl=document.getElementById('new-cantiere-gruppo');
   const nome=input.value.trim();
+  const gruppo=(gruppoEl?.value||'').trim();
   if(!nome){showToast('Inserisci il nome del cantiere','toast-danger');input.focus();return;}
   if(cantieriList.find(c=>c.nome.toLowerCase()===nome.toLowerCase())){showToast('Cantiere già esistente','toast-danger');return;}
   const id=genId();
-  await setDoc(doc(db,'cantieri',id),{nome,creato:Date.now()});
+  await setDoc(doc(db,'cantieri',id),{nome,gruppo,archiviato:false,creato:Date.now()});
   input.value='';
+  if(gruppoEl) gruppoEl.value='';
   // Il listener onSnapshot aggiornerà cantieriList automaticamente
   setTimeout(()=>renderResponsabile(),300);
   showToast('Cantiere "'+nome+'" aggiunto','toast-return');
 };
+
+// Stato apertura linguette gruppi cantieri (in memoria, non persistito)
+let cantGroupOpen={};
+window.toggleCantGroup=function(g){
+  const open=cantGroupOpen[g]!==false;
+  cantGroupOpen[g]=!open;
+  const gkey='cg_'+g.replace(/[^a-zA-Z0-9]/g,'_');
+  const body=document.getElementById('body-'+gkey);
+  const arrow=document.getElementById('arrow-'+gkey);
+  if(body) body.classList.toggle('open',!open);
+  if(arrow) arrow.classList.toggle('open',!open);
+};
+
+window.archiveCantiere=async function(id){
+  const c=cantieriList.find(x=>x.id===id);
+  if(!c) return;
+  if(!confirm('Archiviare il cantiere "'+c.nome+'"?\n\nNon apparirà più nei menu di selezione, ma tutti i dati e le movimentazioni collegate restano a sistema. Potrai ripristinarlo dal menu ☰ → Cantieri archiviati.')) return;
+  await setDoc(doc(db,'cantieri',id),{archiviato:true},{merge:true});
+  if(c) c.archiviato=true; // feedback immediato
+  setTimeout(()=>renderResponsabile(),300);
+  showToast('Cantiere "'+c.nome+'" archiviato','toast-info');
+};
+window.unarchiveCantiere=async function(id){
+  const c=cantieriList.find(x=>x.id===id);
+  if(!c) return;
+  await setDoc(doc(db,'cantieri',id),{archiviato:false},{merge:true});
+  if(c) c.archiviato=false;
+  renderCantieriArchiviati();
+  showToast('Cantiere "'+c.nome+'" ripristinato','toast-return');
+};
+
+function renderCantieriArchiviati(){
+  const el=document.getElementById('cantieri-archiviati-list');
+  if(!el) return;
+  const archiviati=cantieriList.filter(c=>c.archiviato);
+  if(archiviati.length===0){
+    el.innerHTML='<p style="font-size:13px;color:var(--text-light);text-align:center;padding:24px 0">Nessun cantiere archiviato.</p>';
+    return;
+  }
+  // Raggruppa anche gli archiviati per gruppo
+  const groups=new Map();
+  archiviati.forEach(c=>{
+    const g=(c.gruppo||'').trim()||'Senza gruppo';
+    if(!groups.has(g)) groups.set(g,[]);
+    groups.get(g).push(c);
+  });
+  const groupKeys=[...groups.keys()].sort((a,b)=>{
+    if(a==='Senza gruppo') return 1;
+    if(b==='Senza gruppo') return -1;
+    return a.localeCompare(b);
+  });
+  let html='';
+  groupKeys.forEach(g=>{
+    const list=groups.get(g).slice().sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+    html+=`<div class="resp-card" style="margin-bottom:10px">
+      <h3 style="font-size:13px">${g==='Senza gruppo'?'📁 '+g:'🏷️ '+g}</h3>
+      <div class="resp-entity-list" style="margin-bottom:0">
+        ${list.map(c=>`<div class="resp-entity-item">
+          <span class="resp-entity-name">🗄️ ${c.nome}</span>
+          <button class="resp-entity-restore" onclick="unarchiveCantiere('${c.id}')">↩️ Ripristina</button>
+          <button class="resp-entity-del" onclick="deleteCantiere('${c.id}')">✕</button>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+window.renderCantieriArchiviati=renderCantieriArchiviati;
+
 window.deleteCantiere=async function(id){
   const c=cantieriList.find(x=>x.id===id);
-  if(!c||!confirm('Eliminare il cantiere "'+c.nome+'"?')) return;
+  if(!c||!confirm('Eliminare definitivamente il cantiere "'+c.nome+'"?\n\nA differenza dell\'archiviazione, questo rimuove il cantiere dall\'elenco. Le movimentazioni già registrate restano nel registro.')) return;
+  if(!requireUnlockCode()) return;
   await deleteDoc(doc(db,'cantieri',id));
-  setTimeout(()=>renderResponsabile(),300);
+  setTimeout(()=>{
+    renderResponsabile();
+    if(document.getElementById('page-cantieri-archiviati')?.classList.contains('active')) renderCantieriArchiviati();
+  },300);
   showToast('Cantiere eliminato','toast-info');
 };
 
@@ -4151,6 +4425,7 @@ window.addSubcat=async function(cat){
 window.delSubcat=async function(cat,sub){
   var cfg=categories[cat]; if(!cfg) return;
   if(!confirm('Eliminare la sottocategoria "'+sub+'"?')) return;
+  if(!requireUnlockCode()) return;
   cfg.subs=(cfg.subs||[]).filter(function(s){return s!==sub;});
   try{
     await setDoc(doc(db,'categorie',cat),cfg);
@@ -4293,6 +4568,34 @@ window.saveSubcategoria=async function(){
   }
 };
 
+
+// ═══════════════════════════════════
+//  CARICO MASSIVO — DDT/Fattura fissato per più prodotti
+// ═══════════════════════════════════
+let batchDdt={active:false,tipo:'DDT',num:'',data:''};
+window.toggleBatchDdt=function(){
+  batchDdt.active=!batchDdt.active;
+  const banner=document.getElementById('batch-ddt-banner');
+  const toggle=document.getElementById('batch-ddt-toggle');
+  const label=document.getElementById('batch-ddt-toggle-label');
+  if(banner) banner.style.display=batchDdt.active?'block':'none';
+  if(toggle) toggle.classList.toggle('active',batchDdt.active);
+  if(label) label.textContent=batchDdt.active?'Carico massivo ATTIVO — tocca per disattivare':'Carico massivo su stesso DDT / Fattura';
+  renderCaricaList(); // nasconde/mostra i campi DDT per-prodotto
+};
+window.setBatchDdtType=function(tipo){
+  batchDdt.tipo=tipo;
+  const b1=document.getElementById('batch-ddt-btn-ddt');
+  const b2=document.getElementById('batch-ddt-btn-fat');
+  if(b1) b1.classList.toggle('active',tipo==='DDT');
+  if(b2) b2.classList.toggle('active',tipo==='Fattura');
+};
+window.syncBatchDdt=function(){
+  const numEl=document.getElementById('batch-ddt-num');
+  const dateEl=document.getElementById('batch-ddt-date');
+  batchDdt.num=(numEl&&numEl.value.trim())||'';
+  batchDdt.data=(dateEl&&dateEl.value)||'';
+};
 
 // ═══════════════════════════════════
 //  DDT / FATTURA — gestione tipo doc (per singolo prodotto in Carica)
@@ -4463,7 +4766,7 @@ function renderRiepilogo(){
   if(rieSel){
     var prev=rieSel.value;
     rieSel.innerHTML='<option value="">— Tutti i cantieri —</option>'+
-      cantieriList.map(function(c){return '<option value="'+c.nome+'">'+c.nome+'</option>';}).join('');
+      cantieriList.filter(function(c){return !c.archiviato;}).map(function(c){return '<option value="'+c.nome+'">'+c.nome+'</option>';}).join('');
     if(prev) rieSel.value=prev;
   }
   aggiornaRiepilogo();
@@ -5167,6 +5470,7 @@ window.onFuelCounterBlur=function(el){
 window.ricalcolaGiacenze=async function(){
   var panel=document.getElementById('ricalcola-result');
   if(!confirm('Ricalcola le giacenze usando lo storico movimenti?\n\nQuesta operazione aggiorna la quantità di ogni prodotto basandosi sui carichi e prelievi registrati.\n\nProcedere?')) return;
+  if(!requireUnlockCode()) return;
   if(panel) panel.innerHTML='⏳ Caricamento movimenti...';
 
   try{
