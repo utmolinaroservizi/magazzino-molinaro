@@ -401,6 +401,11 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .resp-entity-archive:hover{background:#fff3e2;color:#b9640a;border-color:#f3c886}
 .resp-entity-move{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:var(--brand-600);cursor:pointer;font-family:inherit;white-space:nowrap}
 .resp-entity-move:hover{background:var(--brand-50);border-color:var(--brand-200)}
+.gruppo-opt{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-xs);background:var(--bg-card);font-family:inherit;font-size:13.5px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;transition:var(--transition)}
+.gruppo-opt:hover{background:var(--bg-surface);border-color:var(--brand-300,#9ecb95)}
+.gruppo-opt:active{transform:scale(.98)}
+.gruppo-opt.current{border-color:var(--brand-500);background:var(--brand-50)}
+.gruppo-opt-check{margin-left:auto;color:var(--brand-500);font-weight:700}
 .resp-entity-restore{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:500;color:#2f8137;cursor:pointer;font-family:inherit;white-space:nowrap}
 .resp-entity-restore:hover{background:#eef7ec;border-color:#bfe0b6}
 .cant-group-tag{font-size:10px;font-weight:700;color:var(--brand-600);background:var(--brand-50);border-radius:8px;padding:1px 7px;margin-left:2px}
@@ -899,6 +904,27 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   <div class="fuel-grid" id="fuel-grid"></div>
   <div class="section-label">Movimenti recenti carburante</div>
   <div id="fuel-log-container"></div>
+</div>
+
+<!-- MODALE SCELTA GRUPPO CANTIERE -->
+<div class="modal-backdrop" id="gruppo-modal-backdrop" onclick="closeGruppoModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-top">
+      <div class="modal-product-code" id="gruppo-modal-cant">—</div>
+      <div class="modal-product-name" style="font-size:16px">Sposta in un gruppo</div>
+    </div>
+    <div style="padding:14px 18px 20px">
+      <div id="gruppo-modal-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div class="carica-input-label" style="margin-bottom:6px">Oppure crea un nuovo gruppo</div>
+        <div style="display:flex;gap:6px">
+          <input class="resp-entity-input" id="gruppo-modal-new" placeholder="Nome nuovo gruppo..." onkeydown="if(event.key==='Enter') confermaNuovoGruppo()">
+          <button class="resp-entity-btn" onclick="confermaNuovoGruppo()">Sposta qui</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- FUEL MODAL -->
@@ -4170,23 +4196,68 @@ window.addCantiere=async function(){
   showToast('Cantiere "'+nome+'" aggiunto','toast-return');
 };
 
-window.moveCantiereGruppo=async function(id){
+let _gruppoMoveCantId=null;
+window.moveCantiereGruppo=function(id){
   const c=cantieriList.find(x=>x.id===id);
   if(!c) return;
-  const gruppiEsistenti=[...new Set(cantieriList.map(x=>(x.gruppo||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-  const hint=gruppiEsistenti.length?'\n\nGruppi esistenti: '+gruppiEsistenti.join(', '):'';
+  _gruppoMoveCantId=id;
   const attuale=(c.gruppo||'').trim();
-  const nuovo=prompt('Sposta "'+c.nome+'" in quale gruppo?\nLascia vuoto per toglierlo dal gruppo (Senza gruppo).'+hint,attuale);
-  if(nuovo===null) return; // annullato
-  const gruppo=nuovo.trim();
-  if(gruppo===attuale){showToast('Gruppo invariato','toast-info');return;}
+  // Gruppi esistenti (esclusi archiviati non serve: raggruppiamo su tutti i nomi gruppo in uso)
+  const gruppiEsistenti=[...new Set(cantieriList.map(x=>(x.gruppo||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+
+  const contEl=document.getElementById('gruppo-modal-cant');
+  if(contEl) contEl.textContent='🏗️ '+c.nome;
+
+  let html='';
+  // Opzione "Senza gruppo"
+  const isSenza=attuale==='';
+  html+=`<button class="gruppo-opt ${isSenza?'current':''}" onclick="scegliGruppo('')">
+    <span>📁 Senza gruppo</span>${isSenza?'<span class="gruppo-opt-check">✓ attuale</span>':''}
+  </button>`;
+  // Gruppi esistenti
+  gruppiEsistenti.forEach(g=>{
+    const cur=g===attuale;
+    html+=`<button class="gruppo-opt ${cur?'current':''}" onclick="scegliGruppo('${g.replace(/'/g,"\\'")}')">
+      <span>🏷️ ${g}</span>${cur?'<span class="gruppo-opt-check">✓ attuale</span>':''}
+    </button>`;
+  });
+  const listEl=document.getElementById('gruppo-modal-list');
+  if(listEl) listEl.innerHTML=html;
+  const newEl=document.getElementById('gruppo-modal-new');
+  if(newEl) newEl.value='';
+
+  document.getElementById('gruppo-modal-backdrop').classList.add('open');
+  document.body.style.overflow='hidden';
+};
+window.closeGruppoModal=function(e){
+  if(e&&e.target&&e.target.id!=='gruppo-modal-backdrop') return;
+  document.getElementById('gruppo-modal-backdrop').classList.remove('open');
+  document.body.style.overflow='';
+  _gruppoMoveCantId=null;
+};
+window.scegliGruppo=async function(gruppo){
+  await applicaSpostamentoGruppo((gruppo||'').trim());
+};
+window.confermaNuovoGruppo=async function(){
+  const el=document.getElementById('gruppo-modal-new');
+  const g=(el&&el.value||'').trim();
+  if(!g){showToast('Scrivi il nome del nuovo gruppo','toast-danger');el?.focus();return;}
+  await applicaSpostamentoGruppo(g);
+};
+async function applicaSpostamentoGruppo(gruppo){
+  const id=_gruppoMoveCantId;
+  if(!id) return;
+  const c=cantieriList.find(x=>x.id===id);
+  if(!c){closeGruppoModal();return;}
+  const attuale=(c.gruppo||'').trim();
+  if(gruppo===attuale){showToast('Gruppo invariato','toast-info');closeGruppoModal();return;}
   await setDoc(doc(db,'cantieri',id),{gruppo},{merge:true});
-  if(c) c.gruppo=gruppo; // feedback immediato
-  // Tieni aperta la linguetta di destinazione così vedi subito lo spostamento
-  cantGroupOpen[gruppo||'Senza gruppo']=true;
+  c.gruppo=gruppo; // feedback immediato
+  cantGroupOpen[gruppo||'Senza gruppo']=true; // tieni aperta la destinazione
+  closeGruppoModal();
   setTimeout(()=>renderResponsabile(),300);
   showToast(gruppo?'Spostato in "'+gruppo+'"':'Rimosso dal gruppo','toast-return');
-};
+}
 
 // Stato apertura linguette gruppi cantieri (in memoria, non persistito)
 let cantGroupOpen={};
