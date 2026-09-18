@@ -2991,6 +2991,9 @@ function renderResponsabile(){
   const withPrice=itemsList.filter(it=>it.prezzo!=null).length;
   document.getElementById('valore-sub').textContent=withPrice+'/'+itemsList.length+' prodotti con prezzo impostato';
 
+  // Popola il dropdown dipendenti del registro presenze (legge da Firestore "utenti")
+  popolaDropdownPresenzeResp();
+
   // Categorie + sottocategorie + dropdown cantiere stats
   let html='';
   catOrder.forEach(cat=>{
@@ -3980,6 +3983,7 @@ function renderCaricaList(){
   // ── Form nuovo prodotto — in cima, solo fuori dalla ricerca ─────────────────────
   let addHtml='';
   if(!isSearch){
+    _naDdtType='DDT'; // il form viene ricreato con il bottone DDT attivo di default
     const unitOpts=['pz','m','kit','conf','lt'].map(u=>`<option value="${u}">${u}</option>`).join('');
     const subOpts=cfg.subs&&cfg.subs.length>0
       ? '<option value="">Nessuna</option>'+cfg.subs.map(s=>`<option value="${s}">${s}</option>`).join('')
@@ -4018,6 +4022,19 @@ function renderCaricaList(){
             ${fornitoriList.map(f=>'<option value="'+f.nome+'">'+f.nome+'</option>').join('')}
           </select>
         </div>
+        ${batchDdt.active?`<div class="carica-input-wrap carica-add-full">
+          <div style="font-size:11.5px;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-200);border-radius:8px;padding:7px 10px">📄 Carico iniziale associato al documento fissato in alto (${batchDdt.tipo}${batchDdt.num?' n° '+batchDdt.num:''})</div>
+        </div>`:`<div class="carica-input-wrap carica-add-full">
+          <div class="carica-input-label">DDT / Fattura (opzionale, per il carico iniziale)</div>
+          <div class="ddt-row" style="margin-top:2px">
+            <div class="ddt-type-btns">
+              <button type="button" class="ddt-type-btn active" id="na-ddt-btn-ddt" onclick="setNaDdtType('DDT')">DDT</button>
+              <button type="button" class="ddt-type-btn" id="na-ddt-btn-fat" onclick="setNaDdtType('Fattura')">Fattura</button>
+            </div>
+            <input class="ddt-input" id="na-ddt-num" placeholder="N° documento..." type="text">
+            <input class="ddt-date" id="na-ddt-date" type="date">
+          </div>
+        </div>`}
       </div>
       ${backdateBlockHtml('carnew')}
       <button class="carica-add-btn" onclick="submitNuovoProdottoCarica()">
@@ -4127,8 +4144,10 @@ window.submitNuovoProdottoCarica=async function(){
     await saveItem(item);
     // Log carico iniziale se qty > 0
     if(qty>0){
+      const ddtInfo=getNaDdtInfo();
       const entry={id:genId(),itemId:id,code,name,delta:qty,prevQty:0,
-        operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('carnew'),backdated:isBackdated('carnew'),createdAt:Date.now(),type:'load',fornitore};
+        operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('carnew'),backdated:isBackdated('carnew'),createdAt:Date.now(),type:'load',fornitore,
+        tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc};
       await saveMovimento(entry);
     }
     renderCarica();
@@ -4718,6 +4737,29 @@ function resetDdtItem(itemId){
   setDdtTypeItem(itemId,'DDT');
 }
 
+// DDT/Fattura per il form "Aggiungi nuovo prodotto" in Carica
+var _naDdtType='DDT';
+window.setNaDdtType=function(tipo){
+  _naDdtType=tipo;
+  const bDdt=document.getElementById('na-ddt-btn-ddt');
+  const bFat=document.getElementById('na-ddt-btn-fat');
+  if(bDdt) bDdt.classList.toggle('active',tipo==='DDT');
+  if(bFat) bFat.classList.toggle('active',tipo==='Fattura');
+};
+function getNaDdtInfo(){
+  // Se è attiva la modalità carico massivo, usa il documento fissato
+  if(batchDdt.active){
+    return {tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data};
+  }
+  const numEl=document.getElementById('na-ddt-num');
+  const dateEl=document.getElementById('na-ddt-date');
+  return {
+    tipo_doc:_naDdtType,
+    num_doc:(numEl&&numEl.value.trim())||'',
+    data_doc:(dateEl&&dateEl.value)||''
+  };
+}
+
 // ═══════════════════════════════════
 //  EXPORT EXCEL DDT / FATTURE
 // ═══════════════════════════════════
@@ -5143,7 +5185,8 @@ window.apriRegistroPresenze=async function(){
   }
   var results=await Promise.all(promises);
   var byData={};results.forEach(function(r){byData[r.data]=r.d;});
-  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var opItem=presenzeDipList.filter(function(o){return o.id===uid;})[0]
+    ||operatoriList.filter(function(o){return o.id===uid;})[0];
   var nomeDip=opItem?opItem.nome:'Dipendente';
   renderCalendarioResp(panel,uid,nomeDip,anno,meseN,byData);
 };
@@ -5182,7 +5225,7 @@ function renderCalendarioResp(panel,uid,nome,anno,mese,byData){
 }
 
 window.apriDettaglioGiorno=function(uid,dataStr){
-  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var opItem=(typeof presenzeDipList!=="undefined"?presenzeDipList.filter(function(o){return o.id===uid;})[0]:null)||operatoriList.filter(function(o){return o.id===uid;})[0];
   var nome=opItem?opItem.nome:'Dipendente';
   var data=dataStr;
   var id=presDocId(uid,data);
@@ -5214,7 +5257,7 @@ window.apriDettaglioGiorno=function(uid,dataStr){
 };
 
 window.impostaPresenzaResp=async function(uid,data,stato){
-  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var opItem=(typeof presenzeDipList!=="undefined"?presenzeDipList.filter(function(o){return o.id===uid;})[0]:null)||operatoriList.filter(function(o){return o.id===uid;})[0];
   var nome=opItem?opItem.nome:'';
   var id=presDocId(uid,data);
   var dato={uid:uid,nome:nome,data:data,stato:stato,timestamp:Date.now(),segnato_da:'responsabile'};
@@ -5248,13 +5291,32 @@ async function applicaAutoAssenze(uid,anno,mese){
   if(count>0){try{await batch.commit();}catch(e){console.warn('[AUTO-A]',e.message);}}
 }
 
+// Cache dipendenti letti da Firestore "utenti" (stessa fonte del registro presenze hamburger e dell'export)
+let presenzeDipList=[];
 function popolaDropdownPresenzeResp(){
   var sel=document.getElementById('reg-pres-operatore');
   if(!sel) return;
-  var prev=sel.value;
-  sel.innerHTML='<option value="">— Seleziona dipendente —</option>'+
-    operatoriList.map(function(o){return '<option value="'+o.id+'">'+o.nome+'</option>';}).join('');
-  if(prev) sel.value=prev;
+  sel.innerHTML='<option value="">— Caricamento dipendenti... —</option>';
+  getDocs(collection(db,'utenti')).then(function(snap){
+    presenzeDipList=[];
+    snap.forEach(function(d){
+      var data=d.data();
+      presenzeDipList.push({id:d.id, nome:data.nome||data.email||d.id});
+    });
+    presenzeDipList.sort(function(a,b){return a.nome.localeCompare(b.nome);});
+    var prev=sel.value;
+    if(presenzeDipList.length===0){
+      sel.innerHTML='<option value="">— Nessun dipendente trovato —</option>';
+    } else {
+      sel.innerHTML='<option value="">— Seleziona dipendente —</option>'+
+        presenzeDipList.map(function(o){return '<option value="'+o.id+'">'+o.nome+'</option>';}).join('');
+      if(prev) sel.value=prev;
+    }
+  }).catch(function(e){
+    console.error('[PRESENZE-RESP] Errore lettura utenti:',e);
+    sel.innerHTML='<option value="">— Errore caricamento —</option>';
+    showToast('Errore lettura dipendenti: '+e.message,'toast-danger');
+  });
 }
 
 window.exportPresenzeExcel=async function(){
@@ -5391,7 +5453,7 @@ window.aggiornaCalendarioResp=async function(){
     byData[d2]=presenzeCache[presDocId(uid,d2)]||null;
   }
 
-  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var opItem=(typeof presenzeDipList!=="undefined"?presenzeDipList.filter(function(o){return o.id===uid;})[0]:null)||operatoriList.filter(function(o){return o.id===uid;})[0];
   var nomeDip=opItem?opItem.nome:'Dipendente';
   renderCalendarioBello(panel,uid,nomeDip,anno,meseN,byData);
 };
@@ -5511,7 +5573,7 @@ window.apriDettaglioGiornoRP=function(uid,dataStr){
 };
 
 window.impostaPresenzaRespRP=async function(uid,data,stato){
-  var opItem=operatoriList.filter(function(o){return o.id===uid;})[0];
+  var opItem=(typeof presenzeDipList!=="undefined"?presenzeDipList.filter(function(o){return o.id===uid;})[0]:null)||operatoriList.filter(function(o){return o.id===uid;})[0];
   var nome=opItem?opItem.nome:'';
   var id=presDocId(uid,data);
   var dato={uid:uid,nome:nome,data:data,stato:stato,timestamp:Date.now(),segnato_da:'responsabile'};
