@@ -3831,29 +3831,80 @@ function renderCarburante(){
     </div>`;
   }).join('');
 
-  // Fuel log
+  // Fuel log — raggruppato per mese, con linguette comprimibili
   const fuelCodes=fuels.map(f=>f.code);
-  const fuelLog=actLog.filter(e=>fuelCodes.includes(e.code)).slice(0,30);
+  const fuelLog=actLog.filter(e=>fuelCodes.includes(e.code));
   const logC=document.getElementById('fuel-log-container');
   if(fuelLog.length===0){
     logC.innerHTML='<div class="empty-state"><p>Nessun movimento carburante</p></div>';return;
   }
-  let html='';
-  fuelLog.forEach(entry=>{
-    const isTake=entry.delta<0;
+  // Ordina dal più recente e raggruppa per anno-mese
+  const ordinati=fuelLog.slice().sort((a,b)=>b.time-a.time);
+  const nomiMesi=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  const gruppiMese=[]; // preserva l'ordine (dal più recente)
+  const mappaMese={};
+  ordinati.forEach(entry=>{
     const d=new Date(entry.time);
-    const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-    const veh=entry.mezzo?`<div class="log-time" style="color:#555;font-weight:600">🚛 ${entry.mezzo} · ${entry.targa||''}</div>`:'';
-    html+=`<div class="log-item">
-      <div class="log-icon ${isTake?'take':'ret'}">${isTake?'−':'+'}</div>
-      <div class="log-info"><div class="log-text"><strong>${entry.code}</strong> — ${entry.name}</div>
-      <div class="log-operator">👷 ${entry.operator||'N/D'}</div>
-      ${veh}
-      <div class="log-time">${isTake?'Prelevati':'Reinseriti'} ${Math.abs(entry.delta)} lt · ${ts}</div></div>
+    const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    if(!mappaMese[key]){
+      mappaMese[key]={label:nomiMesi[d.getMonth()]+' '+d.getFullYear(),lista:[]};
+      gruppiMese.push(key);
+    }
+    mappaMese[key].lista.push(entry);
+  });
+
+  let html='';
+  gruppiMese.forEach((key,idx)=>{
+    const g=mappaMese[key];
+    // Default: apri solo il primo gruppo (mese più recente); se già interagito, rispetta lo stato salvato
+    const isOpen=fuelMonthOpen[key]!==undefined?fuelMonthOpen[key]:(idx===0);
+    // Riepilogo litri del mese: prelevati e reinseriti
+    let prel=0,rein=0;
+    g.lista.forEach(e=>{if(e.delta<0) prel+=Math.abs(e.delta); else rein+=e.delta;});
+    const gkey='fm_'+key.replace(/[^0-9]/g,'_');
+    let items='';
+    g.lista.forEach(entry=>{
+      const isTake=entry.delta<0;
+      const d=new Date(entry.time);
+      const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+      const veh=entry.mezzo?`<div class="log-time" style="color:#555;font-weight:600">🚛 ${entry.mezzo} · ${entry.targa||''}</div>`:'';
+      items+=`<div class="log-item">
+        <div class="log-icon ${isTake?'take':'ret'}">${isTake?'−':'+'}</div>
+        <div class="log-info"><div class="log-text"><strong>${entry.code}</strong> — ${entry.name}</div>
+        <div class="log-operator">👷 ${entry.operator||'N/D'}</div>
+        ${veh}
+        <div class="log-time">${isTake?'Prelevati':'Reinseriti'} ${Math.abs(entry.delta)} lt · ${ts}</div></div>
+      </div>`;
+    });
+    html+=`<div class="cant-group">
+      <div class="cant-group-head" onclick="toggleFuelMonth('${key}')">
+        <svg class="cant-group-arrow ${isOpen?'open':''}" id="arrow-${gkey}" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <span>📅 ${g.label}</span>
+        <span class="cant-group-count">${g.lista.length}</span>
+      </div>
+      <div class="cant-group-body ${isOpen?'open':''}" id="body-${gkey}" style="gap:0;padding:${isOpen?'8px':'0'}">
+        <div style="font-size:11px;color:var(--text-muted);padding:2px 4px 8px">− ${prel.toLocaleString('it-IT')} lt prelevati · + ${rein.toLocaleString('it-IT')} lt reinseriti</div>
+        ${items}
+      </div>
     </div>`;
   });
   logC.innerHTML=html;
 }
+
+// Stato apertura linguette mesi carburante (in memoria)
+let fuelMonthOpen={};
+window.toggleFuelMonth=function(key){
+  const gkey='fm_'+key.replace(/[^0-9]/g,'_');
+  const body=document.getElementById('body-'+gkey);
+  const arrow=document.getElementById('arrow-'+gkey);
+  const willOpen=!(body&&body.classList.contains('open'));
+  fuelMonthOpen[key]=willOpen;
+  if(body){
+    body.classList.toggle('open',willOpen);
+    body.style.padding=willOpen?'8px':'0';
+  }
+  if(arrow) arrow.classList.toggle('open',willOpen);
+};
 
 // Mappa codice carburante → chiave combustibile per filtrare mezzi
 function fuelCodeToCombustibile(code){
