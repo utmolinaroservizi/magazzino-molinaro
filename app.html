@@ -200,6 +200,28 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .fuel-vehicle-select:focus{border-color:var(--brand-500)}
 .fuel-vehicle-label{font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:3px}
 
+/* Analisi carburante (area Resp) */
+.fa-mini-btn{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:600;font-family:inherit;color:var(--brand-600);cursor:pointer}
+.fa-mini-btn:active{transform:scale(.95)}
+.fa-mezzi-list{max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-xs);padding:6px;background:var(--bg-surface);display:flex;flex-direction:column;gap:2px}
+.fa-mezzo-opt{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12.5px;transition:var(--transition)}
+.fa-mezzo-opt:hover{background:var(--bg-card)}
+.fa-mezzo-opt input{width:16px;height:16px;accent-color:var(--brand-500);flex-shrink:0;cursor:pointer}
+.fa-mezzo-opt .fa-mezzo-targa{margin-left:auto;font-size:10.5px;color:var(--text-light);font-weight:600;font-variant-numeric:tabular-nums}
+.fa-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.fa-summary-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;background:var(--bg-card)}
+.fa-summary-card.period{border-color:var(--brand-200);background:var(--brand-50)}
+.fa-summary-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);font-weight:700;margin-bottom:6px}
+.fa-summary-lt{font-size:20px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.fa-summary-eur{font-size:13px;font-weight:600;color:var(--brand-600);margin-top:4px}
+.fa-summary-sub{font-size:10.5px;color:var(--text-muted);margin-top:6px;line-height:1.4}
+.fa-mov-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border);font-size:12px}
+.fa-mov-badge{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.fa-mov-badge.take{background:#FFF3D6;color:#9A6C1E}
+.fa-mov-badge.ret{background:var(--brand-50);color:var(--brand-600)}
+.fa-export-btn{width:100%;padding:10px;border:none;border-radius:var(--radius-xs);background:#1D6F42;color:#fff;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px}
+.fa-export-btn:active{transform:scale(.98)}
+
 /* COUNTER SELECTOR */
 .counter-zone{padding:16px 20px 4px;text-align:center}
 .counter-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-light);font-weight:600;margin-bottom:12px}
@@ -1192,6 +1214,43 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       </select>
       <button class="resp-entity-btn" onclick="addMezzo()" style="grid-column:1 / span 2">+ Aggiungi mezzo</button>
     </div>
+  </div>
+  <div class="resp-card">
+    <h3>⛽ Analisi carburante (nafta)</h3>
+    <p>Filtra le movimentazioni della nafta per periodo, mezzo e operatore. Vedi i litri e la spesa nel periodo scelto e da sempre, poi esporta in Excel.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div>
+        <div class="fuel-vehicle-label">Periodo</div>
+        <select class="modal-cantiere-select" id="fa-periodo" onchange="onFaPeriodoChange()">
+          <option value="tutto">Tutto (dall'inizio)</option>
+          <option value="mese">Mese specifico</option>
+        </select>
+      </div>
+      <div id="fa-mese-wrap" style="display:none">
+        <div class="fuel-vehicle-label">Mese</div>
+        <input type="month" class="modal-cantiere-select" id="fa-mese">
+      </div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div class="fuel-vehicle-label">Operatore</div>
+      <select class="modal-cantiere-select" id="fa-operatore">
+        <option value="">— Tutti gli operatori —</option>
+      </select>
+    </div>
+    <div style="margin-bottom:8px">
+      <div class="fuel-vehicle-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Mezzi (nessuna selezione = tutti)</span>
+        <span style="display:flex;gap:8px">
+          <button type="button" class="fa-mini-btn" onclick="faSelectAllMezzi(true)">Tutti</button>
+          <button type="button" class="fa-mini-btn" onclick="faSelectAllMezzi(false)">Nessuno</button>
+        </span>
+      </div>
+      <div id="fa-mezzi-list" class="fa-mezzi-list"></div>
+    </div>
+    <button class="resp-btn resp-btn-green" onclick="analizzaCarburante()" style="margin-bottom:12px">
+      🔍 Analizza movimentazioni
+    </button>
+    <div id="fa-risultati"></div>
   </div>
   <div class="resp-card">
     <h3>🏗️ Excel movimentazioni per cantiere</h3>
@@ -2993,6 +3052,9 @@ function renderResponsabile(){
 
   // Popola il dropdown dipendenti del registro presenze (legge da Firestore "utenti")
   popolaDropdownPresenzeResp();
+
+  // Popola i filtri dell'analisi carburante (mezzi + operatori)
+  popolaFiltriAnalisiCarburante();
 
   // Categorie + sottocategorie + dropdown cantiere stats
   let html='';
@@ -5318,6 +5380,237 @@ function popolaDropdownPresenzeResp(){
     showToast('Errore lettura dipendenti: '+e.message,'toast-danger');
   });
 }
+
+// ═══════════════════════════════════════════════
+//  ANALISI CARBURANTE (nafta) — area responsabile
+// ═══════════════════════════════════════════════
+const NAFTA_CODE='CB.001';
+// Ultimo risultato calcolato, per l'export Excel
+let _faLastResult=null;
+
+function naftaPrezzoCorrente(){
+  const naftaItem=itemsList.find(it=>it.code===NAFTA_CODE)
+    ||itemsList.find(it=>it.cat==='Carburante'&&(it.name||'').toUpperCase().includes('NAFTA'));
+  return naftaItem&&naftaItem.prezzo!=null?naftaItem.prezzo:null;
+}
+
+window.onFaPeriodoChange=function(){
+  const per=document.getElementById('fa-periodo').value;
+  const wrap=document.getElementById('fa-mese-wrap');
+  if(wrap) wrap.style.display=per==='mese'?'block':'none';
+  const meseEl=document.getElementById('fa-mese');
+  if(per==='mese'&&meseEl&&!meseEl.value) meseEl.value=dataOggiIT().slice(0,7);
+};
+
+function popolaFiltriAnalisiCarburante(){
+  // Mezzi a nafta (dal registro mezzi); fallback su tutti se manca il combustibile
+  const listEl=document.getElementById('fa-mezzi-list');
+  if(listEl){
+    const mezziNafta=mezziList.filter(m=>((m.combustibile||'nafta').toLowerCase())==='nafta');
+    if(mezziNafta.length===0){
+      listEl.innerHTML='<div style="font-size:11.5px;color:var(--text-light);padding:6px">Nessun mezzo a nafta registrato.</div>';
+    } else {
+      listEl.innerHTML=mezziNafta.map(function(m){
+        const key=(m.targa||m.mezzo||'').replace(/"/g,'&quot;');
+        return '<label class="fa-mezzo-opt"><input type="checkbox" class="fa-mezzo-cb" value="'+key+'"><span>'+m.mezzo+'</span><span class="fa-mezzo-targa">'+(m.targa||'')+'</span></label>';
+      }).join('');
+    }
+  }
+  // Operatori: da chi ha fatto movimenti nafta (nella cache actLog)
+  const opSel=document.getElementById('fa-operatore');
+  if(opSel){
+    const prev=opSel.value;
+    const nomi=[...new Set(actLog.filter(e=>e.code===NAFTA_CODE&&e.operator).map(e=>e.operator))].sort((a,b)=>a.localeCompare(b));
+    opSel.innerHTML='<option value="">— Tutti gli operatori —</option>'+nomi.map(n=>'<option value="'+n.replace(/"/g,'&quot;')+'">'+n+'</option>').join('');
+    if(prev) opSel.value=prev;
+  }
+}
+
+window.faSelectAllMezzi=function(all){
+  document.querySelectorAll('.fa-mezzo-cb').forEach(cb=>{cb.checked=all;});
+};
+
+function faGetSelectedMezzi(){
+  return [...document.querySelectorAll('.fa-mezzo-cb:checked')].map(cb=>cb.value);
+}
+
+// Un movimento appartiene al mezzo X se la sua targa o il nome mezzo coincide con la chiave selezionata
+function faMovMatchMezzo(entry,keys){
+  if(keys.length===0) return true; // nessuna selezione = tutti
+  const t=(entry.targa||'').trim();
+  const m=(entry.mezzo||'').trim();
+  return keys.some(k=>k===t||k===m);
+}
+
+window.analizzaCarburante=async function(){
+  const risEl=document.getElementById('fa-risultati');
+  if(!risEl) return;
+  risEl.innerHTML='<div style="text-align:center;padding:20px 0;color:var(--text-muted);font-size:13px">Analisi in corso...</div>';
+
+  const periodo=document.getElementById('fa-periodo').value;
+  const operatore=document.getElementById('fa-operatore').value;
+  const mezziKeys=faGetSelectedMezzi();
+
+  // Finestra temporale
+  let tsStart=null,tsEnd=null,meseLabel='';
+  if(periodo==='mese'){
+    const meseStr=document.getElementById('fa-mese').value||dataOggiIT().slice(0,7);
+    const anno=parseInt(meseStr.split('-')[0]),mese=parseInt(meseStr.split('-')[1]);
+    tsStart=new Date(anno,mese-1,1,0,0,0).getTime();
+    tsEnd=new Date(anno,mese,1,0,0,0).getTime(); // primo del mese successivo
+    const nomiM=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+    meseLabel=nomiM[mese-1]+' '+anno;
+  }
+
+  // Carica TUTTI i movimenti nafta da Firestore (da sempre), fallback su actLog
+  let tuttiNafta=[];
+  try{
+    const snap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(20000)));
+    snap.forEach(d=>{const e={id:d.id,...d.data()};if(e.code===NAFTA_CODE) tuttiNafta.push(e);});
+  }catch(err){
+    console.warn('[ANALISI-CARB] fallback su actLog:',err.message);
+    tuttiNafta=actLog.filter(e=>e.code===NAFTA_CODE);
+  }
+
+  // Applica filtri mezzo + operatore (validi sia per "da sempre" che per il periodo)
+  const filtroBase=tuttiNafta.filter(e=>faMovMatchMezzo(e,mezziKeys)&&(!operatore||e.operator===operatore));
+  // Nel periodo
+  const nelPeriodo=periodo==='mese'
+    ? filtroBase.filter(e=>e.time>=tsStart&&e.time<tsEnd)
+    : filtroBase;
+
+  const prezzo=naftaPrezzoCorrente();
+
+  // Calcolo litri e spesa. Prelievi = delta<0 (litri erogati). Rifornimenti = delta>0.
+  function calcola(list){
+    let litriPrelevati=0,litriRiforniti=0;
+    list.forEach(e=>{if(e.delta<0) litriPrelevati+=Math.abs(e.delta); else litriRiforniti+=e.delta;});
+    const spesa=prezzo!=null?litriPrelevati*prezzo:null;
+    return {litriPrelevati,litriRiforniti,spesa,nMov:list.length};
+  }
+  const statPeriodo=calcola(nelPeriodo);
+  const statSempre=calcola(filtroBase);
+
+  // Salva per export
+  _faLastResult={
+    periodo,meseLabel,operatore,mezziKeys,prezzo,
+    movimenti:nelPeriodo.slice().sort((a,b)=>b.time-a.time),
+    statPeriodo,statSempre
+  };
+
+  // ── Render ──
+  const fmtLt=n=>n.toLocaleString('it-IT',{maximumFractionDigits:0});
+  const fmtEur=n=>n!=null?'€ '+n.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+  const periodoTxt=periodo==='mese'?meseLabel:'Tutto (dall\'inizio)';
+
+  let filtriTxt=[];
+  if(mezziKeys.length>0) filtriTxt.push(mezziKeys.length+' mezz'+(mezziKeys.length===1?'o':'i'));
+  else filtriTxt.push('tutti i mezzi');
+  if(operatore) filtriTxt.push('operatore: '+operatore);
+
+  let html='<div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">Filtri: '+filtriTxt.join(' · ')+'</div>';
+
+  html+='<div class="fa-summary-grid">';
+  html+='<div class="fa-summary-card period">'
+    +'<div class="fa-summary-label">Periodo · '+periodoTxt+'</div>'
+    +'<div class="fa-summary-lt">'+fmtLt(statPeriodo.litriPrelevati)+' lt</div>'
+    +'<div class="fa-summary-eur">'+fmtEur(statPeriodo.spesa)+'</div>'
+    +'<div class="fa-summary-sub">prelevati · rifornimenti: '+fmtLt(statPeriodo.litriRiforniti)+' lt</div>'
+    +'</div>';
+  html+='<div class="fa-summary-card">'
+    +'<div class="fa-summary-label">Da sempre</div>'
+    +'<div class="fa-summary-lt">'+fmtLt(statSempre.litriPrelevati)+' lt</div>'
+    +'<div class="fa-summary-eur">'+fmtEur(statSempre.spesa)+'</div>'
+    +'<div class="fa-summary-sub">prelevati · rifornimenti: '+fmtLt(statSempre.litriRiforniti)+' lt</div>'
+    +'</div>';
+  html+='</div>';
+
+  if(prezzo!=null){
+    html+='<div style="font-size:10.5px;color:var(--text-light);margin-bottom:8px">Spesa = litri prelevati × prezzo nafta attuale ('+fmtEur(prezzo)+'/lt)</div>';
+  } else {
+    html+='<div style="font-size:10.5px;color:#B33A3A;margin-bottom:8px">⚠️ Prezzo nafta non impostato: imposta il prezzo dalla sezione Carburante per vedere la spesa.</div>';
+  }
+
+  // Elenco movimenti del periodo
+  if(_faLastResult.movimenti.length===0){
+    html+='<div style="text-align:center;padding:16px 0;color:var(--text-muted);font-size:12.5px">Nessuna movimentazione nel periodo/filtri scelti.</div>';
+  } else {
+    html+='<div class="fuel-vehicle-label" style="margin:6px 0">Movimenti nel periodo ('+_faLastResult.movimenti.length+')</div>';
+    html+='<div style="max-height:340px;overflow-y:auto">';
+    _faLastResult.movimenti.forEach(e=>{
+      const isTake=e.delta<0;
+      const d=new Date(e.time);
+      const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+      const veh=e.mezzo?(e.mezzo+(e.targa?' · '+e.targa:'')):'—';
+      html+='<div class="fa-mov-row">'
+        +'<div class="fa-mov-badge '+(isTake?'take':'ret')+'">'+(isTake?'−':'+')+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-weight:700">'+(isTake?'Prelievo':'Rifornimento')+' '+Math.abs(e.delta)+' lt</div>'
+        +'<div style="color:var(--text-muted);font-size:11px">👷 '+(e.operator||'N/D')+' · 🚛 '+veh+'</div>'
+        +'<div style="color:var(--text-light);font-size:10.5px">'+ts+(e.backdated?' · (retrodatato)':'')+'</div>'
+        +'</div></div>';
+    });
+    html+='</div>';
+  }
+
+  html+='<button class="fa-export-btn" onclick="exportAnalisiCarburante()">'
+    +'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'
+    +'Esporta Excel</button>';
+
+  risEl.innerHTML=html;
+};
+
+window.exportAnalisiCarburante=async function(){
+  if(typeof XLSX==='undefined'){showToast('Libreria Excel non disponibile','toast-danger');return;}
+  if(!_faLastResult){showToast('Esegui prima un\'analisi','toast-danger');return;}
+  const r=_faLastResult;
+  const fmtEurNum=n=>n!=null?Math.round(n*100)/100:'';
+
+  // Foglio 1: Riepilogo
+  const periodoTxt=r.periodo==='mese'?r.meseLabel:'Tutto (dall\'inizio)';
+  const mezziTxt=r.mezziKeys.length>0?r.mezziKeys.join(', '):'Tutti';
+  const rows1=[
+    ['ANALISI CARBURANTE (NAFTA)'],
+    [],
+    ['Periodo',periodoTxt],
+    ['Operatore',r.operatore||'Tutti'],
+    ['Mezzi',mezziTxt],
+    ['Prezzo nafta €/lt',r.prezzo!=null?fmtEurNum(r.prezzo):'non impostato'],
+    [],
+    ['','Litri prelevati','Litri rifornimenti','Spesa € (prelievi)','N° movimenti'],
+    ['Nel periodo',r.statPeriodo.litriPrelevati,r.statPeriodo.litriRiforniti,fmtEurNum(r.statPeriodo.spesa),r.statPeriodo.nMov],
+    ['Da sempre',r.statSempre.litriPrelevati,r.statSempre.litriRiforniti,fmtEurNum(r.statSempre.spesa),r.statSempre.nMov]
+  ];
+  const ws1=XLSX.utils.aoa_to_sheet(rows1);
+  ws1['!cols']=[{wch:16},{wch:16},{wch:18},{wch:18},{wch:14}];
+  ws1['!merges']=[{s:{r:0,c:0},e:{r:0,c:4}}];
+
+  // Foglio 2: Movimenti del periodo
+  const header=['Data','Ora','Tipo','Litri','Operatore','Mezzo','Targa','Retrodatato'];
+  const rows2=[header];
+  r.movimenti.forEach(e=>{
+    const d=new Date(e.time);
+    rows2.push([
+      d.toLocaleDateString('it-IT'),
+      d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),
+      e.delta<0?'Prelievo':'Rifornimento',
+      Math.abs(e.delta),
+      e.operator||'',
+      e.mezzo||'',
+      e.targa||'',
+      e.backdated?'Sì':''
+    ]);
+  });
+  const ws2=XLSX.utils.aoa_to_sheet(rows2);
+  ws2['!cols']=[{wch:12},{wch:8},{wch:14},{wch:8},{wch:20},{wch:28},{wch:14},{wch:12}];
+
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws1,'Riepilogo');
+  XLSX.utils.book_append_sheet(wb,ws2,'Movimenti');
+  const suffix=r.periodo==='mese'?r.meseLabel.replace(' ','_'):'dall_inizio';
+  XLSX.writeFile(wb,'Analisi_Carburante_'+suffix+'.xlsx');
+  showToast('Excel analisi carburante scaricato','toast-return');
+};
 
 window.exportPresenzeExcel=async function(){
   if(typeof XLSX==='undefined'){showToast('Libreria Excel non disponibile','toast-danger');return;}
