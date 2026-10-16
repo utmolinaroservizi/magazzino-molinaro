@@ -560,6 +560,8 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .resp-sub-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--bg-surface);border-radius:99px;font-size:11.5px;font-weight:600;border:1.5px solid var(--border)}
 .resp-sub-del{background:transparent;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:0;line-height:1}
 .resp-sub-del:hover{color:#B33A3A}
+.resp-sub-edit{background:transparent;border:none;cursor:pointer;font-size:11px;color:var(--text-muted);padding:0 1px;line-height:1}
+.resp-sub-edit:hover{color:var(--brand-600)}
 .resp-add-sub-row{display:flex;gap:6px;margin:6px 0 0 32px}
 .resp-add-sub-input{flex:1;padding:7px 10px;border:1.5px dashed var(--border);border-radius:var(--radius-xs);font-size:12px;font-family:inherit;outline:none;background:transparent}
 .resp-add-sub-input:focus{border-color:var(--brand-400);border-style:solid;background:var(--bg-card)}
@@ -1693,6 +1695,8 @@ function isResp(){return currentUser&&currentUser.ruolo==='responsabile'}
 //  qualcuno prema per sbaglio eliminazioni / ricalcoli / rettifiche.
 // ═══════════════════════════════════════
 const UNLOCK_CODE='21071999';
+// Etichetta del gruppo dei prodotti senza sottocategoria (o con sottocategoria eliminata)
+const NO_SUB_LABEL='Nessuna sottocategoria';
 function requireUnlockCode(){
   const val=prompt('⚠️ Azione delicata.\nInserisci il codice di sblocco per procedere:');
   if(val===null) return false; // annullato
@@ -2348,8 +2352,12 @@ function renderMateriali(){
           </div>`;
         });
       });
-      // Items without a sub
-      const unsub=ci.filter(it=>!it.sub);
+      // Prodotti senza sottocategoria, o con una sottocategoria non più esistente:
+      // raggruppati sotto un'intestazione propria (prima finivano visivamente nell'ultima sezione)
+      const unsub=ci.filter(it=>!it.sub||!cfg.subs.includes(it.sub));
+      if(unsub.length>0){
+        html+=`<div class="sub-header"><div class="sub-header-dot" style="background:var(--text-light)"></div><div class="sub-header-label" style="color:var(--text-muted)">${NO_SUB_LABEL}</div><div class="sub-header-line"></div></div>`;
+      }
       unsub.forEach(it=>{
         const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
         html+=`<div class="item-card" onclick='openModal("${it.id}")'>
@@ -3085,7 +3093,8 @@ function renderResponsabile(){
     const catKey=cat.replace(/[^a-zA-Z0-9]/g,'_');
     let chips=subs.map(s=>
       '<span class="resp-sub-chip">'+s+
-      ' <button class="resp-sub-del" onclick="delSubcat('+jsAttr(cat)+','+jsAttr(s)+')">✕</button></span>'
+      ' <button class="resp-sub-edit" title="Rinomina" onclick="renameSubcat('+jsAttr(cat)+','+jsAttr(s)+')">✎</button>'+
+      '<button class="resp-sub-del" title="Elimina" onclick="delSubcat('+jsAttr(cat)+','+jsAttr(s)+')">✕</button></span>'
     ).join('');
     if(!chips) chips='<span style="font-size:11px;color:var(--text-light)">Nessuna sottocategoria</span>';
     html+='<div class="resp-cat-block">'+
@@ -3569,15 +3578,13 @@ window.exportPdfContaInventario=async function(){
       // Gruppi per sottocategoria: prima quelle definite (in ordine), poi eventuali altre, infine i prodotti senza sottocategoria
       const subsDef=(cfg.subs||[]);
       const groups=[];
-      if(subsDef.length>0||items.some(it=>it.sub)){
+      if(subsDef.length>0){
         subsDef.forEach(sub=>{
           const g=items.filter(it=>it.sub===sub);
           if(g.length) groups.push({label:sub,items:g.sort(sortFn)});
         });
-        const otherSubs=[...new Set(items.map(it=>it.sub).filter(s=>s&&!subsDef.includes(s)))].sort((a,b)=>_invCollator.compare(a,b));
-        otherSubs.forEach(sub=>groups.push({label:sub,items:items.filter(it=>it.sub===sub).sort(sortFn)}));
-        const noSub=items.filter(it=>!it.sub);
-        if(noSub.length) groups.push({label:'Altri prodotti',items:noSub.sort(sortFn)});
+        const noSub=items.filter(it=>!it.sub||!subsDef.includes(it.sub));
+        if(noSub.length) groups.push({label:NO_SUB_LABEL,items:noSub.sort(sortFn)});
       } else {
         groups.push({label:null,items:items.slice().sort(sortFn)});
       }
@@ -3836,8 +3843,18 @@ window.downloadPdfQr=async function(){
         curY+=6;col=0;curX=MX;
         for(const it of subItems) await drawQrCard(it,cfg);
       }
-      const unsub=ci.filter(it=>!it.sub);
-      if(unsub.length>0){flushRow();for(const it of unsub) await drawQrCard(it,cfg);}
+      const unsub=ci.filter(it=>!it.sub||!cfg.subs.includes(it.sub));
+      if(unsub.length>0){
+        flushRow();checkSpace(6+CARD_H);
+        doc.setFont('helvetica','bold');doc.setFontSize(7);
+        doc.setTextColor(120,120,120);
+        doc.text('>> '+s(NO_SUB_LABEL).toUpperCase(),MX+3,curY+4);
+        doc.setDrawColor(170,170,170);doc.setLineWidth(0.25);
+        const twn=doc.getStringUnitWidth('>> '+s(NO_SUB_LABEL).toUpperCase())*7/doc.internal.scaleFactor;
+        doc.line(MX+twn+5,curY+3.5,PAGE_W-MX,curY+3.5);
+        curY+=6;col=0;curX=MX;
+        for(const it of unsub) await drawQrCard(it,cfg);
+      }
     } else {
       for(const it of ci) await drawQrCard(it,cfg);
     }
@@ -3920,9 +3937,10 @@ window.renderQrPage=function(){
         });
         html+=`</div>`;
       });
-      // unsub items
-      const unsub=ci.filter(it=>!it.sub);
+      // prodotti senza sottocategoria (o con sottocategoria non più esistente)
+      const unsub=ci.filter(it=>!it.sub||!cfg.subs.includes(it.sub));
       if(unsub.length>0){
+        html+=`<div class="qr-sub-header">${NO_SUB_LABEL}</div>`;
         html+=`<div class="qr-section-grid">`;
         unsub.forEach(it=>{
           html+=renderQrCard(it,cfg);
@@ -4880,6 +4898,49 @@ window.addSubcat=async function(cat){
     showToast('"'+nome+'" aggiunto','toast-return');
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
 };
+// Rinomina sottocategoria (Resp, con codice di sblocco).
+// Aggiorna il nome nella categoria e il SOLO campo "sub" dei prodotti collegati
+// (update parziale: quantità, prezzi, codici e QR non vengono toccati).
+let _renameSubBusy=false;
+window.renameSubcat=async function(cat,oldName){
+  if(!isResp()||_renameSubBusy) return;
+  const cfg=categories[cat]; if(!cfg||!Array.isArray(cfg.subs)) return;
+  const idx=cfg.subs.indexOf(oldName); if(idx<0) return;
+  const linked=itemsList.filter(it=>it.cat===cat&&it.sub===oldName);
+  const input=prompt('Nuovo nome per la sottocategoria "'+oldName+'"'+
+    (linked.length?'\n('+linked.length+(linked.length===1?' prodotto collegato verrà aggiornato)':' prodotti collegati verranno aggiornati)'):''),oldName);
+  if(input===null) return;
+  const newName=input.trim().replace(/\s+/g,' ');
+  if(!newName){showToast('Il nome non può essere vuoto','toast-danger');return;}
+  if(newName===oldName){showToast('Nome invariato','toast-info');return;}
+  if(newName===NO_SUB_LABEL){showToast('Nome riservato, scegline un altro','toast-danger');return;}
+  if(cfg.subs.some((s,i)=>i!==idx&&s.toLowerCase()===newName.toLowerCase())){
+    showToast('Esiste già una sottocategoria "'+newName+'"','toast-danger');return;
+  }
+  if(!requireUnlockCode()) return;
+  _renameSubBusy=true;
+  const prevSubs=cfg.subs.slice();
+  try{
+    const newSubs=cfg.subs.slice(); newSubs[idx]=newName;
+    // Scritture in blocchi atomici (max ~450 operazioni per batch)
+    const ops=[{ref:doc(db,'categorie',cat),data:{...cfg,subs:newSubs},set:true}]
+      .concat(linked.map(it=>({ref:doc(db,'inventario',it.id),data:{sub:newName}})));
+    for(let i=0;i<ops.length;i+=450){
+      const batch=writeBatch(db);
+      ops.slice(i,i+450).forEach(o=>o.set?batch.set(o.ref,o.data):batch.update(o.ref,o.data));
+      await batch.commit();
+    }
+    cfg.subs=newSubs;
+    linked.forEach(it=>{it.sub=newName;});
+    renderResponsabile();
+    if(document.getElementById('page-materiali')?.classList.contains('active')) renderMateriali();
+    showToast('"'+oldName+'" rinominata in "'+newName+'"'+(linked.length?' · '+linked.length+' prodotti aggiornati':''),'toast-return');
+  }catch(e){
+    cfg.subs=prevSubs;
+    showToast('Errore: '+e.message,'toast-danger');
+  }finally{_renameSubBusy=false;}
+};
+
 // Riordino sottocategorie (frecce ▲▼ in Materiali, solo responsabili).
 // Cambia SOLO l'ordine dell'array subs della categoria: nessun prodotto viene toccato.
 let _subMoveChain=Promise.resolve();
