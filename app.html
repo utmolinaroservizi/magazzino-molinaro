@@ -3048,6 +3048,10 @@ window.closeForm=(e)=>{if(e&&e.target&&e.target.id!=='form-backdrop') return;doc
 // ═══════════════════════════════════════
 //  RESPONSABILE
 // ═══════════════════════════════════════
+// Argomento JS sicuro dentro un attributo HTML onclick="...": le virgolette di
+// JSON.stringify vengono codificate (&quot;) così non chiudono l'attributo.
+function jsAttr(v){return JSON.stringify(String(v)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
 function renderResponsabile(){
   const totalVal=itemsList.reduce((s,it)=>{const p=it.prezzo!=null?it.prezzo:0;return s+p*it.qty;},0);
   document.getElementById('valore-num').textContent='€ '+totalVal.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -3069,7 +3073,7 @@ function renderResponsabile(){
     const catKey=cat.replace(/[^a-zA-Z0-9]/g,'_');
     let chips=subs.map(s=>
       '<span class="resp-sub-chip">'+s+
-      ' <button class="resp-sub-del" onclick="delSubcat('+JSON.stringify(cat)+','+JSON.stringify(s)+')">✕</button></span>'
+      ' <button class="resp-sub-del" onclick="delSubcat('+jsAttr(cat)+','+jsAttr(s)+')">✕</button></span>'
     ).join('');
     if(!chips) chips='<span style="font-size:11px;color:var(--text-light)">Nessuna sottocategoria</span>';
     html+='<div class="resp-cat-block">'+
@@ -3077,11 +3081,11 @@ function renderResponsabile(){
       '<div class="resp-cat-icon" style="background:'+cfg.bg+'">'+cfg.icon+'</div>'+
       '<div class="resp-cat-info" style="flex:1"><div class="resp-cat-name" style="color:'+cfg.color+'">'+cfg.label+'</div>'+
       '<div class="resp-cat-sub">'+cfg.prefix+' · '+ci.length+' prodotti</div></div>'+
-      '<button class="resp-cat-del" onclick="deleteCategory('+JSON.stringify(cat)+')">✕</button></div>'+
+      '<button class="resp-cat-del" onclick="deleteCategory('+jsAttr(cat)+')">✕</button></div>'+
       '<div class="resp-cat-subs">'+chips+'</div>'+
       '<div class="resp-add-sub-row">'+
       '<input class="resp-add-sub-input" id="nsi_'+catKey+'" placeholder="+ Nuova sottocategoria...">'+
-      '<button class="resp-add-sub-btn" onclick="addSubcat('+JSON.stringify(cat)+')">Aggiungi</button>'+
+      '<button class="resp-add-sub-btn" onclick="addSubcat('+jsAttr(cat)+')">Aggiungi</button>'+
       '</div></div>';
   });
   document.getElementById('resp-cat-list').innerHTML=html||'<p style="font-size:12px;color:var(--text-light);padding:10px 0">Nessuna categoria</p>';
