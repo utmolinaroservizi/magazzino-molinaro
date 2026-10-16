@@ -379,6 +379,11 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .sub-header-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .sub-header-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
 .sub-header-line{flex:1;height:1px;background:var(--border)}
+.sub-move{display:flex;gap:4px;flex-shrink:0}
+.sub-move-btn{width:28px;height:24px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text-muted);font-size:10px;line-height:1;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.sub-move-btn:hover:not(:disabled){background:var(--brand-50);border-color:var(--brand-200);color:var(--brand-600)}
+.sub-move-btn:active:not(:disabled){transform:scale(.92)}
+.sub-move-btn:disabled{opacity:.3;cursor:default}
 
 /* CARBURANTE */
 .fuel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
@@ -2322,10 +2327,17 @@ function renderMateriali(){
       </div>
       <div class="items-container ${isOpen?'open':''}" id="items-${ek}">`;
     if(hasSubs){
+      // Sottosezioni visibili (con almeno un prodotto): servono per abilitare le frecce agli estremi
+      const visibleSubs=cfg.subs.filter(sub=>ci.some(it=>it.sub===sub));
       cfg.subs.forEach(sub=>{
         const subItems=ci.filter(it=>it.sub===sub);
         if(subItems.length===0) return;
-        html+=`<div class="sub-header"><div class="sub-header-dot" style="background:${cfg.color}"></div><div class="sub-header-label" style="color:${cfg.color}">${sub}</div><div class="sub-header-line"></div></div>`;
+        const vi=visibleSubs.indexOf(sub);
+        const arrows=isResp()?`<div class="sub-move">
+            <button class="sub-move-btn" title="Sposta su" ${vi===0?'disabled':''} onclick="event.stopPropagation();moveSubcat(${jsAttr(cat)},${jsAttr(sub)},-1)">▲</button>
+            <button class="sub-move-btn" title="Sposta giù" ${vi===visibleSubs.length-1?'disabled':''} onclick="event.stopPropagation();moveSubcat(${jsAttr(cat)},${jsAttr(sub)},1)">▼</button>
+          </div>`:'';
+        html+=`<div class="sub-header"><div class="sub-header-dot" style="background:${cfg.color}"></div><div class="sub-header-label" style="color:${cfg.color}">${sub}</div><div class="sub-header-line"></div>${arrows}</div>`;
         subItems.forEach(it=>{
           const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
           html+=`<div class="item-card" onclick='openModal("${it.id}")'>
@@ -4868,6 +4880,36 @@ window.addSubcat=async function(cat){
     showToast('"'+nome+'" aggiunto','toast-return');
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
 };
+// Riordino sottocategorie (frecce ▲▼ in Materiali, solo responsabili).
+// Cambia SOLO l'ordine dell'array subs della categoria: nessun prodotto viene toccato.
+let _subMoveChain=Promise.resolve();
+window.moveSubcat=function(cat,sub,dir){
+  if(!isResp()) return;
+  const cfg=categories[cat]; if(!cfg||!Array.isArray(cfg.subs)) return;
+  const ci=getItemsByCat(cat);
+  // si scavalca la sottosezione VISIBILE più vicina (quelle vuote non sono mostrate)
+  const visible=cfg.subs.filter(s=>ci.some(it=>it.sub===s));
+  const vi=visible.indexOf(sub), ni=vi+dir;
+  if(vi<0||ni<0||ni>=visible.length) return;
+  const neighbor=visible[ni];
+  const prev=cfg.subs.slice();
+  const arr=cfg.subs.filter(s=>s!==sub);
+  let pos=arr.indexOf(neighbor);
+  if(dir>0) pos+=1;
+  arr.splice(pos,0,sub);
+  cfg.subs=arr;
+  // feedback immediato
+  renderMateriali();
+  const q=document.getElementById('search-input');
+  if(q&&q.value) filterItems();
+  // salvataggi in coda: l'ultimo scritto è sempre l'ordine più recente
+  const snapshot={...cfg,subs:arr.slice()};
+  _subMoveChain=_subMoveChain.then(()=>setDoc(doc(db,'categorie',cat),snapshot)).catch(e=>{
+    cfg.subs=prev; renderMateriali();
+    showToast('Errore salvataggio ordine: '+e.message,'toast-danger');
+  });
+};
+
 window.delSubcat=async function(cat,sub){
   var cfg=categories[cat]; if(!cfg) return;
   if(!confirm('Eliminare la sottocategoria "'+sub+'"?')) return;
