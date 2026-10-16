@@ -32,13 +32,13 @@ html,body{height:100%}
 body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);background-image:radial-gradient(circle at 20% 20%,rgba(77,171,61,.06) 0%,transparent 55%),radial-gradient(circle at 85% 90%,rgba(45,106,33,.06) 0%,transparent 50%);background-attachment:fixed;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
 #loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-#loading-screen img{height:44px;object-fit:contain}
+#loading-screen img{height:64px;object-fit:contain}
 .loading-spinner{width:32px;height:32px;border:3px solid var(--brand-100);border-top-color:var(--brand-500);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:13px;color:var(--text-muted);font-weight:500}
 
 .header{background:var(--bg-card);color:var(--text);padding:0 18px;height:64px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
-.header-logo{height:34px;object-fit:contain}
+.header-logo{height:42px;object-fit:contain}
 .header-divider{width:1px;height:26px;background:var(--border)}
 .header-title{font-size:14px;font-weight:600;letter-spacing:-.1px}
 .header-sub{font-size:10px;font-weight:500;color:var(--text-light);text-transform:uppercase;letter-spacing:.12em;margin-top:2px}
@@ -1166,10 +1166,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   </div>
   <div class="resp-card">
     <h3>📦 Inventario con prezzi</h3>
-    <p>Scarica l'elenco completo dei materiali con categorie, codici, quantità e prezzi.</p>
+    <p>Scarica l'elenco completo dei materiali con categorie, codici, quantità e prezzi, oppure la scheda PDF di conta per la verifica fisica delle giacenze (con colonna "Quantità rettificata" da compilare).</p>
     <button class="resp-btn resp-btn-green" onclick="exportInventory()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Scarica Excel inventario
+    </button>
+    <button class="resp-btn resp-btn-green" id="pdf-conta-btn" onclick="exportPdfContaInventario()" style="margin-top:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+      Scarica PDF conta inventario
     </button>
   </div>
   <div class="resp-card">
@@ -3426,6 +3430,220 @@ window.exportInventory=function(){
 };
 function downloadCSV(content,filename){const blob=new Blob([content],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}
 function dateStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+// ═══════════════════════════════════════
+//  PDF CONTA INVENTARIO (scheda di verifica giacenze)
+//  Codice | Prodotto | Quantità | Quantità rettificata (vuota)
+//  Raggruppato per categoria e sottocategoria; sola lettura dei dati.
+// ═══════════════════════════════════════
+const _invCollator=new Intl.Collator('it',{numeric:true,sensitivity:'base'});
+// Formazione del cavo: "1X1,5" -> {n:1,s:1.5}; "3G2,5" -> {n:3,s:2.5}
+function _invFormazioneCavo(name){
+  const m=String(name||'').toUpperCase().match(/(\d+)\s*[XG]\s*(\d+(?:[.,]\d+)?)/);
+  if(!m) return null;
+  return {n:parseInt(m[1],10),s:parseFloat(m[2].replace(',','.'))};
+}
+function _invCompare(a,b,isCavi){
+  if(isCavi){
+    const fa=_invFormazioneCavo(a.name),fb=_invFormazioneCavo(b.name);
+    if(fa&&fb){
+      if(fa.n!==fb.n) return fa.n-fb.n;   // prima 1x, poi 2x, 3x...
+      if(fa.s!==fb.s) return fa.s-fb.s;   // poi per sezione crescente
+    } else if(fa&&!fb) return -1;
+    else if(!fa&&fb) return 1;
+  }
+  // ordinamento naturale: "2" prima di "10", "1X2,5" prima di "1X10"
+  return _invCollator.compare(a.name||'',b.name||'')||_invCollator.compare(a.code||'',b.code||'');
+}
+async function _invLogoDataUrl(){
+  try{
+    const res=await fetch('logo-molinaro.png',{cache:'force-cache'});
+    if(!res.ok) return null;
+    const blob=await res.blob();
+    return await new Promise((resolve)=>{
+      const fr=new FileReader();
+      fr.onload=()=>resolve(fr.result);
+      fr.onerror=()=>resolve(null);
+      fr.readAsDataURL(blob);
+    });
+  }catch(e){return null;}
+}
+function _hexToRgb(hex,fallback){
+  const m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(String(hex||'').trim());
+  return m?[parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]:fallback;
+}
+
+window.exportPdfContaInventario=async function(){
+  if(typeof window.jspdf==='undefined'){
+    showToast('Libreria PDF non ancora caricata, riprova tra un secondo','toast-danger');return;
+  }
+  const btn=document.getElementById('pdf-conta-btn');
+  const btnHtml=btn?btn.innerHTML:'';
+  if(btn){btn.disabled=true;btn.textContent='Generazione PDF...';}
+  try{
+    // Testo compatibile con i font standard di jsPDF (Latin-1)
+    const t=str=>String(str==null?'':str)
+      .replace(/[‘’‚′]/g,"'")
+      .replace(/[“”„″]/g,'"')
+      .replace(/[–—]/g,'-')
+      .replace(/…/g,'...')
+      .replace(/[φΦ⌀∅]/g,'Ø') // simbolo diametro -> Ø (Latin-1)
+      .replace(/[^\x00-\xFF]/g,'?');
+    const fmtQ=q=>(Number(q)||0).toLocaleString('it-IT',{maximumFractionDigits:2});
+
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const PW=210,PH=297,MX=12,TOP=36,BOTTOM=PH-16;
+    const COL_CODE=24,COL_QTY=28,COL_RETT=36;
+    const COL_PROD=PW-2*MX-COL_CODE-COL_QTY-COL_RETT; // ~98 mm
+    const X_CODE=MX,X_PROD=X_CODE+COL_CODE,X_QTY=X_PROD+COL_PROD,X_RETT=X_QTY+COL_QTY,X_END=X_RETT+COL_RETT;
+    const LINE=4.2,ROW_MIN=7.5;
+
+    const now=new Date();
+    const dataStr=now.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const oraStr=now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    const logo=await _invLogoDataUrl();
+
+    let y=TOP;
+    function header(){
+      if(logo){try{doc.addImage(logo,'PNG',MX,9,31,14);}catch(e){}}
+      doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(40,40,40);
+      doc.text('SCHEDA DI CONTA INVENTARIO',PW-MX,15,{align:'right'});
+      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(100,100,100);
+      doc.text(t('Magazzino Molinaro - giacenze a sistema al '+dataStr+' ore '+oraStr),PW-MX,21,{align:'right'});
+      doc.setDrawColor(77,171,61);doc.setLineWidth(0.6);doc.line(MX,27,PW-MX,27);
+      doc.setLineWidth(0.2);
+    }
+    function colHeader(){
+      const HH=9;
+      doc.setFillColor(55,60,55);doc.rect(MX,y,X_END-MX,HH,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(255,255,255);
+      doc.text('CODICE',X_CODE+2,y+5.6);
+      doc.text('PRODOTTO',X_PROD+2,y+5.6);
+      doc.text(t('QUANTITÀ'),X_RETT-2,y+5.6,{align:'right'});
+      doc.text(t('QUANTITÀ'),X_RETT+COL_RETT/2,y+3.9,{align:'center'});
+      doc.text('RETTIFICATA',X_RETT+COL_RETT/2,y+7.3,{align:'center'});
+      y+=HH;
+    }
+    function newPage(){doc.addPage();header();y=TOP;}
+    // Garantisce spazio per h mm; se va a capo pagina ripete l'intestazione colonne (e un richiamo di categoria)
+    function ensure(h,ctx){
+      if(y+h<=BOTTOM) return;
+      newPage();
+      if(ctx){
+        doc.setFont('helvetica','italic');doc.setFontSize(8);doc.setTextColor(120,120,120);
+        doc.text(t(ctx+' (segue)'),MX,y+3);y+=5;
+      }
+      colHeader();
+    }
+
+    header();
+
+    // Ordine categorie: catOrder + eventuali categorie non in elenco
+    const allCats=[...catOrder.filter(c=>categories[c]),...Object.keys(categories).filter(c=>!catOrder.includes(c))];
+    let totProdotti=0;
+
+    allCats.forEach(cat=>{
+      const cfg=categories[cat];
+      const items=getItemsByCat(cat);
+      if(items.length===0) return;
+      const isCavi=String(cat).toLowerCase()==='cavi';
+      const sortFn=(a,b)=>_invCompare(a,b,isCavi);
+
+      // Gruppi per sottocategoria: prima quelle definite (in ordine), poi eventuali altre, infine i prodotti senza sottocategoria
+      const subsDef=(cfg.subs||[]);
+      const groups=[];
+      if(subsDef.length>0||items.some(it=>it.sub)){
+        subsDef.forEach(sub=>{
+          const g=items.filter(it=>it.sub===sub);
+          if(g.length) groups.push({label:sub,items:g.sort(sortFn)});
+        });
+        const otherSubs=[...new Set(items.map(it=>it.sub).filter(s=>s&&!subsDef.includes(s)))].sort((a,b)=>_invCollator.compare(a,b));
+        otherSubs.forEach(sub=>groups.push({label:sub,items:items.filter(it=>it.sub===sub).sort(sortFn)}));
+        const noSub=items.filter(it=>!it.sub);
+        if(noSub.length) groups.push({label:'Altri prodotti',items:noSub.sort(sortFn)});
+      } else {
+        groups.push({label:null,items:items.slice().sort(sortFn)});
+      }
+
+      // Intestazione categoria (+ spazio per intestazione colonne e almeno una riga)
+      ensure(9+9+ROW_MIN*3+(groups[0].label?7:0),null);
+      const fill=_hexToRgb(cfg.bg,[238,241,234]);
+      const ink=_hexToRgb(cfg.color,[45,106,33]);
+      doc.setFillColor(fill[0],fill[1],fill[2]);doc.rect(MX,y,X_END-MX,8,'F');
+      doc.setFillColor(ink[0],ink[1],ink[2]);doc.rect(MX,y,1.6,8,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(ink[0],ink[1],ink[2]);
+      doc.text(t((cfg.label||cat).toUpperCase()),MX+4,y+5.5);
+      doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(110,110,110);
+      doc.text(t(items.length+(items.length===1?' prodotto':' prodotti')),X_END-2,y+5.5,{align:'right'});
+      y+=9;
+      colHeader();
+
+      const ctxLabel=(cfg.label||cat);
+      groups.forEach(g=>{
+        if(g.label){
+          ensure(6.5+ROW_MIN,ctxLabel);
+          doc.setFillColor(245,246,243);doc.rect(MX,y,X_END-MX,6.5,'F');
+          doc.setFont('helvetica','bolditalic');doc.setFontSize(9);doc.setTextColor(ink[0],ink[1],ink[2]);
+          doc.text(t(g.label),MX+3,y+4.4);
+          y+=6.5;
+        }
+        g.items.forEach((it,idx)=>{
+          doc.setFont('helvetica','normal');doc.setFontSize(9);
+          const lines=doc.splitTextToSize(t(it.name),COL_PROD-4);
+          const h=Math.max(ROW_MIN,lines.length*LINE+3.3);
+          ensure(h,ctxLabel+(g.label?' - '+g.label:''));
+          if(idx%2===1){doc.setFillColor(250,250,248);doc.rect(MX,y,X_RETT-MX,h,'F');}
+          // cella da compilare a mano
+          doc.setFillColor(255,253,240);doc.rect(X_RETT,y,COL_RETT,h,'F');
+          doc.setDrawColor(200,200,195);
+          doc.rect(MX,y,X_END-MX,h);
+          [X_PROD,X_QTY,X_RETT].forEach(x=>doc.line(x,y,x,y+h));
+          const ty=y+(h-(lines.length-1)*LINE)/2+1.2;
+          doc.setFont('courier','bold');doc.setFontSize(8.5);doc.setTextColor(60,60,60);
+          doc.text(t(it.code),X_CODE+2,y+h/2+1.2);
+          doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(30,30,30);
+          doc.text(lines,X_PROD+2,ty);
+          doc.setFont('helvetica','bold');
+          doc.text(t(fmtQ(it.qty)+' '+(it.unit||'')),X_RETT-2,y+h/2+1.2,{align:'right'});
+          y+=h;
+          totProdotti++;
+        });
+      });
+      y+=6;
+    });
+
+    // Riquadro firme in coda
+    ensure(26,null);
+    y+=4;
+    doc.setDrawColor(150,150,150);doc.setLineWidth(0.3);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(60,60,60);
+    const fw=(X_END-MX-12)/3;
+    ['Conta eseguita da','Data','Firma'].forEach((lab,i)=>{
+      const fx=MX+i*(fw+6);
+      doc.text(lab,fx,y+4);
+      doc.line(fx,y+14,fx+fw,y+14);
+    });
+
+    // Piè di pagina con numerazione
+    const nPag=doc.getNumberOfPages();
+    for(let i=1;i<=nPag;i++){
+      doc.setPage(i);
+      doc.setDrawColor(220,220,215);doc.setLineWidth(0.2);doc.line(MX,PH-12,PW-MX,PH-12);
+      doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(130,130,130);
+      doc.text(t('Molinaro ESCo - Scheda di conta inventario del '+dataStr+' - '+totProdotti+' prodotti'),MX,PH-8);
+      doc.text('Pagina '+i+' di '+nPag,PW-MX,PH-8,{align:'right'});
+    }
+
+    doc.save('Conta_Inventario_Molinaro_'+dateStr()+'.pdf');
+    showToast('PDF conta inventario scaricato','toast-return');
+  }catch(e){
+    console.error('[PDF-CONTA]',e);
+    showToast('Errore generazione PDF: '+e.message,'toast-danger');
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML=btnHtml;}
+  }
+};
 
 // ═══════════════════════════════════════
 //  PDF QR TOTALE
