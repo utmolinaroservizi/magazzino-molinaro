@@ -452,6 +452,48 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .batch-ddt-banner{background:var(--brand-50);border:1.5px solid var(--brand-200);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px}
 .batch-ddt-banner-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-600);margin-bottom:9px}
 .batch-ddt-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ddt-filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.aa-sugg{display:flex;flex-direction:column;gap:4px}
+.aa-sugg-item{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);font-family:inherit;font-size:12.5px;text-align:left;cursor:pointer;color:var(--text)}
+.aa-sugg-item:active{transform:scale(.99)}
+.aa-sugg-name{flex:1;min-width:0}
+.aa-sugg-qty{font-size:11px;color:var(--text-muted);white-space:nowrap}
+.aa-sugg-empty{font-size:12px;color:var(--text-muted);padding:8px 4px}
+.aa-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.aa-kpi{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:8px 6px;text-align:center}
+.aa-kpi.in{background:#EEF7EC;border-color:#BFE0B6}
+.aa-kpi.out{background:#FFF3E2;border-color:#F3C886}
+.aa-kpi-l{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-light)}
+.aa-kpi-v{font-size:16px;font-weight:700;line-height:1.2;margin-top:3px;font-variant-numeric:tabular-nums}
+.aa-kpi-u{font-size:10px;color:var(--text-muted)}
+.aa-cant{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.aa-cant-row{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;font-size:12px;border-top:1px solid var(--border)}
+.aa-cant-row:first-child{border-top:none}
+.aa-list{max-height:440px;overflow-y:auto}
+.aa-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border);font-size:12px}
+.aa-badge{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.aa-badge.in{background:var(--brand-50);color:var(--brand-600)}
+.aa-badge.out{background:#FFF3D6;color:#9A6C1E}
+.aa-badge.rett{background:#EEF0F6;color:#4B5675}
+@media(max-width:380px){.aa-kpis{grid-template-columns:1fr 1fr}}
+.ddt-card-meta{font-size:11.5px;color:var(--text-muted);margin:-4px 0 8px;line-height:1.6}
+.ddt-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:auto;white-space:nowrap}
+.ddt-badge.ok{background:#E8F5E1;color:#2f7a22}
+.ddt-badge.part{background:#FFF3D6;color:#9A6C1E}
+.ddt-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--border);font-size:12.5px}
+.ddt-line-sc{font-size:10.5px;color:#2f7a22;font-weight:600}
+.ddt-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.ddt-act{flex:1;min-width:92px;padding:8px 6px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--text)}
+.ddt-act:active{transform:scale(.97)}
+.ddt-act.primary{background:var(--brand-500);border-color:var(--brand-500);color:#fff}
+.ddt-act.danger{color:#B33A3A;border-color:#F0C0C0}
+.ddt-act:disabled{opacity:.45;cursor:default}
+.ddt-mod-line{display:grid;grid-template-columns:1fr 74px 30px;gap:6px;align-items:center;padding:6px 0;border-top:1px solid var(--border);font-size:12px}
+.ddt-mod-line input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;text-align:right}
+.ddt-mod-line.removed{opacity:.4;text-decoration:line-through}
+.ddt-mod-x{width:28px;height:28px;border-radius:50%;border:1px solid #F0C0C0;background:transparent;color:#B33A3A;cursor:pointer;font-family:inherit}
+.ddt-sc-line{display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px}
+.ddt-sc-line.short{color:#B33A3A}
 .batch-ddt-hint{font-size:11px;color:var(--text-muted);margin-top:9px;line-height:1.45}
 .carica-cat-select{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;background:var(--bg-card);color:var(--text);outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
 .carica-cat-select:focus{border-color:var(--brand-500)}
@@ -728,7 +770,11 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   </button>
   <button class="hamburger-menu-item" onclick="showPage('ricerca-ddt');closeHamburgerMenu()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="11.5" cy="15.5" r="2.5"/><line x1="13.3" y1="17.3" x2="15" y2="19"/></svg>
-    Ricerca DDT/Fatture
+    DDT / Fatture
+  </button>
+  <button class="hamburger-menu-item" onclick="showPage('analisi-articolo');closeHamburgerMenu()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/><polyline points="7.5 12 9.5 9.5 11.5 11 13.5 8.5"/></svg>
+    Analisi articolo
   </button>
   <button class="hamburger-menu-item" onclick="showPage('cantieri-archiviati');closeHamburgerMenu()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
@@ -910,7 +956,11 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <input class="ddt-input" id="batch-ddt-num" placeholder="N° documento..." type="text" oninput="syncBatchDdt()">
       <input class="ddt-date" id="batch-ddt-date" type="date" oninput="syncBatchDdt()">
     </div>
-    <div class="batch-ddt-hint" id="batch-ddt-hint">Imposta numero e data: verranno applicati automaticamente ad ogni "Conferma carico" finché la modalità resta attiva.</div>
+    <div style="margin-top:8px">
+      <div class="carica-input-label">Destinatario (opzionale)</div>
+      <select class="carica-input" id="batch-ddt-dest" style="text-align:left" onchange="onDestSelectChange(this);syncBatchDdt()"></select>
+    </div>
+    <div class="batch-ddt-hint" id="batch-ddt-hint">Imposta numero, data ed eventuale destinatario: verranno applicati automaticamente ad ogni "Conferma carico" finché la modalità resta attiva.</div>
   </div>
   <div class="search-bar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1083,15 +1133,65 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 <div class="page" id="page-ricerca-ddt">
   <div class="hero">
     <div class="hero-eyebrow">Responsabile · Documenti</div>
-    <div class="hero-title" style="font-size:18px">📄 Ricerca DDT / Fatture</div>
-    <div class="hero-meta">Cerca un documento e vedi i prodotti caricati</div>
+    <div class="hero-title" style="font-size:18px">📄 DDT / Fatture</div>
+    <div class="hero-meta">Cerca, consulta, modifica, scarica su cantiere o elimina i documenti di carico</div>
   </div>
-  <div class="search-bar">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" placeholder="Cerca numero DDT o Fattura..." id="ricerca-ddt-input" onkeydown="if(event.key==='Enter') eseguiRicercaDdt()">
+  <div class="ddt-filters">
+    <div class="ddt-f">
+      <div class="carica-input-label">N° documento</div>
+      <input class="carica-input" id="ddt-f-num" type="text" placeholder="es. 1234" onkeydown="if(event.key==='Enter') eseguiRicercaDdt()">
+    </div>
+    <div class="ddt-f">
+      <div class="carica-input-label">Data documento</div>
+      <input class="carica-input" id="ddt-f-data" type="date">
+    </div>
+    <div class="ddt-f">
+      <div class="carica-input-label">Fornitore</div>
+      <select class="carica-input" id="ddt-f-forn" style="text-align:left"><option value="">— Tutti —</option></select>
+    </div>
+    <div class="ddt-f">
+      <div class="carica-input-label">Prodotto</div>
+      <input class="carica-input" id="ddt-f-prod" type="text" placeholder="Nome o codice" onkeydown="if(event.key==='Enter') eseguiRicercaDdt()">
+    </div>
   </div>
-  <button class="carica-add-btn" style="margin-bottom:16px" onclick="eseguiRicercaDdt()">🔍 Cerca</button>
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <button class="carica-add-btn" style="flex:1" onclick="eseguiRicercaDdt()">🔍 Cerca</button>
+    <button class="carica-add-btn" style="flex:0 0 auto;width:auto;padding:8px 14px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border)" onclick="azzeraFiltriDdt()">Azzera</button>
+  </div>
   <div id="ricerca-ddt-results"></div>
+</div>
+
+<!-- ANALISI ARTICOLO (solo responsabili) -->
+<div class="page" id="page-analisi-articolo">
+  <div class="hero">
+    <div class="hero-eyebrow">Responsabile · Analisi</div>
+    <div class="hero-title" style="font-size:18px">🔎 Analisi articolo</div>
+    <div class="hero-meta">Tutte le entrate e le uscite di un singolo articolo</div>
+  </div>
+  <div class="search-bar" style="margin-bottom:6px">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Cerca articolo per nome o codice..." id="aa-search" oninput="aaSuggest()" onfocus="this.select()">
+  </div>
+  <div id="aa-sugg" class="aa-sugg"></div>
+  <div id="aa-filters" class="ddt-filters" style="display:none;margin-top:8px">
+    <div class="ddt-f">
+      <div class="carica-input-label">Periodo</div>
+      <select class="carica-input" id="aa-periodo" style="text-align:left" onchange="onAaPeriodoChange()">
+        <option value="tutto">Da sempre</option>
+        <option value="mese">Mese specifico</option>
+        <option value="intervallo">Intervallo di date</option>
+      </select>
+    </div>
+    <div class="ddt-f" id="aa-mese-wrap" style="display:none">
+      <div class="carica-input-label">Mese</div>
+      <input class="carica-input" type="month" id="aa-mese" onchange="renderAnalisiArticolo()">
+    </div>
+    <div id="aa-range-wrap" style="display:none;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:8px">
+      <div><div class="carica-input-label">Dal</div><input class="carica-input" type="date" id="aa-da" onchange="renderAnalisiArticolo()"></div>
+      <div><div class="carica-input-label">Al</div><input class="carica-input" type="date" id="aa-a" onchange="renderAnalisiArticolo()"></div>
+    </div>
+  </div>
+  <div id="aa-result" style="margin-top:12px"></div>
 </div>
 
 <!-- RETTIFICA GIACENZA D'EMERGENZA (solo responsabili) -->
@@ -1302,8 +1402,14 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
   </div>
   <div class="resp-card">
     <h3>🗂️ Gestione categorie e sottocategorie</h3>
-    <p>Aggiungi sottocategorie o elimina categorie (azione irreversibile).</p>
+    <p>Rinomina categorie e sottocategorie (✎), aggiungi sottocategorie o elimina categorie (azione irreversibile).</p>
     <div class="resp-cat-list" id="resp-cat-list"></div>
+  </div>
+  <div class="resp-card">
+    <h3>📏 Unità di misura</h3>
+    <p>Unità disponibili per gli articoli, con il numero di articoli che le usano. Puoi aggiungerne di nuove (es. kg, mq, rotolo); quelle personalizzate non in uso si possono eliminare.</p>
+    <div class="resp-cat-subs" id="resp-unita-list" style="margin-bottom:10px"></div>
+    <button class="resp-add-sub-btn" style="width:100%" onclick="aggiungiUnitaResp()">+ Nuova unità di misura</button>
   </div>
 </div>
 
@@ -1337,6 +1443,11 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
         <select id="m-sub-select" class="modal-cantiere-select" onchange="saveSubcategoria()" style="border-color:var(--border)">
           <option value="">— Nessuna —</option>
         </select>
+      </div>
+      <!-- UNITÀ DI MISURA (solo responsabile) -->
+      <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-light)">
+        <div class="modal-price-label" style="margin-bottom:5px">📏 Unità di misura</div>
+        <select id="m-unit-select" class="modal-cantiere-select" onchange="saveUnitaArticolo(this)" style="border-color:var(--border)"></select>
       </div>
       <div class="modal-price-row">
         <div>
@@ -1414,7 +1525,7 @@ import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   doc, getDoc, collection, getDocs, setDoc, deleteDoc,
-  onSnapshot, writeBatch, query, orderBy, limit, startAfter
+  onSnapshot, writeBatch, query, orderBy, limit, startAfter, where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ═══════════════════════════════════════
@@ -1697,6 +1808,53 @@ function isResp(){return currentUser&&currentUser.ruolo==='responsabile'}
 const UNLOCK_CODE='21071999';
 // Etichetta del gruppo dei prodotti senza sottocategoria (o con sottocategoria eliminata)
 const NO_SUB_LABEL='Nessuna sottocategoria';
+
+// ═══════════════════════════════════════
+//  UNITÀ DI MISURA (standard + personalizzate in Firestore meta/unita)
+// ═══════════════════════════════════════
+const DEFAULT_UNITS=[{v:'pz',l:'Pezzi'},{v:'m',l:'Metri'},{v:'kit',l:'Kit'},{v:'conf',l:'Confezioni'},{v:'lt',l:'Litri'}];
+const UNIT_LONG={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
+let customUnits=[]; // [{v,l}]
+function getAllUnits(){
+  const out=[...DEFAULT_UNITS];
+  customUnits.forEach(u=>{if(!out.some(x=>x.v.toLowerCase()===u.v.toLowerCase())) out.push(u);});
+  // unità già usate da qualche articolo (es. 'mat') ma non presenti in elenco
+  (typeof itemsList!=='undefined'?itemsList:[]).forEach(it=>{
+    if(it.unit&&!out.some(x=>x.v===it.unit)) out.push({v:it.unit,l:it.unit});
+  });
+  return out;
+}
+function unitLong(v){return UNIT_LONG[v]||v||'unità';}
+// <option> per una select di unità; withNew aggiunge "+ Nuova unità…" (solo responsabili)
+function unitOptionsHtml(selected,withNew){
+  return getAllUnits().map(u=>'<option value="'+u.v.replace(/"/g,'&quot;')+'"'+(u.v===selected?' selected':'')+'>'+
+    (u.l&&u.l!==u.v?u.l+' ('+u.v+')':u.v)+'</option>').join('')+
+    (withNew&&isResp()?'<option value="__new__">+ Nuova unità…</option>':'');
+}
+async function promptNewUnit(){
+  const raw=prompt('Sigla della nuova unità di misura\n(es. kg, mq, rotolo, bobina)');
+  if(raw===null) return null;
+  const v=raw.trim().replace(/\s+/g,' ');
+  if(!v){showToast('Sigla non valida','toast-danger');return null;}
+  if(v.length>15){showToast('Sigla troppo lunga (max 15 caratteri)','toast-danger');return null;}
+  const ex=getAllUnits().find(u=>u.v.toLowerCase()===v.toLowerCase());
+  if(ex){showToast('Unità "'+ex.v+'" già presente','toast-info');return ex.v;}
+  const next=[...customUnits,{v,l:v}];
+  try{
+    await setDoc(doc(db,'meta','unita'),{list:next});
+    customUnits=next;
+    showToast('Unità "'+v+'" aggiunta','toast-return');
+    return v;
+  }catch(e){showToast('Errore salvataggio unità: '+e.message,'toast-danger');return null;}
+}
+// onchange delle select di unità: gestisce "+ Nuova unità…"
+window.onUnitSelectChange=async function(sel){
+  if(sel.value!=='__new__'){sel.dataset.prev=sel.value;return;}
+  const v=await promptNewUnit();
+  const keep=v||sel.dataset.prev||'pz';
+  sel.innerHTML=unitOptionsHtml(keep,true);
+  sel.value=keep; sel.dataset.prev=keep;
+};
 function requireUnlockCode(){
   const val=prompt('⚠️ Azione delicata.\nInserisci il codice di sblocco per procedere:');
   if(val===null) return false; // annullato
@@ -1819,8 +1977,8 @@ onAuthStateChanged(auth, async (firebaseUser)=>{
 
     // 4. Navigazione iniziale
     listenRealtime();
-    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo','registro-presenze','ricerca-ddt','rettifica','cantieri-archiviati'];
-    const RESP_ONLY_PAGES=['carica','responsabile','riepilogo','ricerca-ddt','rettifica','cantieri-archiviati'];
+    const VALID_PAGES=['dashboard','materiali','registro','qrcode','carburante','carica','responsabile','presenze','riepilogo','registro-presenze','ricerca-ddt','rettifica','cantieri-archiviati','analisi-articolo'];
+    const RESP_ONLY_PAGES=['carica','responsabile','riepilogo','ricerca-ddt','rettifica','cantieri-archiviati','analisi-articolo'];
     const hashPage=window.location.hash.replace('#','');
     const startPage=(VALID_PAGES.includes(hashPage)&&(!RESP_ONLY_PAGES.includes(hashPage)||isResp()))?hashPage:'dashboard';
     history.replaceState({page:startPage},'','#'+startPage);
@@ -2112,6 +2270,11 @@ function listenRealtime(){
       if(document.getElementById('page-carburante').classList.contains('active')) renderCarburante();
     }
   });
+  onSnapshot(doc(db,'meta','unita'),snap=>{
+    const d=snap.exists()?snap.data():null;
+    customUnits=d&&Array.isArray(d.list)?d.list.filter(u=>u&&u.v):[];
+    if(document.getElementById('page-responsabile')?.classList.contains('active')) renderUnitaCard();
+  },()=>{});
   onSnapshot(query(collection(db,'movimenti'),orderBy('time','desc'),limit(5000)),snap=>{
     // Aggiorna solo le voci già caricate (top), non azzera la paginazione
     const fresh=[];snap.forEach(d=>fresh.push({id:d.id,...d.data()}));
@@ -2199,6 +2362,14 @@ function _showPage(id){
   if(id==='rettifica'){
     if(!isResp()){_showPage('dashboard');return;}
     renderRettificaList();
+  }
+  if(id==='analisi-articolo'){
+    if(!isResp()){_showPage('dashboard');return;}
+    if(_aaItem) renderAnalisiArticolo();
+  }
+  if(id==='ricerca-ddt'){
+    if(!isResp()){_showPage('dashboard');return;}
+    eseguiRicercaDdt();
   }
   if(id==='cantieri-archiviati'){
     if(!isResp()){_showPage('dashboard');return;}
@@ -2440,7 +2611,7 @@ window.openModal=function(id){
   document.getElementById('m-qty').textContent=item.qty;
   document.getElementById('modal-operator-name').textContent=currentUser.nome;
   const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili',lt:'litri disponibili'};
-  document.getElementById('m-unit').textContent=um[item.unit]||'disponibili';
+  document.getElementById('m-unit').textContent=um[item.unit]||((item.unit?item.unit+' ':'')+'disponibili');
 
   // Modifica nome: solo responsabili
   const nameEditBtn=document.getElementById('m-name-edit-btn');
@@ -2471,6 +2642,9 @@ window.openModal=function(id){
     subSel.innerHTML='<option value="">— Nessuna —</option>'+
       subs.map(function(s){return '<option value="'+s+'"'+(item.sub===s?' selected':'')+'>'+s+'</option>';}).join('');
     document.getElementById('modal-sub-zone').style.display=subs.length>0?'block':'none';
+    // Unità di misura
+    const uSel=document.getElementById('m-unit-select');
+    if(uSel){uSel.innerHTML=unitOptionsHtml(item.unit||'pz',true);uSel.value=item.unit||'pz';uSel.dataset.prev=uSel.value;}
   } else {
     priceZone.classList.remove('visible');
   }
@@ -2486,8 +2660,7 @@ function updateCounterDisplay(){
   const el=document.getElementById('m-counter');
   el.value=counterVal;
   el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150);
-  const unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
-  const un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
+  const un=currentModalItem?unitLong(currentModalItem.unit):'unità';
   document.getElementById('m-counter-unit').textContent=un;
   document.getElementById('m-counter-hint').textContent=counterStep>1?'Passo: '+counterStep+' '+un:'';
   document.getElementById('m-take-label').innerHTML='Preleva<br><b>'+counterVal+' '+un+'</b>';
@@ -2600,8 +2773,7 @@ window.doAdjust=async function(sign){
   if(isResp()) renderPriceSection(currentModalItem);
   const qe=document.getElementById('m-qty');qe.style.transform='scale(1.15)';setTimeout(()=>qe.style.transform='scale(1)',200);
   const cls=actualDelta<0?'toast-take':'toast-return';
-  const unitNames={pz:'pz',m:'m',kit:'kit',mat:'mat',conf:'conf',lt:'lt'};
-  const un=unitNames[currentModalItem.unit]||'';
+  const un=currentModalItem.unit||'';
   showToast((actualDelta<0?'−':'+ ')+Math.abs(actualDelta)+' '+un+' '+currentModalItem.code+' · '+currentUser.nome,cls);
   // Reset contatore
   counterVal=counterStep;
@@ -2803,7 +2975,9 @@ function renderLogItem(entry,isTake,ts){
   // Info mezzo (solo per nafta)
   const vehicleHTML=entry.mezzo?`<div class="log-time" style="color:#555;font-weight:600">🚛 ${entry.mezzo} · ${entry.targa||''}</div>`:'';
   // Info cantiere
-  const cantiereHTML=entry.cantiere?`<div class="log-time" style="color:#2563EB;font-weight:600">🏗️ ${entry.cantiere}</div>`:'';
+  const cantiereHTML=(entry.cantiere?`<div class="log-time" style="color:#2563EB;font-weight:600">🏗️ ${entry.cantiere}</div>`:'')+
+    (entry.da_ddt&&entry.rif_num_doc?`<div class="log-time">📤 da ${entry.rif_tipo_doc||'DDT'} n° ${entry.rif_num_doc}</div>`:'')+
+    (entry.type==='load'&&entry.num_doc?`<div class="log-time">📄 ${entry.tipo_doc||'DDT'} n° ${entry.num_doc}${entry.destinatario?' · destinatario '+entry.destinatario:''}</div>`:'');
   // Info fornitore
   const fornitoreHTML=entry.fornitore?`<div class="log-time" style="color:#15803D;font-weight:600">🏭 ${entry.fornitore}</div>`:'';
 
@@ -3015,7 +3189,7 @@ window.openAddProductForm=function(preCat){
     <div class="form-group"><label>Nome prodotto</label><input id="fp-name" placeholder="es. LAMPADA LED 50W"></div>
     <div class="form-row">
       <div class="form-group"><label>Quantità iniziale</label><input id="fp-qty" type="number" min="0" value="0"></div>
-      <div class="form-group"><label>Unità</label><select id="fp-unit"><option value="pz">Pezzi</option><option value="m">Metri</option><option value="kit">Kit</option><option value="conf">Confezioni</option><option value="lt">Litri</option></select></div>
+      <div class="form-group"><label>Unità</label><select id="fp-unit" data-prev="pz" onchange="onUnitSelectChange(this)">${unitOptionsHtml('pz',true)}</select></div>
     </div>
     <div class="form-group"><label>Prezzo unitario (€) — opzionale</label><input id="fp-price" type="number" min="0" step="0.01" placeholder="0.00"></div>
     <div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" onclick="submitProduct()">Aggiungi</button></div>`;
@@ -3040,7 +3214,8 @@ window.submitProduct=async function(){
   const cat=document.getElementById('fp-cat').value;
   const name=document.getElementById('fp-name').value.trim().toUpperCase();
   const qty=parseInt(document.getElementById('fp-qty').value)||0;
-  const unit=document.getElementById('fp-unit').value;
+  let unit=document.getElementById('fp-unit').value;
+  if(!unit||unit==='__new__') unit='pz';
   const priceRaw=parseFloat(document.getElementById('fp-price').value);
   const prezzo=isNaN(priceRaw)||priceRaw<=0?null:Math.round(priceRaw*100)/100;
   const subEl=document.getElementById('fp-sub');
@@ -3081,6 +3256,9 @@ function renderResponsabile(){
   // Popola il dropdown dipendenti del registro presenze (legge da Firestore "utenti")
   popolaDropdownPresenzeResp();
 
+  // Unità di misura
+  renderUnitaCard();
+
   // Popola i filtri dell'analisi carburante (mezzi + operatori)
   popolaFiltriAnalisiCarburante();
 
@@ -3100,7 +3278,8 @@ function renderResponsabile(){
     html+='<div class="resp-cat-block">'+
       '<div style="display:flex;align-items:center;gap:8px">'+
       '<div class="resp-cat-icon" style="background:'+cfg.bg+'">'+cfg.icon+'</div>'+
-      '<div class="resp-cat-info" style="flex:1"><div class="resp-cat-name" style="color:'+cfg.color+'">'+cfg.label+'</div>'+
+      '<div class="resp-cat-info" style="flex:1"><div class="resp-cat-name" style="color:'+cfg.color+'">'+cfg.label+
+      ' <button class="resp-sub-edit" title="Rinomina categoria" style="font-size:12px" onclick="renameCategory('+jsAttr(cat)+')">✎</button></div>'+
       '<div class="resp-cat-sub">'+cfg.prefix+' · '+ci.length+' prodotti</div></div>'+
       '<button class="resp-cat-del" onclick="deleteCategory('+jsAttr(cat)+')">✕</button></div>'+
       '<div class="resp-cat-subs">'+chips+'</div>'+
@@ -4316,6 +4495,10 @@ function renderCarica(){
     return `<option value="${c}" ${c===caricaActiveCat?'selected':''}>${cfg.icon} ${cfg.label} (${n} prodotti)</option>`;
   }).join('');
 
+  // Destinatario del carico massivo: aggiorna l'elenco cantieri mantenendo la scelta
+  const bdest=document.getElementById('batch-ddt-dest');
+  if(bdest){bdest.innerHTML=destOptionsHtml(batchDdt.dest);bdest.value=batchDdt.dest||'';}
+
   renderCaricaList();
 }
 
@@ -4349,7 +4532,7 @@ function renderCaricaList(){
   let addHtml='';
   if(!isSearch){
     _naDdtType='DDT'; // il form viene ricreato con il bottone DDT attivo di default
-    const unitOpts=['pz','m','kit','conf','lt'].map(u=>`<option value="${u}">${u}</option>`).join('');
+    const unitOpts=unitOptionsHtml('pz',true);
     const subOpts=cfg.subs&&cfg.subs.length>0
       ? '<option value="">Nessuna</option>'+cfg.subs.map(s=>`<option value="${s}">${s}</option>`).join('')
       : '';
@@ -4370,7 +4553,7 @@ function renderCaricaList(){
         </div>
         <div class="carica-input-wrap">
           <div class="carica-input-label">Unità</div>
-          <select class="carica-input" id="na-unit">${unitOpts}</select>
+          <select class="carica-input" id="na-unit" data-prev="pz" onchange="onUnitSelectChange(this)">${unitOpts}</select>
         </div>
         <div class="carica-input-wrap">
           <div class="carica-input-label">Prezzo €/unità</div>
@@ -4399,6 +4582,8 @@ function renderCaricaList(){
             <input class="ddt-input" id="na-ddt-num" placeholder="N° documento..." type="text">
             <input class="ddt-date" id="na-ddt-date" type="date">
           </div>
+          <div class="carica-input-label" style="margin-top:6px">Destinatario (opzionale)</div>
+          <select class="carica-input" id="na-ddt-dest" style="text-align:left" onchange="onDestSelectChange(this)">${destOptionsHtml('')}</select>
         </div>`}
       </div>
       ${backdateBlockHtml('carnew')}
@@ -4408,6 +4593,7 @@ function renderCaricaList(){
     </div>`;
   }
 
+  const destOptsCache=destOptionsHtml('');
   // ── Prodotti esistenti ──────────────────────
   const itemsHtml=items.length===0
     ? `<div style="text-align:center;padding:20px 0 10px;color:var(--text-muted);font-size:13px">
@@ -4468,6 +4654,8 @@ function renderCaricaList(){
                 <input class="ddt-input" id="ddt-num-${it.id}" placeholder="N° documento..." type="text">
                 <input class="ddt-date" id="ddt-date-${it.id}" type="date">
               </div>
+              <div class="carica-input-label" style="margin-top:6px">Destinatario (opzionale)</div>
+              <select class="carica-input" id="ddt-dest-${it.id}" style="text-align:left" onchange="onDestSelectChange(this)">${destOptsCache}</select>
             </div>`}
           </div>
           ${backdateBlockHtml('car-'+it.id)}
@@ -4486,7 +4674,8 @@ window.submitNuovoProdottoCarica=async function(){
   if(_submitNuovoProdottoCaricaBusy) return; // Anti doppio-click
   const name=(document.getElementById('na-name')?.value||'').trim().toUpperCase();
   const qty=parseInt(document.getElementById('na-qty')?.value)||0;
-  const unit=document.getElementById('na-unit')?.value||'pz';
+  let unit=document.getElementById('na-unit')?.value||'pz';
+  if(unit==='__new__') unit='pz';
   const priceRaw=parseFloat(document.getElementById('na-price')?.value);
   const prezzo=isNaN(priceRaw)||priceRaw<=0?null:Math.round(priceRaw*100)/100;
   const subEl=document.getElementById('na-sub');
@@ -4512,7 +4701,7 @@ window.submitNuovoProdottoCarica=async function(){
       const ddtInfo=getNaDdtInfo();
       const entry={id:genId(),itemId:id,code,name,delta:qty,prevQty:0,
         operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('carnew'),backdated:isBackdated('carnew'),createdAt:Date.now(),type:'load',fornitore,
-        tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc};
+        tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc,destinatario:ddtInfo.destinatario||''};
       await saveMovimento(entry);
     }
     renderCarica();
@@ -4540,12 +4729,12 @@ window.confirmCarico=async function(itemId){
 
   // DDT/Fattura: dal documento fissato (carico massivo) oppure dai campi del prodotto
   var ddtInfo=batchDdt.active
-    ? {tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data}
+    ? {tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data,destinatario:batchDdt.dest||''}
     : getDdtInfoItem(itemId);
   const entry={id:genId(),itemId:item.id,code:item.code,name:item.name,
     delta:qty,prevQty,operator:currentUser.nome,operatorUid:currentUser.uid,
     time:getBackdatedTime('car-'+itemId),backdated:isBackdated('car-'+itemId),createdAt:Date.now(),type:'load',fornitore,
-    tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc};
+    tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc,destinatario:ddtInfo.destinatario||''};
   await saveMovimento(entry);
 
   qtyEl.value='';
@@ -4898,6 +5087,31 @@ window.addSubcat=async function(cat){
     showToast('"'+nome+'" aggiunto','toast-return');
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
 };
+// Rinomina categoria (Resp, con codice di sblocco).
+// Cambia SOLO l'etichetta visualizzata: chiave interna, prefisso, codici articolo e QR restano invariati.
+window.renameCategory=async function(cat){
+  if(!isResp()) return;
+  const cfg=categories[cat]; if(!cfg) return;
+  const oldLabel=cfg.label||cat;
+  const input=prompt('Nuovo nome per la categoria "'+oldLabel+'"\n(codici articolo e QR non cambiano)',oldLabel);
+  if(input===null) return;
+  const newLabel=input.trim().replace(/\s+/g,' ');
+  if(!newLabel){showToast('Il nome non può essere vuoto','toast-danger');return;}
+  if(newLabel===oldLabel){showToast('Nome invariato','toast-info');return;}
+  if(Object.keys(categories).some(k=>k!==cat&&((categories[k].label||k).toLowerCase()===newLabel.toLowerCase()))){
+    showToast('Esiste già una categoria "'+newLabel+'"','toast-danger');return;
+  }
+  if(!requireUnlockCode()) return;
+  try{
+    await setDoc(doc(db,'categorie',cat),{...cfg,label:newLabel});
+    cfg.label=newLabel;
+    renderResponsabile();
+    if(document.getElementById('page-materiali')?.classList.contains('active')) renderMateriali();
+    if(document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboard();
+    showToast('Categoria rinominata in "'+newLabel+'"','toast-return');
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+};
+
 // Rinomina sottocategoria (Resp, con codice di sblocco).
 // Aggiorna il nome nella categoria e il SOLO campo "sub" dei prodotti collegati
 // (update parziale: quantità, prezzi, codici e QR non vengono toccati).
@@ -5099,6 +5313,55 @@ async function migrateAssegnaSubcategorie(){
   }catch(e){console.warn('[SUBCAT-ASSIGN]',e.message);}
 }
 // Salva la sottocategoria selezionata — tocca SOLO il campo sub
+function renderUnitaCard(){
+  const el=document.getElementById('resp-unita-list'); if(!el) return;
+  el.innerHTML=getAllUnits().map(u=>{
+    const isCustom=customUnits.some(c=>c.v===u.v);
+    const nUso=itemsList.filter(it=>it.unit===u.v).length;
+    return '<span class="resp-sub-chip" title="'+nUso+' articoli">'+(u.l&&u.l!==u.v?u.l+' ('+u.v+')':u.v)+
+      ' <span style="font-weight:500;color:var(--text-light)">· '+nUso+'</span>'+
+      (isCustom?' <button class="resp-sub-del" title="Elimina" onclick="eliminaUnita('+jsAttr(u.v)+')">✕</button>':'')+'</span>';
+  }).join('');
+}
+window.aggiungiUnitaResp=async function(){await promptNewUnit();renderUnitaCard();};
+window.eliminaUnita=async function(v){
+  const nUso=itemsList.filter(it=>it.unit===v).length;
+  if(nUso>0){showToast('Unità "'+v+'" usata da '+nUso+' articoli: cambia prima la loro unità','toast-danger');return;}
+  if(!confirm('Eliminare l\'unità "'+v+'"?')) return;
+  if(!requireUnlockCode()) return;
+  const next=customUnits.filter(u=>u.v!==v);
+  try{await setDoc(doc(db,'meta','unita'),{list:next});customUnits=next;renderUnitaCard();showToast('Unità eliminata','toast-info');}
+  catch(e){showToast('Errore: '+e.message,'toast-danger');}
+};
+
+// Cambia SOLO l'unità di misura (e il passo del contatore coerente con l'unità):
+// la quantità numerica in giacenza resta identica.
+window.saveUnitaArticolo=async function(sel){
+  if(!currentModalItem||!isResp()) return;
+  const item=currentModalItem;
+  let v=sel.value;
+  if(v==='__new__'){
+    v=await promptNewUnit();
+    if(!v){sel.innerHTML=unitOptionsHtml(item.unit,true);sel.value=item.unit;return;}
+    sel.innerHTML=unitOptionsHtml(v,true);sel.value=v;
+  }
+  if(v===item.unit) return;
+  if(!confirm('Cambiare l\'unità di "'+item.name+'" da "'+item.unit+'" a "'+v+'"?\n\nLa quantità in giacenza resta '+item.qty+': cambia solo l\'unità con cui è espressa.')){
+    sel.value=item.unit;return;
+  }
+  const newStep=v==='m'?10:1;
+  try{
+    await setDoc(doc(db,'inventario',item.id),{unit:v,step:newStep},{merge:true});
+    item.unit=v;item.step=newStep;
+    sel.dataset.prev=v;
+    const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili',lt:'litri disponibili'};
+    document.getElementById('m-unit').textContent=um[v]||(v+' disponibili');
+    counterStep=newStep;counterVal=newStep;updateCounterDisplay();
+    renderPriceSection(item);
+    showToast('Unità aggiornata: '+v,'toast-return');
+  }catch(e){sel.value=item.unit;showToast('Errore: '+e.message,'toast-danger');}
+};
+
 window.saveSubcategoria=async function(){
   if(!currentModalItem) return;
   var newSub=document.getElementById('m-sub-select').value||null;
@@ -5121,7 +5384,7 @@ window.saveSubcategoria=async function(){
 // ═══════════════════════════════════
 //  CARICO MASSIVO — DDT/Fattura fissato per più prodotti
 // ═══════════════════════════════════
-let batchDdt={active:false,tipo:'DDT',num:'',data:''};
+let batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:''};
 window.toggleBatchDdt=function(){
   batchDdt.active=!batchDdt.active;
   const banner=document.getElementById('batch-ddt-banner');
@@ -5144,6 +5407,8 @@ window.syncBatchDdt=function(){
   const dateEl=document.getElementById('batch-ddt-date');
   batchDdt.num=(numEl&&numEl.value.trim())||'';
   batchDdt.data=(dateEl&&dateEl.value)||'';
+  const destEl=document.getElementById('batch-ddt-dest');
+  batchDdt.dest=(destEl&&destEl.value&&destEl.value!=='__newcant__')?destEl.value:'';
 };
 
 // ═══════════════════════════════════
@@ -5160,10 +5425,12 @@ window.setDdtTypeItem=function(itemId,tipo){
 function getDdtInfoItem(itemId){
   const numEl=document.getElementById('ddt-num-'+itemId);
   const dateEl=document.getElementById('ddt-date-'+itemId);
+  const destEl=document.getElementById('ddt-dest-'+itemId);
   return {
     tipo_doc:_ddtTypeByItem[itemId]||'DDT',
     num_doc:(numEl&&numEl.value.trim())||'',
-    data_doc:(dateEl&&dateEl.value)||''
+    data_doc:(dateEl&&dateEl.value)||'',
+    destinatario:(destEl&&destEl.value&&destEl.value!=='__newcant__')?destEl.value:''
   };
 }
 function resetDdtItem(itemId){
@@ -5172,8 +5439,46 @@ function resetDdtItem(itemId){
   const dateEl=document.getElementById('ddt-date-'+itemId);
   if(numEl) numEl.value='';
   if(dateEl) dateEl.value='';
+  const destEl=document.getElementById('ddt-dest-'+itemId);
+  if(destEl) destEl.value='';
   setDdtTypeItem(itemId,'DDT');
 }
+
+// ═══════════════════════════════════
+//  DESTINATARIO (cantiere) del carico — opzionale
+// ═══════════════════════════════════
+function destOptionsHtml(selected){
+  const esc=v=>String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const attivi=cantieriList.filter(c=>!c.archiviato).map(c=>c.nome);
+  if(selected&&!attivi.includes(selected)) attivi.unshift(selected);
+  return '<option value="">— Nessun destinatario —</option>'+
+    attivi.map(n=>'<option value="'+esc(n)+'"'+(n===selected?' selected':'')+'>🏗️ '+esc(n)+'</option>').join('')+
+    '<option value="__newcant__">+ Nuovo cantiere…</option>';
+}
+// Crea un cantiere al volo (o riusa quello con lo stesso nome); restituisce il nome o null
+async function creaCantiereRapido(){
+  const raw=prompt('Nome del nuovo cantiere:');
+  if(raw===null) return null;
+  const nome=raw.trim().replace(/\s+/g,' ');
+  if(!nome){showToast('Nome cantiere non valido','toast-danger');return null;}
+  const ex=cantieriList.find(c=>c.nome.toLowerCase()===nome.toLowerCase());
+  if(ex){showToast('Cantiere "'+ex.nome+'" già esistente'+(ex.archiviato?' (archiviato)':''),'toast-info');return ex.nome;}
+  const id=genId();
+  try{
+    await setDoc(doc(db,'cantieri',id),{nome,gruppo:'',archiviato:false,creato:Date.now()});
+    if(!cantieriList.find(c=>c.id===id)) cantieriList.push({id,nome,gruppo:'',archiviato:false,creato:Date.now()});
+    showToast('Cantiere "'+nome+'" creato','toast-return');
+    return nome;
+  }catch(e){showToast('Errore creazione cantiere: '+e.message,'toast-danger');return null;}
+}
+window.onDestSelectChange=async function(sel){
+  if(sel.value!=='__newcant__'){sel.dataset.prev=sel.value;return;}
+  const nome=await creaCantiereRapido();
+  const keep=nome||sel.dataset.prev||'';
+  sel.innerHTML=destOptionsHtml(keep);
+  sel.value=keep; sel.dataset.prev=keep;
+  if(sel.id==='batch-ddt-dest') syncBatchDdt();
+};
 
 // DDT/Fattura per il form "Aggiungi nuovo prodotto" in Carica
 var _naDdtType='DDT';
@@ -5187,14 +5492,16 @@ window.setNaDdtType=function(tipo){
 function getNaDdtInfo(){
   // Se è attiva la modalità carico massivo, usa il documento fissato
   if(batchDdt.active){
-    return {tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data};
+    return {tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data,destinatario:batchDdt.dest||''};
   }
   const numEl=document.getElementById('na-ddt-num');
   const dateEl=document.getElementById('na-ddt-date');
+  const destEl=document.getElementById('na-ddt-dest');
   return {
     tipo_doc:_naDdtType,
     num_doc:(numEl&&numEl.value.trim())||'',
-    data_doc:(dateEl&&dateEl.value)||''
+    data_doc:(dateEl&&dateEl.value)||'',
+    destinatario:(destEl&&destEl.value&&destEl.value!=='__newcant__')?destEl.value:''
   };
 }
 
@@ -5224,7 +5531,7 @@ window.exportDDT=async function(){
   rows.push(['RIEPILOGO DDT / FATTURE — MAGAZZINO MOLINARO']);
   rows.push(['Generato il: '+new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})]);
   rows.push([]);
-  rows.push(['Data carico','Tipo doc.','N° Documento','Data doc.','Fornitore','Codice','Prodotto','Qtà','Unità','Operatore']);
+  rows.push(['Data carico','Tipo doc.','N° Documento','Data doc.','Fornitore','Codice','Prodotto','Qtà','Unità','Operatore','Destinatario','Scaricato su']);
 
   tutti.forEach(function(e){
     var d=new Date(e.time);
@@ -5240,7 +5547,9 @@ window.exportDDT=async function(){
       e.name,
       e.delta,
       it&&it.unit||'',
-      e.operator||'N/D'
+      e.operator||'N/D',
+      e.destinatario||'',
+      e.scarico_cantiere?(e.scarico_cantiere+' ('+(e.scarico_qty||'')+')'):''
     ]);
   });
 
@@ -5249,82 +5558,567 @@ window.exportDDT=async function(){
   rows.push(['Totale carichi con documento:',tutti.length]);
 
   var ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:14},{wch:12},{wch:18},{wch:14},{wch:22},{wch:10},{wch:40},{wch:8},{wch:8},{wch:20}];
-  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}}];
+  ws['!cols']=[{wch:14},{wch:12},{wch:18},{wch:14},{wch:22},{wch:10},{wch:40},{wch:8},{wch:8},{wch:20},{wch:22},{wch:24}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:11}},{s:{r:1,c:0},e:{r:1,c:11}}];
   XLSX.utils.book_append_sheet(wb,ws,'DDT-Fatture');
   var fname='DDT_Fatture_Molinaro_'+new Date().toISOString().slice(0,10)+'.xlsx';
   XLSX.writeFile(wb,fname);
   showToast('Excel DDT/Fatture scaricato','toast-return');
 };
 
-// ═══════════════════════════════════
-//  RICERCA DDT / FATTURE — prodotti associati
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  DDT / FATTURE — ricerca, consultazione, modifica, scarico, eliminazione
+//  Un documento = tutti i movimenti di carico (type 'load') con stesso
+//  tipo + numero + fornitore. Le giacenze vengono aggiornate scrivendo SOLO
+//  il campo qty, letto fresco da Firestore, in un unico batch atomico.
+// ═══════════════════════════════════════════════════════════════
+let _ddtGroups=new Map();      // chiave → gruppo (ultima ricerca)
+let _ddtAllLoads=null;         // cache movimenti di carico con documento
+const DDT_MAX_LINES=140;       // limite di sicurezza per un batch Firestore (≤500 operazioni)
+
+function _ddtNorm(v){return String(v||'').trim().replace(/\s+/g,' ').toUpperCase();}
+function ddtKeyOf(e){return (e.tipo_doc||'DDT')+'|'+_ddtNorm(e.num_doc)+'|'+_ddtNorm(e.fornitore);}
+function _ddtEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function _ddtUnit(e){const it=itemsList.find(i=>i.id===e.itemId)||itemsList.find(i=>i.code===e.code);return it&&it.unit||'';}
+function _ddtFmtData(d){return d?new Date(d+'T12:00:00').toLocaleDateString('it-IT'):'—';}
+
+async function _ddtLoadAll(){
+  let out=[];
+  try{
+    const snap=await getDocs(query(collection(db,'movimenti'),where('type','==','load')));
+    snap.forEach(d=>{const e={id:d.id,...d.data()};if(e.num_doc&&String(e.num_doc).trim()) out.push(e);});
+  }catch(err){
+    console.warn('[DDT] lettura completa non riuscita, uso cache locale:',err.message);
+    out=actLog.filter(e=>e.type==='load'&&e.num_doc&&String(e.num_doc).trim());
+  }
+  _ddtAllLoads=out;
+  return out;
+}
+function _ddtBuildGroups(loads){
+  const m=new Map();
+  loads.forEach(e=>{
+    const k=ddtKeyOf(e);
+    if(!m.has(k)) m.set(k,{key:k,tipo:e.tipo_doc||'DDT',num:String(e.num_doc).trim(),fornitore:(e.fornitore||'').trim(),data_doc:'',destinatario:'',lines:[],lastTime:0});
+    const g=m.get(k);
+    g.lines.push(e);
+    if(!g.data_doc&&e.data_doc) g.data_doc=e.data_doc;
+    if(!g.destinatario&&e.destinatario) g.destinatario=e.destinatario;
+    g.lastTime=Math.max(g.lastTime,e.time||0);
+  });
+  m.forEach(g=>{
+    g.lines.sort((a,b)=>(a.time||0)-(b.time||0));
+    const sc=g.lines.filter(l=>l.scarico_mov_id);
+    g.scaricate=sc.length;
+    g.cantieriScarico=[...new Set(sc.map(l=>l.scarico_cantiere).filter(Boolean))];
+  });
+  return m;
+}
+function _ddtPopolaFornitori(loads){
+  const sel=document.getElementById('ddt-f-forn'); if(!sel) return;
+  const prev=sel.value;
+  const nomi=new Set(fornitoriList.map(f=>f.nome));
+  loads.forEach(e=>{if(e.fornitore) nomi.add(e.fornitore.trim());});
+  sel.innerHTML='<option value="">— Tutti —</option>'+[...nomi].sort((a,b)=>a.localeCompare(b)).map(n=>'<option value="'+_ddtEsc(n)+'">'+_ddtEsc(n)+'</option>').join('');
+  sel.value=prev;
+}
+window.azzeraFiltriDdt=function(){
+  ['ddt-f-num','ddt-f-data','ddt-f-prod'].forEach(id=>{const el=document.getElementById(id);if(el) el.value='';});
+  const f=document.getElementById('ddt-f-forn');if(f) f.value='';
+  eseguiRicercaDdt();
+};
+
 window.eseguiRicercaDdt=async function(){
-  const inputEl=document.getElementById('ricerca-ddt-input');
-  const q=(inputEl&&inputEl.value||'').trim().toLowerCase();
   const resultsEl=document.getElementById('ricerca-ddt-results');
   if(!resultsEl) return;
-  if(!q){
-    resultsEl.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>Inserisci un numero di DDT o Fattura</p></div>';
-    return;
-  }
+  const fNum=(document.getElementById('ddt-f-num')?.value||'').trim().toLowerCase();
+  const fData=document.getElementById('ddt-f-data')?.value||'';
+  const fForn=document.getElementById('ddt-f-forn')?.value||'';
+  const fProd=(document.getElementById('ddt-f-prod')?.value||'').trim().toLowerCase();
+  const hasFilter=!!(fNum||fData||fForn||fProd);
   resultsEl.innerHTML='<div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:13px">Ricerca in corso...</div>';
 
-  var tutti=[];
-  try{
-    var snap=await getDocs(query(collection(db,'movimenti'),orderBy('time','desc'),limit(5000)));
-    snap.forEach(function(d){
-      var e=Object.assign({id:d.id},d.data());
-      if(e.type!=='load') return;
-      if(!e.num_doc) return;
-      if(!e.num_doc.toLowerCase().includes(q)) return;
-      tutti.push(e);
-    });
-  }catch(err){
-    tutti=actLog.filter(function(e){return e.type==='load'&&e.num_doc&&e.num_doc.toLowerCase().includes(q);});
-  }
+  const loads=await _ddtLoadAll();
+  _ddtPopolaFornitori(loads);
+  const all=_ddtBuildGroups(loads);
+  let groups=[...all.values()];
+  if(fNum) groups=groups.filter(g=>g.num.toLowerCase().includes(fNum));
+  if(fData) groups=groups.filter(g=>g.lines.some(l=>l.data_doc===fData));
+  if(fForn) groups=groups.filter(g=>_ddtNorm(g.fornitore)===_ddtNorm(fForn));
+  if(fProd) groups=groups.filter(g=>g.lines.some(l=>(l.code||'').toLowerCase().includes(fProd)||(l.name||'').toLowerCase().includes(fProd)));
+  groups.sort((a,b)=>b.lastTime-a.lastTime);
+  const LIM=hasFilter?100:30;
+  const shown=groups.slice(0,LIM);
+  _ddtGroups=new Map(shown.map(g=>[g.key,g]));
 
-  if(tutti.length===0){
-    resultsEl.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>Nessun carico trovato per «'+inputEl.value.trim()+'»</p></div>';
+  if(shown.length===0){
+    resultsEl.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>'+(hasFilter?'Nessun documento corrisponde ai filtri':'Nessun carico con DDT o fattura registrato')+'</p></div>';
     return;
   }
-
-  tutti.sort(function(a,b){return b.time-a.time;});
-
-  // Raggruppa per tipo+numero documento
-  var groups=new Map();
-  tutti.forEach(function(e){
-    var key=(e.tipo_doc||'DDT')+'|'+e.num_doc;
-    if(!groups.has(key)) groups.set(key,[]);
-    groups.get(key).push(e);
-  });
-
-  var html='';
-  groups.forEach(function(entries,key){
-    var parts=key.split('|');
-    var tipo=parts[0],num=parts[1];
-    var first=entries[0];
-    var dataDoc=first.data_doc?new Date(first.data_doc+'T12:00:00').toLocaleDateString('it-IT'):'—';
-    html+='<div class="carica-item">'
-      +'<div class="carica-item-top">'
-      +'<span class="carica-item-code" style="background:var(--brand-50);color:var(--brand-600)">'+tipo+'</span>'
-      +'<span class="carica-item-name">N° '+num+'</span>'
-      +'</div>'
-      +'<div style="font-size:11px;color:var(--text-muted);margin:-4px 0 10px">📅 '+dataDoc+' · '+entries.length+' prodott'+(entries.length===1?'o':'i')+' caricat'+(entries.length===1?'o':'i')+'</div>';
-    entries.forEach(function(e){
-      var it=itemsList.filter(function(i){return i.id===e.itemId;})[0]||itemsList.filter(function(i){return i.code===e.code;})[0];
-      var un=it&&it.unit||'';
-      var ts=new Date(e.time).toLocaleDateString('it-IT');
-      html+='<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border);font-size:12.5px">'
-        +'<div><strong>'+e.code+'</strong> — '+e.name+(e.fornitore?'<br><span style="color:var(--text-muted);font-size:11px">🏭 '+e.fornitore+'</span>':'')+'</div>'
-        +'<div style="text-align:right;color:var(--text-muted);flex-shrink:0"><span style="color:var(--brand-600);font-weight:700">+'+e.delta+(un?' '+un:'')+'</span><br>'+ts+'</div>'
-        +'</div>';
-    });
-    html+='</div>';
-  });
-
+  let html='<div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px">'+
+    (hasFilter?groups.length+' document'+(groups.length===1?'o trovato':'i trovati')+(groups.length>LIM?' (mostrati i primi '+LIM+')':''):'Ultimi '+shown.length+' documenti — usa i filtri per cercare')+'</div>';
+  shown.forEach(g=>{html+=_ddtCardHtml(g,fProd);});
   resultsEl.innerHTML=html;
+};
+
+function _ddtCardHtml(g,fProd){
+  const n=g.lines.length;
+  let badge='';
+  if(g.scaricate===n) badge='<span class="ddt-badge ok">✓ Scaricato su '+_ddtEsc(g.cantieriScarico.join(', '))+'</span>';
+  else if(g.scaricate>0) badge='<span class="ddt-badge part">Scaricato in parte ('+g.scaricate+'/'+n+')</span>';
+  let h='<div class="carica-item">'+
+    '<div class="carica-item-top">'+
+      '<span class="carica-item-code" style="background:var(--brand-50);color:var(--brand-600)">'+_ddtEsc(g.tipo)+'</span>'+
+      '<span class="carica-item-name">N° '+_ddtEsc(g.num)+'</span>'+badge+
+    '</div>'+
+    '<div class="ddt-card-meta">📅 '+_ddtFmtData(g.data_doc)+(g.fornitore?' · 🏭 '+_ddtEsc(g.fornitore):'')+
+      (g.destinatario?' · 🏗️ Destinatario: <b>'+_ddtEsc(g.destinatario)+'</b>':'')+
+      ' · '+n+' prodott'+(n===1?'o':'i')+'</div>';
+  g.lines.forEach(e=>{
+    const un=_ddtUnit(e);
+    const hit=fProd&&(((e.code||'').toLowerCase().includes(fProd))||((e.name||'').toLowerCase().includes(fProd)));
+    h+='<div class="ddt-line"'+(hit?' style="background:#FFFBEA"':'')+'>'+
+      '<div><strong>'+_ddtEsc(e.code)+'</strong> — '+_ddtEsc(e.name)+
+        (e.scarico_mov_id?'<br><span class="ddt-line-sc">↘ scaricato '+(e.scarico_qty||'')+' '+_ddtEsc(un)+' su '+_ddtEsc(e.scarico_cantiere||'')+'</span>':'')+'</div>'+
+      '<div style="text-align:right;color:var(--text-muted);flex-shrink:0"><span style="color:var(--brand-600);font-weight:700">+'+e.delta+(un?' '+_ddtEsc(un):'')+'</span><br>'+new Date(e.time).toLocaleDateString('it-IT')+'</div>'+
+    '</div>';
+  });
+  const allSc=g.scaricate===n, anySc=g.scaricate>0;
+  h+='<div class="ddt-actions">'+
+    '<button class="ddt-act" onclick="openModificaDdt('+jsAttr(g.key)+')">✏️ Modifica</button>'+
+    (allSc?'':'<button class="ddt-act primary" onclick="openScaricoDdt('+jsAttr(g.key)+')">📤 Scarica su cantiere</button>')+
+    (anySc?'<button class="ddt-act" onclick="annullaScaricoDdt('+jsAttr(g.key)+')">↩️ Annulla scarico</button>':'')+
+    '<button class="ddt-act danger" onclick="eliminaDdt('+jsAttr(g.key)+')">🗑️ Elimina</button>'+
+  '</div></div>';
+  return h;
+}
+
+// Legge la giacenza aggiornata (da Firestore) degli articoli indicati
+async function _ddtFreshQty(itemIds){
+  const out={};
+  for(const id of [...new Set(itemIds)]){
+    try{
+      const s=await getDoc(doc(db,'inventario',id));
+      out[id]=s.exists()?(Number(s.data().qty)||0):null;
+    }catch(e){
+      const it=itemsList.find(i=>i.id===id);
+      out[id]=it?Number(it.qty)||0:null;
+    }
+  }
+  return out;
+}
+function _ddtRefresh(){
+  if(document.getElementById('page-ricerca-ddt')?.classList.contains('active')) eseguiRicercaDdt();
+  if(document.getElementById('page-materiali')?.classList.contains('active')) renderMateriali();
+  if(document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboard();
+}
+function _ddtTitle(g){return g.tipo+' n° '+g.num+(g.fornitore?' ('+g.fornitore+')':'');}
+
+// ── SCARICO INTERO SU CANTIERE ─────────────────────────────────
+window.openScaricoDdt=async function(key){
+  const g=_ddtGroups.get(key); if(!g) return;
+  const lines=g.lines.filter(l=>!l.scarico_mov_id);
+  if(lines.length===0){showToast('Documento già scaricato','toast-info');return;}
+  if(lines.length>DDT_MAX_LINES){showToast('Documento troppo grande per uno scarico unico','toast-danger');return;}
+  const fresh=await _ddtFreshQty(lines.map(l=>l.itemId));
+  const avail={...fresh};
+  let rows='',short=0;
+  lines.forEach(l=>{
+    const a=avail[l.itemId];
+    const q=a==null?0:Math.min(l.delta,Math.max(0,a));
+    if(a!=null) avail[l.itemId]=a-q;
+    const un=_ddtUnit(l);
+    const isShort=q<l.delta;
+    if(isShort) short++;
+    rows+='<div class="ddt-sc-line'+(isShort?' short':'')+'"><div><b>'+_ddtEsc(l.code)+'</b> — '+_ddtEsc(l.name)+
+      (isShort?'<br><span style="font-size:10.5px">'+(a==null?'articolo non più presente':'disponibili solo '+Math.max(0,a)+' '+_ddtEsc(un))+'</span>':'')+'</div>'+
+      '<div style="font-weight:700;white-space:nowrap">−'+q+' '+_ddtEsc(un)+(isShort?' <span style="font-weight:500">/ '+l.delta+'</span>':'')+'</div></div>';
+  });
+  const opts='<option value="">— Seleziona cantiere —</option>'+destOptionsHtml(g.destinatario).replace('<option value="">— Nessun destinatario —</option>','');
+  document.getElementById('form-modal').innerHTML=
+    '<h2>📤 Scarica su cantiere</h2>'+
+    '<div style="font-size:12.5px;color:var(--text-muted);margin:-8px 0 14px">'+_ddtEsc(_ddtTitle(g))+' · '+lines.length+' prodott'+(lines.length===1?'o':'i')+' in un\'unica operazione</div>'+
+    '<div class="form-group"><label>Cantiere</label><select id="ddt-sc-cant" onchange="onDestSelectChange(this)">'+opts+'</select></div>'+
+    (short?'<div style="font-size:11.5px;background:#FDECEC;color:#B33A3A;border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ Per '+short+' articol'+(short===1?'o':'i')+' la giacenza attuale è inferiore alla quantità del documento: verrà scaricato solo il disponibile.</div>':'')+
+    '<div style="max-height:40vh;overflow-y:auto;margin-bottom:14px">'+rows+'</div>'+
+    '<div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" id="ddt-sc-btn" onclick="confermaScaricoDdt('+jsAttr(key)+')">Scarica</button></div>';
+  const sel=document.getElementById('ddt-sc-cant');
+  if(sel&&g.destinatario) sel.value=g.destinatario;
+  document.getElementById('form-backdrop').classList.add('open');
+};
+
+let _ddtBusy=false;
+window.confermaScaricoDdt=async function(key){
+  if(_ddtBusy) return;
+  const g=_ddtGroups.get(key); if(!g) return;
+  const cantiere=document.getElementById('ddt-sc-cant')?.value||'';
+  if(!cantiere||cantiere==='__newcant__'){showToast('⚠️ Seleziona il cantiere!','toast-danger');return;}
+  const lines=g.lines.filter(l=>!l.scarico_mov_id);
+  if(lines.length===0) return;
+  _ddtBusy=true;
+  const btn=document.getElementById('ddt-sc-btn'); if(btn){btn.disabled=true;btn.textContent='Scarico in corso...';}
+  try{
+    const fresh=await _ddtFreshQty(lines.map(l=>l.itemId));
+    const qty={...fresh};
+    const now=Date.now();
+    const batch=writeBatch(db);
+    let nScaricati=0,nSaltati=0;
+    lines.forEach(l=>{
+      const a=qty[l.itemId];
+      if(a==null){nSaltati++;return;}
+      const q=Math.min(l.delta,Math.max(0,a));
+      if(q<=0){nSaltati++;return;}
+      qty[l.itemId]=a-q;
+      const takeId=genId();
+      batch.set(doc(db,'movimenti',takeId),{
+        itemId:l.itemId,code:l.code,name:l.name,delta:-q,prevQty:a,
+        operator:currentUser.nome,operatorUid:currentUser.uid,time:now,createdAt:now,type:'take',cantiere,
+        da_ddt:true,rif_tipo_doc:g.tipo,rif_num_doc:g.num,rif_fornitore:g.fornitore||'',rif_load_id:l.id
+      });
+      batch.update(doc(db,'movimenti',l.id),{scarico_mov_id:takeId,scarico_cantiere:cantiere,scarico_qty:q,scarico_time:now});
+      nScaricati++;
+    });
+    if(nScaricati===0){showToast('Nessuna quantità disponibile da scaricare','toast-danger');return;}
+    Object.keys(qty).forEach(id=>{if(fresh[id]!=null&&qty[id]!==fresh[id]) batch.update(doc(db,'inventario',id),{qty:qty[id]});});
+    await batch.commit();
+    Object.keys(qty).forEach(id=>{const it=itemsList.find(i=>i.id===id);if(it&&qty[id]!=null) it.qty=qty[id];});
+    closeForm();
+    showToast('📤 '+nScaricati+' articol'+(nScaricati===1?'o scaricato':'i scaricati')+' su '+cantiere+(nSaltati?' · '+nSaltati+' senza disponibilità':''),'toast-take');
+    _ddtRefresh();
+  }catch(e){
+    showToast('Errore scarico: '+e.message,'toast-danger');
+  }finally{
+    _ddtBusy=false;
+    if(btn){btn.disabled=false;btn.textContent='Scarica';}
+  }
+};
+
+// ── ANNULLA SCARICO ────────────────────────────────────────────
+window.annullaScaricoDdt=async function(key){
+  if(_ddtBusy) return;
+  const g=_ddtGroups.get(key); if(!g) return;
+  const lines=g.lines.filter(l=>l.scarico_mov_id);
+  if(lines.length===0) return;
+  if(!confirm('Annullare lo scarico di '+_ddtTitle(g)+'?\n\nI '+lines.length+' prelievi generati verranno eliminati e le quantità torneranno in magazzino.')) return;
+  if(!requireUnlockCode()) return;
+  _ddtBusy=true;
+  try{
+    const fresh=await _ddtFreshQty(lines.map(l=>l.itemId));
+    const qty={...fresh};
+    const batch=writeBatch(db);
+    for(const l of lines){
+      let exists=false;
+      try{exists=(await getDoc(doc(db,'movimenti',l.scarico_mov_id))).exists();}catch(e){}
+      if(exists){
+        batch.delete(doc(db,'movimenti',l.scarico_mov_id));
+        if(qty[l.itemId]!=null) qty[l.itemId]+=Number(l.scarico_qty)||0;
+      }
+      // se il prelievo era già stato eliminato dal registro, la giacenza è già stata ripristinata: si pulisce solo il riferimento
+      batch.update(doc(db,'movimenti',l.id),{scarico_mov_id:null,scarico_cantiere:null,scarico_qty:null,scarico_time:null});
+    }
+    Object.keys(qty).forEach(id=>{if(fresh[id]!=null&&qty[id]!==fresh[id]) batch.update(doc(db,'inventario',id),{qty:qty[id]});});
+    await batch.commit();
+    Object.keys(qty).forEach(id=>{const it=itemsList.find(i=>i.id===id);if(it&&qty[id]!=null) it.qty=qty[id];});
+    showToast('Scarico annullato, giacenze ripristinate','toast-info');
+    _ddtRefresh();
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+  finally{_ddtBusy=false;}
+};
+
+// ── ELIMINA DOCUMENTO ──────────────────────────────────────────
+window.eliminaDdt=async function(key){
+  if(_ddtBusy) return;
+  const g=_ddtGroups.get(key); if(!g) return;
+  if(g.scaricate>0){showToast('Il documento è stato scaricato su cantiere: annulla prima lo scarico','toast-danger');return;}
+  if(g.lines.length>DDT_MAX_LINES){showToast('Documento troppo grande per un\'eliminazione unica','toast-danger');return;}
+  const fresh=await _ddtFreshQty(g.lines.map(l=>l.itemId));
+  const qty={...fresh};
+  const sottoZero=[];
+  g.lines.forEach(l=>{
+    if(qty[l.itemId]==null) return;
+    const nv=qty[l.itemId]-l.delta;
+    if(nv<0) sottoZero.push(l.code);
+    qty[l.itemId]=nv;
+  });
+  Object.keys(qty).forEach(id=>{if(qty[id]!=null&&qty[id]<0) qty[id]=0;});
+  if(!confirm('Eliminare '+_ddtTitle(g)+'?\n\nVerranno eliminati '+g.lines.length+' carichi e le relative quantità verranno tolte dalla giacenza.'+
+    (sottoZero.length?'\n\n⚠️ Per '+sottoZero.join(', ')+' la giacenza attuale è inferiore al caricato: verrà portata a 0.':''))) return;
+  if(!requireUnlockCode()) return;
+  _ddtBusy=true;
+  try{
+    const batch=writeBatch(db);
+    g.lines.forEach(l=>batch.delete(doc(db,'movimenti',l.id)));
+    Object.keys(qty).forEach(id=>{if(fresh[id]!=null&&qty[id]!==fresh[id]) batch.update(doc(db,'inventario',id),{qty:qty[id]});});
+    await batch.commit();
+    Object.keys(qty).forEach(id=>{const it=itemsList.find(i=>i.id===id);if(it&&qty[id]!=null) it.qty=qty[id];});
+    actLog=actLog.filter(e=>!g.lines.some(l=>l.id===e.id));
+    showToast('Documento eliminato e giacenze aggiornate','toast-info');
+    _ddtRefresh();
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+  finally{_ddtBusy=false;}
+};
+
+// ── MODIFICA DOCUMENTO ─────────────────────────────────────────
+let _ddtModRemoved=new Set();
+window.openModificaDdt=function(key){
+  const g=_ddtGroups.get(key); if(!g) return;
+  _ddtModRemoved=new Set();
+  const fornNomi=new Set(fornitoriList.map(f=>f.nome)); if(g.fornitore) fornNomi.add(g.fornitore);
+  const fornOpts='<option value="">— Nessuno —</option>'+[...fornNomi].sort((a,b)=>a.localeCompare(b)).map(n=>'<option value="'+_ddtEsc(n)+'"'+(n===g.fornitore?' selected':'')+'>'+_ddtEsc(n)+'</option>').join('');
+  let rows='';
+  g.lines.forEach(l=>{
+    const lock=!!l.scarico_mov_id;
+    rows+='<div class="ddt-mod-line" id="ddt-ml-'+l.id+'"><div><b>'+_ddtEsc(l.code)+'</b> — '+_ddtEsc(l.name)+
+      (lock?'<br><span class="ddt-line-sc">scaricato: quantità bloccata</span>':'')+'</div>'+
+      '<input type="number" min="1" step="1" inputmode="numeric" id="ddt-mq-'+l.id+'" value="'+l.delta+'"'+(lock?' disabled':'')+'>'+
+      (lock?'<span></span>':'<button class="ddt-mod-x" title="Togli dal documento" onclick="toggleRigaDdt('+jsAttr(l.id)+')">✕</button>')+'</div>';
+  });
+  document.getElementById('form-modal').innerHTML=
+    '<h2>✏️ Modifica documento</h2>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Tipo</label><select id="ddt-m-tipo"><option value="DDT"'+(g.tipo==='DDT'?' selected':'')+'>DDT</option><option value="Fattura"'+(g.tipo==='Fattura'?' selected':'')+'>Fattura</option></select></div>'+
+      '<div class="form-group"><label>Numero</label><input id="ddt-m-num" value="'+_ddtEsc(g.num)+'"></div>'+
+    '</div>'+
+    '<div class="form-row">'+
+      '<div class="form-group"><label>Data documento</label><input type="date" id="ddt-m-data" value="'+_ddtEsc(g.data_doc)+'"></div>'+
+      '<div class="form-group"><label>Fornitore</label><select id="ddt-m-forn">'+fornOpts+'</select></div>'+
+    '</div>'+
+    '<div class="form-group"><label>Destinatario (opzionale)</label><select id="ddt-m-dest" onchange="onDestSelectChange(this)">'+destOptionsHtml(g.destinatario)+'</select></div>'+
+    '<div class="form-group" style="margin-bottom:6px"><label>Prodotti e quantità caricate</label></div>'+
+    '<div style="max-height:34vh;overflow-y:auto;margin-bottom:14px">'+rows+'</div>'+
+    '<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Se cambi quantità o togli prodotti, la giacenza viene corretta di conseguenza (richiede il codice di sblocco).</div>'+
+    '<div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" id="ddt-m-btn" onclick="salvaModificaDdt('+jsAttr(key)+')">Salva</button></div>';
+  document.getElementById('form-backdrop').classList.add('open');
+};
+window.toggleRigaDdt=function(id){
+  const row=document.getElementById('ddt-ml-'+id); if(!row) return;
+  if(_ddtModRemoved.has(id)){_ddtModRemoved.delete(id);row.classList.remove('removed');}
+  else{_ddtModRemoved.add(id);row.classList.add('removed');}
+};
+window.salvaModificaDdt=async function(key){
+  if(_ddtBusy) return;
+  const g=_ddtGroups.get(key); if(!g) return;
+  const tipo=document.getElementById('ddt-m-tipo').value;
+  const num=document.getElementById('ddt-m-num').value.trim();
+  const data=document.getElementById('ddt-m-data').value||'';
+  const forn=document.getElementById('ddt-m-forn').value||'';
+  let dest=document.getElementById('ddt-m-dest').value||''; if(dest==='__newcant__') dest='';
+  if(!num){showToast('Il numero del documento è obbligatorio','toast-danger');return;}
+  if(_ddtModRemoved.size===g.lines.length){showToast('Per togliere tutti i prodotti usa "Elimina"','toast-danger');return;}
+
+  // Variazioni di quantità per riga e per articolo
+  const changes=[];const diffByItem={};
+  for(const l of g.lines){
+    if(l.scarico_mov_id) continue;
+    if(_ddtModRemoved.has(l.id)){changes.push({l,remove:true});diffByItem[l.itemId]=(diffByItem[l.itemId]||0)-l.delta;continue;}
+    const v=parseInt(document.getElementById('ddt-mq-'+l.id)?.value,10);
+    if(isNaN(v)||v<1){showToast('Quantità non valida per '+l.code,'toast-danger');return;}
+    if(v!==l.delta){changes.push({l,newQty:v});diffByItem[l.itemId]=(diffByItem[l.itemId]||0)+(v-l.delta);}
+  }
+  const headerChanged=tipo!==g.tipo||num!==g.num||data!==(g.data_doc||'')||forn!==(g.fornitore||'')||dest!==(g.destinatario||'');
+  if(!headerChanged&&changes.length===0){showToast('Nessuna modifica','toast-info');closeForm();return;}
+
+  let fresh={},qty={};
+  if(changes.length>0){
+    fresh=await _ddtFreshQty(Object.keys(diffByItem));
+    qty={...fresh};
+    const sottoZero=[];
+    Object.keys(diffByItem).forEach(id=>{
+      if(qty[id]==null) return;
+      let nv=qty[id]+diffByItem[id];
+      if(nv<0){const it=itemsList.find(i=>i.id===id);sottoZero.push(it?it.code:id);nv=0;}
+      qty[id]=nv;
+    });
+    const riepilogo=changes.map(c=>c.l.code+': '+(c.remove?'tolto ('+c.l.delta+')':c.l.delta+' → '+c.newQty)).join('\n');
+    if(!confirm('Confermi le modifiche alle quantità?\n\n'+riepilogo+'\n\nLa giacenza verrà corretta di conseguenza.'+
+      (sottoZero.length?'\n\n⚠️ Per '+sottoZero.join(', ')+' la giacenza andrebbe sotto zero: verrà portata a 0.':''))) return;
+    if(!requireUnlockCode()) return;
+  }
+  _ddtBusy=true;
+  const btn=document.getElementById('ddt-m-btn'); if(btn){btn.disabled=true;btn.textContent='Salvataggio...';}
+  try{
+    const batch=writeBatch(db);
+    const header={tipo_doc:tipo,num_doc:num,data_doc:data,fornitore:forn,destinatario:dest};
+    for(const l of g.lines){
+      const c=changes.find(x=>x.l.id===l.id);
+      if(c&&c.remove){batch.delete(doc(db,'movimenti',l.id));continue;}
+      const upd={...header};
+      if(c&&c.newQty) upd.delta=c.newQty;
+      batch.update(doc(db,'movimenti',l.id),upd);
+      // aggiorna il riferimento sul prelievo generato dallo scarico, se esiste ancora
+      if(l.scarico_mov_id&&(tipo!==g.tipo||num!==g.num||forn!==(g.fornitore||''))){
+        try{
+          if((await getDoc(doc(db,'movimenti',l.scarico_mov_id))).exists())
+            batch.update(doc(db,'movimenti',l.scarico_mov_id),{rif_tipo_doc:tipo,rif_num_doc:num,rif_fornitore:forn});
+        }catch(e){}
+      }
+    }
+    Object.keys(qty).forEach(id=>{if(fresh[id]!=null&&qty[id]!==fresh[id]) batch.update(doc(db,'inventario',id),{qty:qty[id]});});
+    await batch.commit();
+    Object.keys(qty).forEach(id=>{const it=itemsList.find(i=>i.id===id);if(it&&qty[id]!=null) it.qty=qty[id];});
+    closeForm();
+    showToast('Documento aggiornato','toast-return');
+    _ddtRefresh();
+  }catch(e){showToast('Errore: '+e.message,'toast-danger');}
+  finally{_ddtBusy=false;if(btn){btn.disabled=false;btn.textContent='Salva';}}
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  ANALISI ARTICOLO — entrate e uscite di un singolo articolo
+//  Sola lettura: nessuna giacenza viene modificata.
+// ═══════════════════════════════════════════════════════════════
+let _aaItem=null;      // articolo selezionato
+let _aaMovs=[];        // tutti i suoi movimenti (da sempre)
+function _aaEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function _aaKind(e){
+  const isRett=e.type==='adjust'||/^rettifica/i.test(e.note||'');
+  if(isRett) return {k:'rett',label:'Rettifica'};
+  if(e.type==='load') return {k:'in',label:'Carico'};
+  if(e.delta>0) return {k:'in',label:'Reimmissione'};
+  return {k:'out',label:'Prelievo'};
+}
+window.aaSuggest=function(){
+  const q=(document.getElementById('aa-search')?.value||'').trim().toLowerCase();
+  const box=document.getElementById('aa-sugg'); if(!box) return;
+  if(q.length<1){box.innerHTML='';return;}
+  const hits=itemsList.filter(it=>(it.name||'').toLowerCase().includes(q)||(it.code||'').toLowerCase().includes(q))
+    .sort((a,b)=>_invCollator.compare(a.code||'',b.code||'')).slice(0,15);
+  box.innerHTML=hits.length===0?'<div class="aa-sugg-empty">Nessun articolo trovato</div>':
+    hits.map(it=>{const cfg=categories[it.cat]||{bg:'#eee',color:'#333',label:it.cat};
+      return '<button class="aa-sugg-item" onclick="selezionaArticoloAnalisi('+jsAttr(it.id)+')">'+
+        '<span class="item-code" style="background:'+cfg.bg+';color:'+cfg.color+'">'+_aaEsc(it.code)+'</span>'+
+        '<span class="aa-sugg-name">'+_aaEsc(it.name)+'</span>'+
+        '<span class="aa-sugg-qty">'+it.qty+' '+_aaEsc(it.unit||'')+'</span></button>';}).join('');
+};
+window.selezionaArticoloAnalisi=async function(id){
+  const it=itemsList.find(i=>i.id===id); if(!it) return;
+  _aaItem=it;
+  document.getElementById('aa-sugg').innerHTML='';
+  document.getElementById('aa-search').value=it.code+' — '+it.name;
+  document.getElementById('aa-filters').style.display='grid';
+  const res=document.getElementById('aa-result');
+  res.innerHTML='<div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:13px">Caricamento movimenti...</div>';
+  let movs=[];
+  try{
+    const snap=await getDocs(query(collection(db,'movimenti'),where('code','==',it.code)));
+    snap.forEach(d=>movs.push({id:d.id,...d.data()}));
+  }catch(e){
+    console.warn('[ANALISI-ART] fallback cache:',e.message);
+    movs=actLog.filter(m=>m.code===it.code);
+  }
+  _aaMovs=movs.filter(m=>typeof m.delta==='number').sort((a,b)=>(b.time||0)-(a.time||0));
+  renderAnalisiArticolo();
+};
+window.onAaPeriodoChange=function(){
+  const p=document.getElementById('aa-periodo').value;
+  document.getElementById('aa-mese-wrap').style.display=p==='mese'?'block':'none';
+  document.getElementById('aa-range-wrap').style.display=p==='intervallo'?'grid':'none';
+  const m=document.getElementById('aa-mese'); if(p==='mese'&&m&&!m.value) m.value=dataOggiIT().slice(0,7);
+  renderAnalisiArticolo();
+};
+function _aaPeriodo(){
+  const p=document.getElementById('aa-periodo')?.value||'tutto';
+  if(p==='mese'){
+    const v=document.getElementById('aa-mese')?.value; if(!v) return {from:null,to:null,label:'Da sempre'};
+    const [y,m]=v.split('-').map(Number);
+    return {from:new Date(y,m-1,1).getTime(),to:new Date(y,m,1).getTime(),label:new Date(y,m-1,1).toLocaleDateString('it-IT',{month:'long',year:'numeric'})};
+  }
+  if(p==='intervallo'){
+    const da=document.getElementById('aa-da')?.value, a=document.getElementById('aa-a')?.value;
+    const from=da?new Date(da+'T00:00:00').getTime():null, to=a?new Date(a+'T00:00:00').getTime()+86400000:null;
+    return {from,to,label:(da?new Date(da+'T12:00:00').toLocaleDateString('it-IT'):'inizio')+' → '+(a?new Date(a+'T12:00:00').toLocaleDateString('it-IT'):'oggi')};
+  }
+  return {from:null,to:null,label:'Da sempre'};
+}
+function _aaTotali(list){
+  let ent=0,usc=0,rett=0;
+  list.forEach(e=>{const k=_aaKind(e).k;if(k==='in') ent+=e.delta;else if(k==='out') usc+=Math.abs(e.delta);else rett+=e.delta;});
+  return {ent,usc,rett,saldo:ent-usc+rett};
+}
+window.renderAnalisiArticolo=function(){
+  const res=document.getElementById('aa-result'); if(!res||!_aaItem) return;
+  const it=itemsList.find(i=>i.id===_aaItem.id)||_aaItem;
+  const un=it.unit||'';
+  const cfg=categories[it.cat]||{bg:'#eee',color:'#333',label:it.cat,icon:'📦'};
+  const per=_aaPeriodo();
+  const list=_aaMovs.filter(e=>(per.from==null||e.time>=per.from)&&(per.to==null||e.time<per.to));
+  const T=_aaTotali(list), S=_aaTotali(_aaMovs);
+  const fmt=n=>(Math.round(n*100)/100).toLocaleString('it-IT');
+  const valore=it.prezzo!=null?' · € '+Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})+'/'+_aaEsc(un):'';
+
+  let h='<div class="carica-item" style="margin-bottom:12px">'+
+    '<div class="carica-item-top"><span class="carica-item-code" style="background:'+cfg.bg+';color:'+cfg.color+'">'+_aaEsc(it.code)+'</span>'+
+    '<span class="carica-item-name">'+_aaEsc(it.name)+'</span><span class="carica-item-qty">'+it.qty+' '+_aaEsc(un)+'</span></div>'+
+    '<div style="font-size:11.5px;color:var(--text-muted)">'+(cfg.icon||'')+' '+_aaEsc(cfg.label||it.cat)+(it.sub?' · '+_aaEsc(it.sub):'')+valore+
+    ' · giacenza attuale '+it.qty+' '+_aaEsc(un)+'</div></div>';
+
+  h+='<div class="fuel-vehicle-label" style="margin-bottom:6px">Periodo: '+_aaEsc(per.label)+'</div>'+
+    '<div class="aa-kpis">'+
+      '<div class="aa-kpi in"><div class="aa-kpi-l">Entrate</div><div class="aa-kpi-v">+'+fmt(T.ent)+'</div><div class="aa-kpi-u">'+_aaEsc(un)+'</div></div>'+
+      '<div class="aa-kpi out"><div class="aa-kpi-l">Uscite</div><div class="aa-kpi-v">−'+fmt(T.usc)+'</div><div class="aa-kpi-u">'+_aaEsc(un)+'</div></div>'+
+      '<div class="aa-kpi"><div class="aa-kpi-l">Rettifiche</div><div class="aa-kpi-v">'+(T.rett>0?'+':'')+fmt(T.rett)+'</div><div class="aa-kpi-u">'+_aaEsc(un)+'</div></div>'+
+      '<div class="aa-kpi"><div class="aa-kpi-l">Saldo</div><div class="aa-kpi-v">'+(T.saldo>0?'+':'')+fmt(T.saldo)+'</div><div class="aa-kpi-u">'+_aaEsc(un)+'</div></div>'+
+    '</div>';
+  if(per.from!=null||per.to!=null){
+    h+='<div style="font-size:11px;color:var(--text-muted);margin:-4px 0 12px">Da sempre: entrate +'+fmt(S.ent)+' · uscite −'+fmt(S.usc)+' · rettifiche '+(S.rett>0?'+':'')+fmt(S.rett)+' '+_aaEsc(un)+'</div>';
+  }
+
+  // Uscite per cantiere (prelievi al netto delle reimmissioni)
+  const perCant={};
+  list.forEach(e=>{const k=_aaKind(e).k;if(k==='rett'||e.type==='load') return;const c=e.cantiere||(e.mezzo?'🚛 '+e.mezzo:'(senza cantiere)');perCant[c]=(perCant[c]||0)+(-e.delta);});
+  const cantRows=Object.entries(perCant).filter(([,v])=>v!==0).sort((a,b)=>b[1]-a[1]);
+  if(cantRows.length){
+    h+='<div class="fuel-vehicle-label" style="margin:4px 0 6px">Consumo netto per destinazione</div><div class="aa-cant">'+
+      cantRows.map(([c,v])=>'<div class="aa-cant-row"><span>'+_aaEsc(c)+'</span><b>'+fmt(v)+' '+_aaEsc(un)+'</b></div>').join('')+'</div>';
+  }
+
+  h+='<div class="fuel-vehicle-label" style="margin:12px 0 6px">Movimenti ('+list.length+')</div>';
+  if(list.length===0){
+    h+='<div style="text-align:center;padding:16px 0;color:var(--text-muted);font-size:12.5px">Nessun movimento nel periodo scelto.</div>';
+  } else {
+    h+='<div class="aa-list">';
+    list.forEach(e=>{
+      const k=_aaKind(e);
+      const d=new Date(e.time);
+      const ts=d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+      const det=[];
+      if(e.fornitore) det.push('🏭 '+_aaEsc(e.fornitore));
+      if(e.num_doc) det.push('📄 '+_aaEsc(e.tipo_doc||'DDT')+' n° '+_aaEsc(e.num_doc));
+      if(e.destinatario) det.push('→ '+_aaEsc(e.destinatario));
+      if(e.cantiere) det.push('🏗️ '+_aaEsc(e.cantiere));
+      if(e.mezzo) det.push('🚛 '+_aaEsc(e.mezzo)+(e.targa?' · '+_aaEsc(e.targa):''));
+      if(e.rif_num_doc) det.push('📤 da '+_aaEsc(e.rif_tipo_doc||'DDT')+' n° '+_aaEsc(e.rif_num_doc));
+      if(k.k==='rett'&&e.note) det.push(_aaEsc(e.note));
+      h+='<div class="aa-row"><div class="aa-badge '+k.k+'">'+(e.delta>0?'+':'−')+'</div>'+
+        '<div style="flex:1;min-width:0"><div style="font-weight:700">'+k.label+' '+(e.delta>0?'+':'−')+fmt(Math.abs(e.delta))+' '+_aaEsc(un)+'</div>'+
+        '<div style="color:var(--text-muted);font-size:11px">👷 '+_aaEsc(e.operator||'N/D')+(det.length?' · '+det.join(' · '):'')+'</div>'+
+        '<div style="color:var(--text-light);font-size:10.5px">'+ts+(e.backdated?' · retrodatato':'')+'</div></div></div>';
+    });
+    h+='</div>';
+  }
+  h+='<button class="fa-export-btn" onclick="exportAnalisiArticolo()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Esporta Excel</button>';
+  res.innerHTML=h;
+};
+window.exportAnalisiArticolo=function(){
+  if(typeof XLSX==='undefined'){showToast('Libreria Excel non disponibile','toast-danger');return;}
+  if(!_aaItem){showToast('Seleziona prima un articolo','toast-danger');return;}
+  const it=itemsList.find(i=>i.id===_aaItem.id)||_aaItem;
+  const per=_aaPeriodo();
+  const list=_aaMovs.filter(e=>(per.from==null||e.time>=per.from)&&(per.to==null||e.time<per.to));
+  const T=_aaTotali(list),S=_aaTotali(_aaMovs);
+  const cfg=categories[it.cat]||{label:it.cat};
+  const r1=[['ANALISI ARTICOLO'],[],['Codice',it.code],['Articolo',it.name],['Categoria',(cfg.label||it.cat)+(it.sub?' / '+it.sub:'')],
+    ['Unità',it.unit||''],['Giacenza attuale',it.qty],['Periodo',per.label],[],
+    ['','Entrate','Uscite','Rettifiche','Saldo'],
+    ['Nel periodo',T.ent,T.usc,T.rett,T.saldo],['Da sempre',S.ent,S.usc,S.rett,S.saldo]];
+  const ws1=XLSX.utils.aoa_to_sheet(r1);ws1['!cols']=[{wch:18},{wch:40},{wch:12},{wch:12},{wch:12}];
+  const r2=[['Data','Ora','Tipo','Quantità','Unità','Operatore','Cantiere','Mezzo','Fornitore','Documento','Destinatario','Note']];
+  list.forEach(e=>{const d=new Date(e.time);r2.push([d.toLocaleDateString('it-IT'),d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}),
+    _aaKind(e).label,e.delta,it.unit||'',e.operator||'',e.cantiere||'',e.mezzo?(e.mezzo+(e.targa?' '+e.targa:'')):'',e.fornitore||'',
+    e.num_doc?((e.tipo_doc||'DDT')+' '+e.num_doc):(e.rif_num_doc?'da '+(e.rif_tipo_doc||'DDT')+' '+e.rif_num_doc:''),e.destinatario||'',e.note||'']);});
+  const ws2=XLSX.utils.aoa_to_sheet(r2);ws2['!cols']=[{wch:12},{wch:7},{wch:14},{wch:10},{wch:7},{wch:20},{wch:24},{wch:22},{wch:22},{wch:18},{wch:22},{wch:28}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws1,'Riepilogo');XLSX.utils.book_append_sheet(wb,ws2,'Movimenti');
+  XLSX.writeFile(wb,'Analisi_'+String(it.code).replace(/[^A-Za-z0-9.]/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  showToast('Excel analisi articolo scaricato','toast-return');
 };
 
 // ═══════════════════════════════════════════════════
@@ -6259,8 +7053,7 @@ window.onCounterInput=function(el){
   var raw=parseInt(el.value);
   if(isNaN(raw)||raw<1) return;
   counterVal=raw;
-  var unitNames={pz:'pezzi',m:'metri',kit:'kit',mat:'matasse',conf:'conf.',lt:'litri'};
-  var un=currentModalItem?unitNames[currentModalItem.unit]||'unità':'unità';
+  var un=currentModalItem?unitLong(currentModalItem.unit):'unità';
   document.getElementById('m-take-label').innerHTML='Preleva<br><b>'+counterVal+' '+un+'</b>';
   document.getElementById('m-return-label').innerHTML='Reinserisci<br><b>'+counterVal+' '+un+'</b>';
 };
