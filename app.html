@@ -445,6 +445,19 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 
 /* CARICA MERCE — selettore categoria */
 .carica-cat-select-wrap{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.carica-new-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:9px 12px;margin-bottom:10px;border:1.5px dashed var(--brand-200);border-radius:var(--radius-xs);background:var(--bg-card);color:var(--brand-600);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.carica-new-toggle.open{border-style:solid;background:var(--brand-50);margin-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0}
+.carica-new-toggle.open + .carica-add-section{border-top:none;border-top-left-radius:0;border-top-right-radius:0}
+.carica-chev{transition:transform .2s;flex-shrink:0;color:var(--text-light)}
+.carica-new-toggle.open .carica-chev,.carica-row.open .carica-chev{transform:rotate(180deg)}
+.carica-item.carica-row{padding:10px 12px;margin-bottom:6px}
+.carica-row .carica-row-head{cursor:pointer;margin-bottom:0}
+.carica-item.carica-row.open{border-color:var(--brand-300,#9ecb95);box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.carica-item.carica-row.open .carica-row-head{margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.carica-search-hint{text-align:center;padding:22px 10px;color:var(--text-muted);font-size:13px;line-height:1.5}
+.carica-search-hint span{font-size:11.5px;color:var(--text-light)}
+.carica-search-more{text-align:center;font-size:11.5px;color:var(--text-muted);padding:6px 0 12px}
+.carica-new-inline{margin-top:10px;padding:8px 14px;border:1.5px dashed var(--brand-300,#9ecb95);border-radius:var(--radius-xs);background:var(--brand-50);color:var(--brand-600);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
 /* Carico massivo su stesso DDT/Fattura */
 .batch-ddt-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;margin-bottom:12px;border:1.5px dashed var(--brand-300,#9ecb95);border-radius:var(--radius-xs);background:var(--brand-50);color:var(--brand-600);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:var(--transition)}
 .batch-ddt-toggle:active{transform:scale(.98)}
@@ -960,14 +973,16 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <div class="carica-input-label">Destinatario (opzionale)</div>
       <select class="carica-input" id="batch-ddt-dest" style="text-align:left" onchange="onDestSelectChange(this);syncBatchDdt()"></select>
     </div>
-    <div class="batch-ddt-hint" id="batch-ddt-hint">Imposta numero, data ed eventuale destinatario: verranno applicati automaticamente ad ogni "Conferma carico" finché la modalità resta attiva.</div>
+    <div style="margin-top:8px">
+      <div class="carica-input-label">Fornitore (scelto una sola volta)</div>
+      <select class="carica-input" id="batch-ddt-forn" style="text-align:left" onchange="syncBatchDdt()"></select>
+    </div>
+    <div class="batch-ddt-hint" id="batch-ddt-hint">Imposta numero, data, fornitore ed eventuale destinatario: verranno applicati automaticamente ad ogni "Conferma carico" finché la modalità resta attiva. Poi cerca un prodotto alla volta e inserisci solo quantità ed eventuale prezzo.</div>
   </div>
+  <div id="carica-new"></div>
   <div class="search-bar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" placeholder="Cerca prodotto o codice..." id="carica-search-input" oninput="renderCaricaList()">
-  </div>
-  <div class="carica-cat-select-wrap">
-    <select class="carica-cat-select" id="carica-cat-sel" onchange="setCaricaCat(this.value)"></select>
+    <input type="text" placeholder="Cerca prodotto o codice..." id="carica-search-input" oninput="renderCaricaList()" autocomplete="off">
   </div>
   <div id="carica-list"></div>
 </div>
@@ -4475,203 +4490,305 @@ window.saveFuelPrice=async function(){
 
 // ═══════════════════════════════════════
 //  CARICA MERCE (responsabili)
+//  Pagina "solo ricerca": i prodotti compaiono come righe compatte
+//  solo dopo aver digitato nome o codice; si apre una scheda alla volta.
+//  Il form "nuovo prodotto" è una sezione unica, chiusa di default,
+//  con la scelta della categoria come primo passo.
 // ═══════════════════════════════════════
-let caricaActiveCat='';
+let caricaOpenId=null;      // id del prodotto con la scheda di carico aperta
+let caricaNewOpen=false;    // sezione "Aggiungi nuovo prodotto" aperta/chiusa
+let _caricaLastQ='';
+const CARICA_MAX_RESULTS=50;
+const _cEsc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+function _caricaAllCats(){
+  const fromOrder=catOrder.filter(c=>categories[c]);
+  const extra=Object.keys(categories).filter(c=>!catOrder.includes(c));
+  return [...fromOrder,...extra];
+}
+function _fornOptionsHtml(selected){
+  const nomi=fornitoriList.map(f=>f.nome);
+  if(selected&&!nomi.includes(selected)) nomi.unshift(selected);
+  return '<option value="">— Seleziona fornitore —</option>'+
+    nomi.map(n=>'<option value="'+_cEsc(n)+'"'+(n===selected?' selected':'')+'>'+_cEsc(n)+'</option>').join('');
+}
+// Conserva i valori digitati quando un contenitore viene ridisegnato
+// (es. aggiornamento in tempo reale dell'inventario da un altro dispositivo)
+function _snapInputs(root){
+  const s={};
+  if(!root) return s;
+  root.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{
+    s[el.id]=(el.type==='checkbox')?{c:el.checked}:{v:el.value};
+  });
+  return s;
+}
+function _restoreInputs(root,s){
+  if(!root||!s) return;
+  Object.keys(s).forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el||!root.contains(el)) return;
+    const o=s[id];
+    if('c' in o){el.checked=o.c;return;}
+    if(o.v==='__new__'||o.v==='__newcant__') return;
+    if(el.tagName==='SELECT'){
+      if([...el.options].some(op=>op.value===o.v)){el.value=o.v;el.dataset.prev=o.v;}
+    } else el.value=o.v;
+  });
+  root.querySelectorAll('input[type=checkbox][id^="bd-"][id$="-toggle"]').forEach(chk=>{
+    const inp=document.getElementById(chk.id.replace(/-toggle$/,'-input'));
+    if(inp) inp.disabled=!chk.checked;
+  });
+}
+function _resetBackdate(prefix){
+  const chk=document.getElementById('bd-'+prefix+'-toggle');
+  const inp=document.getElementById('bd-'+prefix+'-input');
+  if(chk) chk.checked=false;
+  if(inp){inp.value='';inp.disabled=true;}
+}
+function _batchNoticeHtml(withForn){
+  const doc=batchDdt.tipo+(batchDdt.num?' n° '+_cEsc(batchDdt.num):'');
+  const forn=withForn?(batchDdt.forn?' · Fornitore: <strong>'+_cEsc(batchDdt.forn)+'</strong>':' · <strong style="color:#b45309">fornitore non ancora scelto</strong>'):'';
+  return `<div class="carica-input-wrap carica-add-full">
+    <div style="font-size:11.5px;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-200);border-radius:8px;padding:7px 10px">📄 Documento fissato in alto (${doc})${forn}</div>
+  </div>`;
+}
 
 function renderCarica(){
   if(!isResp()) return;
-  const sel=document.getElementById('carica-cat-sel');
-
-  // Ordina per catOrder ma include TUTTO ciò che è in categories
-  const fromOrder=catOrder.filter(c=>categories[c]);
-  const extra=Object.keys(categories).filter(c=>!catOrder.includes(c));
-  const allCats=[...fromOrder,...extra];
-
-  if(!caricaActiveCat||!allCats.includes(caricaActiveCat)) caricaActiveCat=allCats[0]||'';
-
-  sel.innerHTML=allCats.map(c=>{
-    const cfg=categories[c];
-    const n=getItemsByCat(c).length;
-    return `<option value="${c}" ${c===caricaActiveCat?'selected':''}>${cfg.icon} ${cfg.label} (${n} prodotti)</option>`;
-  }).join('');
-
-  // Destinatario del carico massivo: aggiorna l'elenco cantieri mantenendo la scelta
+  // Destinatario e fornitore del carico massivo: aggiorna gli elenchi mantenendo la scelta
   const bdest=document.getElementById('batch-ddt-dest');
   if(bdest){bdest.innerHTML=destOptionsHtml(batchDdt.dest);bdest.value=batchDdt.dest||'';}
-
+  const bforn=document.getElementById('batch-ddt-forn');
+  if(bforn){bforn.innerHTML=_fornOptionsHtml(batchDdt.forn);bforn.value=batchDdt.forn||'';}
+  // Sezione nuovo prodotto: ripartenza pulita ad ogni apertura della pagina
+  const box=document.getElementById('carica-new');
+  if(box) box.innerHTML='';
+  caricaNewOpen=false;
+  _naDdtType='DDT';
+  renderCaricaNew();
   renderCaricaList();
 }
 
-window.setCaricaCat=function(cat){
-  caricaActiveCat=cat;
-  renderCaricaList();
+// ── Sezione unica "Aggiungi nuovo prodotto" ─────────────────────
+function renderCaricaNew(){
+  const box=document.getElementById('carica-new');
+  if(!box) return;
+  const snap=_snapInputs(box);
+  const catOpts='<option value="">— Seleziona categoria —</option>'+_caricaAllCats().map(c=>{
+    const cfg=categories[c];
+    return '<option value="'+_cEsc(c)+'">'+cfg.icon+' '+_cEsc(cfg.label)+'</option>';
+  }).join('');
+  const isFat=_naDdtType==='Fattura';
+  box.innerHTML=`<button type="button" class="carica-new-toggle${caricaNewOpen?' open':''}" id="carica-new-toggle" onclick="toggleCaricaNew()">
+      <span>＋ Aggiungi nuovo prodotto</span>
+      <svg class="carica-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="carica-add-section" id="carica-new-body" style="display:${caricaNewOpen?'block':'none'}">
+      <div class="carica-add-grid">
+        <div class="carica-input-wrap carica-add-full">
+          <div class="carica-input-label">Categoria del nuovo prodotto</div>
+          <select class="carica-input" id="na-cat" style="text-align:left" onchange="onNaCatChange()">${catOpts}</select>
+        </div>
+      </div>
+      <div id="na-fields" style="display:none">
+        <div class="carica-add-grid">
+          <div class="carica-input-wrap carica-add-full">
+            <div class="carica-input-label">Nome prodotto</div>
+            <input class="carica-input" id="na-name" placeholder="es. PANNELLO 550W" style="text-transform:uppercase">
+          </div>
+          <div class="carica-input-wrap">
+            <div class="carica-input-label">Quantità iniziale</div>
+            <input class="carica-input" type="number" min="0" value="0" id="na-qty" inputmode="numeric">
+          </div>
+          <div class="carica-input-wrap">
+            <div class="carica-input-label">Unità</div>
+            <select class="carica-input" id="na-unit" data-prev="pz" onchange="onUnitSelectChange(this)">${unitOptionsHtml('pz',true)}</select>
+          </div>
+          <div class="carica-input-wrap">
+            <div class="carica-input-label">Prezzo €/unità</div>
+            <input class="carica-input" type="number" min="0" step="0.01" placeholder="0.00" id="na-price" inputmode="decimal">
+          </div>
+          <div class="carica-input-wrap" id="na-sub-wrap" style="display:none">
+            <div class="carica-input-label">Sottocategoria</div>
+            <select class="carica-input" id="na-sub"><option value="">Nessuna</option></select>
+          </div>
+          ${batchDdt.active?_batchNoticeHtml(true):`<div class="carica-input-wrap carica-add-full">
+            <div class="carica-input-label">Fornitore</div>
+            <select class="carica-input" id="na-fornitore" style="text-align:left">${_fornOptionsHtml('')}</select>
+          </div>
+          <div class="carica-input-wrap carica-add-full">
+            <div class="carica-input-label">DDT / Fattura (opzionale, per il carico iniziale)</div>
+            <div class="ddt-row" style="margin-top:2px">
+              <div class="ddt-type-btns">
+                <button type="button" class="ddt-type-btn${isFat?'':' active'}" id="na-ddt-btn-ddt" onclick="setNaDdtType('DDT')">DDT</button>
+                <button type="button" class="ddt-type-btn${isFat?' active':''}" id="na-ddt-btn-fat" onclick="setNaDdtType('Fattura')">Fattura</button>
+              </div>
+              <input class="ddt-input" id="na-ddt-num" placeholder="N° documento..." type="text">
+              <input class="ddt-date" id="na-ddt-date" type="date">
+            </div>
+            <div class="carica-input-label" style="margin-top:6px">Destinatario (opzionale)</div>
+            <select class="carica-input" id="na-ddt-dest" style="text-align:left" onchange="onDestSelectChange(this)">${destOptionsHtml('')}</select>
+          </div>`}
+        </div>
+        ${backdateBlockHtml('carnew')}
+        <button class="carica-add-btn" onclick="submitNuovoProdottoCarica()">✚ Crea prodotto e carica</button>
+      </div>
+    </div>`;
+  // Le sottocategorie dipendono dalla categoria: prima ripristino la categoria,
+  // poi ricostruisco le sottocategorie, infine ripristino gli altri campi.
+  const catSel=document.getElementById('na-cat');
+  if(snap['na-cat']&&[...catSel.options].some(o=>o.value===snap['na-cat'].v)) catSel.value=snap['na-cat'].v;
+  onNaCatChange();
+  _restoreInputs(box,snap);
+}
+window.onNaCatChange=function(){
+  const cat=document.getElementById('na-cat')?.value||'';
+  const fields=document.getElementById('na-fields');
+  if(fields) fields.style.display=cat?'block':'none';
+  const subSel=document.getElementById('na-sub');
+  const subWrap=document.getElementById('na-sub-wrap');
+  if(!subSel||!subWrap) return;
+  const subs=(cat&&categories[cat]&&categories[cat].subs)||[];
+  const prev=subSel.value;
+  subSel.innerHTML='<option value="">Nessuna</option>'+subs.map(s=>'<option value="'+_cEsc(s)+'">'+_cEsc(s)+'</option>').join('');
+  subSel.value=subs.includes(prev)?prev:'';
+  subWrap.style.display=subs.length?'':'none';
 };
+window.toggleCaricaNew=function(force){
+  caricaNewOpen=(typeof force==='boolean')?force:!caricaNewOpen;
+  const body=document.getElementById('carica-new-body');
+  const tg=document.getElementById('carica-new-toggle');
+  if(body) body.style.display=caricaNewOpen?'block':'none';
+  if(tg) tg.classList.toggle('open',caricaNewOpen);
+};
+// Dalla ricerca senza risultati: apre il form con il nome già scritto
+window.apriNuovoProdottoDaRicerca=function(){
+  toggleCaricaNew(true);
+  const q=(document.getElementById('carica-search-input')?.value||'').trim().toUpperCase();
+  const nm=document.getElementById('na-name');
+  if(nm&&!nm.value) nm.value=q;
+  const box=document.getElementById('carica-new');
+  if(box) box.scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('na-cat')?.focus();
+};
+
+// ── Risultati della ricerca (righe compatte, una scheda aperta alla volta) ──
+function _caricaBodyHtml(it,destOptsCache){
+  const priceVal=it.prezzo!=null?it.prezzo:'';
+  if(it.cat==='Carburante'){
+    return `<div class="carica-item-body">
+      <div style="font-size:12px;color:var(--text-muted);padding:2px 2px 10px">
+        Il carburante si gestisce dalla sezione dedicata (rifornimento con mezzo e litri).
+      </div>
+      <button class="carica-confirm-btn" style="background:#c26e0f" onclick="openFuelModal('${it.id}')">⛽ Apri gestione carburante</button>
+    </div>`;
+  }
+  const isFat=(_ddtTypeByItem[it.id]||'DDT')==='Fattura';
+  return `<div class="carica-item-body">
+    <div class="carica-inputs">
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Quantità da caricare</div>
+        <input class="carica-input" type="number" min="1" placeholder="0"
+          id="cq-${it.id}" value="" inputmode="numeric">
+      </div>
+      <div class="carica-input-wrap">
+        <div class="carica-input-label">Nuovo prezzo €/${it.unit}</div>
+        <input class="carica-input" type="number" min="0" step="0.01"
+          placeholder="${priceVal||'—'}" id="cp-${it.id}" value="" inputmode="decimal">
+      </div>
+      ${batchDdt.active?_batchNoticeHtml(true):`<div class="carica-input-wrap carica-add-full">
+        <div class="carica-input-label">Fornitore</div>
+        <select class="carica-input" id="cf-${it.id}" style="text-align:left">${_fornOptionsHtml('')}</select>
+      </div>
+      <div class="carica-input-wrap carica-add-full">
+        <div class="carica-input-label">DDT / Fattura (opzionale)</div>
+        <div class="ddt-row" style="margin-top:2px">
+          <div class="ddt-type-btns">
+            <button type="button" class="ddt-type-btn${isFat?'':' active'}" id="ddt-btn-ddt-${it.id}" onclick="setDdtTypeItem('${it.id}','DDT')">DDT</button>
+            <button type="button" class="ddt-type-btn${isFat?' active':''}" id="ddt-btn-fat-${it.id}" onclick="setDdtTypeItem('${it.id}','Fattura')">Fattura</button>
+          </div>
+          <input class="ddt-input" id="ddt-num-${it.id}" placeholder="N° documento..." type="text">
+          <input class="ddt-date" id="ddt-date-${it.id}" type="date">
+        </div>
+        <div class="carica-input-label" style="margin-top:6px">Destinatario (opzionale)</div>
+        <select class="carica-input" id="ddt-dest-${it.id}" style="text-align:left" onchange="onDestSelectChange(this)">${destOptsCache}</select>
+      </div>`}
+    </div>
+    ${backdateBlockHtml('car-'+it.id)}
+    <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
+  </div>`;
+}
 
 function renderCaricaList(){
   const list=document.getElementById('carica-list');
+  if(!list) return;
   const searchEl=document.getElementById('carica-search-input');
   const q=((searchEl&&searchEl.value)||'').toLowerCase().trim();
-  const isSearch=!!q;
+  const snap=_snapInputs(list);
 
-  // Durante la ricerca nascondi il selettore di categoria: la ricerca è
-  // globale su tutte le categorie, il dropdown creerebbe solo confusione.
-  const catWrap=document.querySelector('.carica-cat-select-wrap');
-  if(catWrap) catWrap.style.display=isSearch?'none':'';
-
-  let items,cfg;
-  if(isSearch){
-    // Ricerca ESTESA A TUTTE LE CATEGORIE, carburante incluso.
-    items=itemsList.filter(it=>it.name.toLowerCase().includes(q)||it.code.toLowerCase().includes(q))
-      .sort((a,b)=>a.code.localeCompare(b.code));
-  } else {
-    if(!caricaActiveCat){list.innerHTML='';return;}
-    cfg=categories[caricaActiveCat];
-    items=getItemsByCat(caricaActiveCat);
-  }
-  // ── Form nuovo prodotto — in cima, solo fuori dalla ricerca ─────────────────────
-  let addHtml='';
-  if(!isSearch){
-    _naDdtType='DDT'; // il form viene ricreato con il bottone DDT attivo di default
-    const unitOpts=unitOptionsHtml('pz',true);
-    const subOpts=cfg.subs&&cfg.subs.length>0
-      ? '<option value="">Nessuna</option>'+cfg.subs.map(s=>`<option value="${s}">${s}</option>`).join('')
-      : '';
-
-    addHtml=`<div class="carica-add-section">
-      <div class="carica-add-title">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Aggiungi nuovo prodotto in ${cfg.label}
-      </div>
-      <div class="carica-add-grid">
-        <div class="carica-input-wrap carica-add-full">
-          <div class="carica-input-label">Nome prodotto</div>
-          <input class="carica-input" id="na-name" placeholder="es. PANNELLO 550W" style="text-transform:uppercase">
-        </div>
-        <div class="carica-input-wrap">
-          <div class="carica-input-label">Quantità iniziale</div>
-          <input class="carica-input" type="number" min="0" value="0" id="na-qty" inputmode="numeric">
-        </div>
-        <div class="carica-input-wrap">
-          <div class="carica-input-label">Unità</div>
-          <select class="carica-input" id="na-unit" data-prev="pz" onchange="onUnitSelectChange(this)">${unitOpts}</select>
-        </div>
-        <div class="carica-input-wrap">
-          <div class="carica-input-label">Prezzo €/unità</div>
-          <input class="carica-input" type="number" min="0" step="0.01" placeholder="0.00" id="na-price" inputmode="decimal">
-        </div>
-        ${subOpts?`<div class="carica-input-wrap">
-          <div class="carica-input-label">Sottocategoria</div>
-          <select class="carica-input" id="na-sub">${subOpts}</select>
-        </div>`:''}
-        <div class="carica-input-wrap carica-add-full">
-          <div class="carica-input-label">Fornitore</div>
-          <select class="carica-input" id="na-fornitore" style="text-align:left">
-            <option value="">— Seleziona fornitore —</option>
-            ${fornitoriList.map(f=>'<option value="'+f.nome+'">'+f.nome+'</option>').join('')}
-          </select>
-        </div>
-        ${batchDdt.active?`<div class="carica-input-wrap carica-add-full">
-          <div style="font-size:11.5px;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-200);border-radius:8px;padding:7px 10px">📄 Carico iniziale associato al documento fissato in alto (${batchDdt.tipo}${batchDdt.num?' n° '+batchDdt.num:''})</div>
-        </div>`:`<div class="carica-input-wrap carica-add-full">
-          <div class="carica-input-label">DDT / Fattura (opzionale, per il carico iniziale)</div>
-          <div class="ddt-row" style="margin-top:2px">
-            <div class="ddt-type-btns">
-              <button type="button" class="ddt-type-btn active" id="na-ddt-btn-ddt" onclick="setNaDdtType('DDT')">DDT</button>
-              <button type="button" class="ddt-type-btn" id="na-ddt-btn-fat" onclick="setNaDdtType('Fattura')">Fattura</button>
-            </div>
-            <input class="ddt-input" id="na-ddt-num" placeholder="N° documento..." type="text">
-            <input class="ddt-date" id="na-ddt-date" type="date">
-          </div>
-          <div class="carica-input-label" style="margin-top:6px">Destinatario (opzionale)</div>
-          <select class="carica-input" id="na-ddt-dest" style="text-align:left" onchange="onDestSelectChange(this)">${destOptionsHtml('')}</select>
-        </div>`}
-      </div>
-      ${backdateBlockHtml('carnew')}
-      <button class="carica-add-btn" onclick="submitNuovoProdottoCarica()">
-        ✚ Crea prodotto e carica
-      </button>
+  if(!q){
+    caricaOpenId=null;_caricaLastQ='';
+    list.innerHTML=`<div class="carica-search-hint">
+      <div style="font-size:22px;margin-bottom:4px">🔍</div>
+      Cerca il prodotto da caricare per <strong>nome</strong> o <strong>codice</strong>.<br>
+      <span>Se il prodotto non esiste ancora, usa «Aggiungi nuovo prodotto».</span>
     </div>`;
+    return;
+  }
+
+  // Ricerca ESTESA A TUTTE LE CATEGORIE, carburante incluso.
+  const all=itemsList.filter(it=>it.name.toLowerCase().includes(q)||it.code.toLowerCase().includes(q))
+    .sort((a,b)=>a.code.localeCompare(b.code));
+  const items=all.slice(0,CARICA_MAX_RESULTS);
+  if(caricaOpenId&&!items.some(it=>it.id===caricaOpenId)) caricaOpenId=null;
+  if(q!==_caricaLastQ){
+    // Un solo risultato: la scheda si apre da sola
+    if(items.length===1) caricaOpenId=items[0].id;
+    _caricaLastQ=q;
+  }
+
+  if(items.length===0){
+    list.innerHTML=`<div class="carica-search-hint">
+      Nessun prodotto trovato per «${_cEsc(q)}».<br>
+      <button type="button" class="carica-new-inline" onclick="apriNuovoProdottoDaRicerca()">＋ Crea come nuovo prodotto</button>
+    </div>`;
+    return;
   }
 
   const destOptsCache=destOptionsHtml('');
-  // ── Prodotti esistenti ──────────────────────
-  const itemsHtml=items.length===0
-    ? `<div style="text-align:center;padding:20px 0 10px;color:var(--text-muted);font-size:13px">
-        ${isSearch?'Nessun prodotto trovato per «'+q+'».':'Nessun prodotto ancora in <strong>'+cfg.label+'</strong> — aggiungilo con il form qui sopra.'}
-       </div>`
-    : items.map(it=>{
-        const icfg=isSearch?(categories[it.cat]||{bg:'',color:'var(--text)'}):cfg;
-        const catTag=isSearch&&categories[it.cat]?` <span style="font-weight:500;color:var(--text-muted);font-size:11px">· ${categories[it.cat].label}</span>`:'';
-        const priceVal=it.prezzo!=null?it.prezzo:'';
-        // I prodotti Carburante hanno un flusso dedicato (mezzo + litri):
-        // in ricerca mostriamo una scheda ridotta che apre il modal carburante.
-        if(it.cat==='Carburante'){
-          return `<div class="carica-item">
-            <div class="carica-item-top">
-              <span class="carica-item-code" style="background:${icfg.bg};color:${icfg.color}">${it.code}</span>
-              <span class="carica-item-name">${it.name}${catTag}</span>
-              <span class="carica-item-qty">${it.qty} ${it.unit}</span>
-            </div>
-            <div style="font-size:12px;color:var(--text-muted);padding:2px 2px 10px">
-              Il carburante si gestisce dalla sezione dedicata (rifornimento con mezzo e litri).
-            </div>
-            <button class="carica-confirm-btn" style="background:#c26e0f" onclick="openFuelModal('${it.id}')">⛽ Apri gestione carburante</button>
-          </div>`;
-        }
-        return `<div class="carica-item">
-          <div class="carica-item-top">
-            <span class="carica-item-code" style="background:${icfg.bg};color:${icfg.color}">${it.code}</span>
-            <span class="carica-item-name">${it.name}${catTag}</span>
-            <span class="carica-item-qty">${it.qty} ${it.unit}</span>
-          </div>
-          <div class="carica-inputs">
-            <div class="carica-input-wrap">
-              <div class="carica-input-label">Quantità da caricare</div>
-              <input class="carica-input" type="number" min="1" placeholder="0"
-                id="cq-${it.id}" value="" inputmode="numeric">
-            </div>
-            <div class="carica-input-wrap">
-              <div class="carica-input-label">Nuovo prezzo €/${it.unit}</div>
-              <input class="carica-input" type="number" min="0" step="0.01"
-                placeholder="${priceVal||'—'}" id="cp-${it.id}" value="" inputmode="decimal">
-            </div>
-            <div class="carica-input-wrap carica-add-full">
-              <div class="carica-input-label">Fornitore</div>
-              <select class="carica-input" id="cf-${it.id}" style="text-align:left">
-                <option value="">— Seleziona fornitore —</option>
-                ${fornitoriList.map(f=>'<option value="'+f.nome+'">'+f.nome+'</option>').join('')}
-              </select>
-            </div>
-            ${batchDdt.active?`<div class="carica-input-wrap carica-add-full">
-              <div style="font-size:11.5px;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-200);border-radius:8px;padding:7px 10px">📄 Verrà associato al documento fissato in alto (${batchDdt.tipo}${batchDdt.num?' n° '+batchDdt.num:''})</div>
-            </div>`:`<div class="carica-input-wrap carica-add-full">
-              <div class="carica-input-label">DDT / Fattura (opzionale)</div>
-              <div class="ddt-row" style="margin-top:2px">
-                <div class="ddt-type-btns">
-                  <button type="button" class="ddt-type-btn active" id="ddt-btn-ddt-${it.id}" onclick="setDdtTypeItem('${it.id}','DDT')">DDT</button>
-                  <button type="button" class="ddt-type-btn" id="ddt-btn-fat-${it.id}" onclick="setDdtTypeItem('${it.id}','Fattura')">Fattura</button>
-                </div>
-                <input class="ddt-input" id="ddt-num-${it.id}" placeholder="N° documento..." type="text">
-                <input class="ddt-date" id="ddt-date-${it.id}" type="date">
-              </div>
-              <div class="carica-input-label" style="margin-top:6px">Destinatario (opzionale)</div>
-              <select class="carica-input" id="ddt-dest-${it.id}" style="text-align:left" onchange="onDestSelectChange(this)">${destOptsCache}</select>
-            </div>`}
-          </div>
-          ${backdateBlockHtml('car-'+it.id)}
-          <button class="carica-confirm-btn" onclick="confirmCarico('${it.id}')">📦 Conferma carico</button>
-        </div>`;
-      }).join('');
-
-  list.innerHTML=addHtml+itemsHtml;
+  const rows=items.map(it=>{
+    const icfg=categories[it.cat]||{bg:'',color:'var(--text)'};
+    const catTag=categories[it.cat]?` <span style="font-weight:500;color:var(--text-muted);font-size:11px">· ${_cEsc(categories[it.cat].label)}</span>`:'';
+    const open=it.id===caricaOpenId;
+    return `<div class="carica-item carica-row${open?' open':''}" id="carica-row-${it.id}">
+      <div class="carica-item-top carica-row-head" onclick="toggleCaricaItem('${it.id}')">
+        <span class="carica-item-code" style="background:${icfg.bg};color:${icfg.color}">${it.code}</span>
+        <span class="carica-item-name">${it.name}${catTag}</span>
+        <span class="carica-item-qty">${it.qty} ${it.unit}</span>
+        <svg class="carica-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      ${open?_caricaBodyHtml(it,destOptsCache):''}
+    </div>`;
+  }).join('');
+  const more=all.length>items.length
+    ? `<div class="carica-search-more">Mostrati i primi ${items.length} di ${all.length} risultati — affina la ricerca.</div>`:'';
+  list.innerHTML=rows+more;
+  _restoreInputs(list,snap);
 }
 // Esposta su window per l'attributo inline oninput="renderCaricaList()"
 // (le funzioni dichiarate in <script type="module"> non sono globali)
 window.renderCaricaList=renderCaricaList;
+window.toggleCaricaItem=function(id){
+  caricaOpenId=caricaOpenId===id?null:id;
+  renderCaricaList();
+  if(caricaOpenId) document.getElementById('cq-'+id)?.focus();
+};
 
 let _submitNuovoProdottoCaricaBusy=false;
 window.submitNuovoProdottoCarica=async function(){
   if(_submitNuovoProdottoCaricaBusy) return; // Anti doppio-click
+  const cat=document.getElementById('na-cat')?.value||'';
+  if(!cat||!categories[cat]){showToast('Seleziona la categoria del nuovo prodotto','toast-danger');document.getElementById('na-cat')?.focus();return;}
   const name=(document.getElementById('na-name')?.value||'').trim().toUpperCase();
   const qty=parseInt(document.getElementById('na-qty')?.value)||0;
   let unit=document.getElementById('na-unit')?.value||'pz';
@@ -4681,8 +4798,8 @@ window.submitNuovoProdottoCarica=async function(){
   const subEl=document.getElementById('na-sub');
   const sub=subEl&&subEl.value?subEl.value:null;
   if(!name){showToast('Inserisci il nome del prodotto','toast-danger');document.getElementById('na-name')?.focus();return;}
-  const fornitore=document.getElementById('na-fornitore')?.value||'';
-  const cat=caricaActiveCat;
+  // In carico massivo il fornitore è quello scelto una sola volta in alto
+  const fornitore=batchDdt.active?(batchDdt.forn||''):(document.getElementById('na-fornitore')?.value||'');
   _submitNuovoProdottoCaricaBusy=true;
   try{
     const code=nextCodeForCat(cat);
@@ -4704,42 +4821,62 @@ window.submitNuovoProdottoCarica=async function(){
         tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc,destinatario:ddtInfo.destinatario||''};
       await saveMovimento(entry);
     }
-    renderCarica();
+    // Svuota i campi del form (resta aperto con la stessa categoria, utile per inserimenti in serie)
+    ['na-name','na-price','na-ddt-num','na-ddt-date'].forEach(i=>{const e=document.getElementById(i);if(e) e.value='';});
+    const nq=document.getElementById('na-qty'); if(nq) nq.value='0';
+    const nu=document.getElementById('na-unit'); if(nu){nu.value='pz';nu.dataset.prev='pz';}
+    ['na-sub','na-fornitore','na-ddt-dest'].forEach(i=>{const e=document.getElementById(i);if(e){e.value='';e.dataset.prev='';}});
+    if(document.getElementById('na-ddt-btn-ddt')) setNaDdtType('DDT'); else _naDdtType='DDT';
+    _resetBackdate('carnew');
+    renderCaricaList();
     renderDashboard();
     showToast(code+' — '+name+' aggiunto','toast-return');
   } finally { _submitNuovoProdottoCaricaBusy=false; }
 };
 
+const _caricoBusy=new Set();
 window.confirmCarico=async function(itemId){
+  if(_caricoBusy.has(itemId)) return; // Anti doppio-click
   const item=itemsList.find(i=>i.id===itemId);if(!item) return;
   const qtyEl=document.getElementById('cq-'+itemId);
   const priceEl=document.getElementById('cp-'+itemId);
   const fornEl=document.getElementById('cf-'+itemId);
   const qty=parseInt(qtyEl.value);
   if(isNaN(qty)||qty<=0){showToast('Inserisci una quantità valida','toast-danger');qtyEl.focus();return;}
-  const fornitore=fornEl?.value||'';
-  if(!fornitore){showToast('⚠️ Seleziona il fornitore!','toast-danger');fornEl?.focus();return;}
+  // In carico massivo il fornitore è quello scelto una sola volta in alto
+  const fornitore=batchDdt.active?(batchDdt.forn||''):(fornEl?.value||'');
+  if(!fornitore){
+    if(batchDdt.active){showToast('⚠️ Seleziona il fornitore nel riquadro del carico massivo!','toast-danger');document.getElementById('batch-ddt-forn')?.focus();}
+    else {showToast('⚠️ Seleziona il fornitore!','toast-danger');fornEl?.focus();}
+    return;
+  }
 
   const newPrezzo=priceEl.value!==''?Math.round(parseFloat(priceEl.value)*100)/100:null;
-  const prevQty=item.qty;
-  item.qty+=qty;
-  if(newPrezzo!==null&&!isNaN(newPrezzo)) item.prezzo=newPrezzo;
-
-  await saveItem(item);
-
-  // DDT/Fattura: dal documento fissato (carico massivo) oppure dai campi del prodotto
-  var ddtInfo=batchDdt.active
+  // Dati letti PRIMA del salvataggio: il listener in tempo reale può ridisegnare la scheda
+  const ddtInfo=batchDdt.active
     ? {tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data,destinatario:batchDdt.dest||''}
     : getDdtInfoItem(itemId);
-  const entry={id:genId(),itemId:item.id,code:item.code,name:item.name,
-    delta:qty,prevQty,operator:currentUser.nome,operatorUid:currentUser.uid,
-    time:getBackdatedTime('car-'+itemId),backdated:isBackdated('car-'+itemId),createdAt:Date.now(),type:'load',fornitore,
-    tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc,destinatario:ddtInfo.destinatario||''};
-  await saveMovimento(entry);
+  const bdTime=getBackdatedTime('car-'+itemId), bdFlag=isBackdated('car-'+itemId);
+  _caricoBusy.add(itemId);
+  try{
+    const prevQty=item.qty;
+    item.qty+=qty;
+    if(newPrezzo!==null&&!isNaN(newPrezzo)) item.prezzo=newPrezzo;
 
-  qtyEl.value='';
-  priceEl.value='';
+    await saveItem(item);
+
+    const entry={id:genId(),itemId:item.id,code:item.code,name:item.name,
+      delta:qty,prevQty,operator:currentUser.nome,operatorUid:currentUser.uid,
+      time:bdTime,backdated:bdFlag,createdAt:Date.now(),type:'load',fornitore,
+      tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc,destinatario:ddtInfo.destinatario||''};
+    await saveMovimento(entry);
+  } finally { _caricoBusy.delete(itemId); }
+
+  // Svuota i campi (riletti per id: la scheda potrebbe essere stata ridisegnata)
+  const q2=document.getElementById('cq-'+itemId); if(q2) q2.value='';
+  const p2=document.getElementById('cp-'+itemId); if(p2) p2.value='';
   if(!batchDdt.active) resetDdtItem(itemId);
+  _resetBackdate('car-'+itemId);
 
   // Feedback visivo
   const btn=document.querySelector(`button[onclick="confirmCarico('${itemId}')"]`);
@@ -4748,6 +4885,8 @@ window.confirmCarico=async function(itemId){
 
   showToast('+'+qty+' '+item.unit+' '+item.code+' caricati','toast-return');
   renderDashboard();
+  // Carico massivo: il campo di ricerca è subito pronto per il prodotto successivo
+  if(batchDdt.active){const s=document.getElementById('carica-search-input');if(s){s.focus();s.select();}}
 };
 
 // ═══════════════════════════════════════
@@ -5384,7 +5523,7 @@ window.saveSubcategoria=async function(){
 // ═══════════════════════════════════
 //  CARICO MASSIVO — DDT/Fattura fissato per più prodotti
 // ═══════════════════════════════════
-let batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:''};
+let batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:'',forn:''};
 window.toggleBatchDdt=function(){
   batchDdt.active=!batchDdt.active;
   const banner=document.getElementById('batch-ddt-banner');
@@ -5393,7 +5532,9 @@ window.toggleBatchDdt=function(){
   if(banner) banner.style.display=batchDdt.active?'block':'none';
   if(toggle) toggle.classList.toggle('active',batchDdt.active);
   if(label) label.textContent=batchDdt.active?'Carico massivo ATTIVO — tocca per disattivare':'Carico massivo su stesso DDT / Fattura';
-  renderCaricaList(); // nasconde/mostra i campi DDT per-prodotto
+  // nasconde/mostra i campi DDT e fornitore per-prodotto (i valori digitati restano)
+  renderCaricaNew();
+  renderCaricaList();
 };
 window.setBatchDdtType=function(tipo){
   batchDdt.tipo=tipo;
@@ -5409,6 +5550,11 @@ window.syncBatchDdt=function(){
   batchDdt.data=(dateEl&&dateEl.value)||'';
   const destEl=document.getElementById('batch-ddt-dest');
   batchDdt.dest=(destEl&&destEl.value&&destEl.value!=='__newcant__')?destEl.value:'';
+  const fornEl=document.getElementById('batch-ddt-forn');
+  const prevForn=batchDdt.forn;
+  batchDdt.forn=(fornEl&&fornEl.value)||'';
+  // Aggiorna l'avviso nelle schede aperte (fornitore scelto/non scelto)
+  if(batchDdt.active&&prevForn!==batchDdt.forn){renderCaricaNew();renderCaricaList();}
 };
 
 // ═══════════════════════════════════
