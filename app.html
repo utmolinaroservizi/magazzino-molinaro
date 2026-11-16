@@ -527,6 +527,9 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .ddt-mod-line{display:grid;grid-template-columns:1fr 74px 30px;gap:6px;align-items:center;padding:6px 0;border-top:1px solid var(--border);font-size:12px}
 .ddt-mod-line input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;text-align:right}
 .ddt-mod-line.removed{opacity:.4;text-decoration:line-through}
+.ddt-mod-line.new{background:#F3FAEF}
+.ddt-new-tag{display:inline-block;font-size:9.5px;font-weight:700;color:#fff;background:var(--brand-500);border-radius:99px;padding:1px 6px;vertical-align:middle}
+.modal-codart{margin-top:6px;font-size:12px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-100);border-radius:8px;padding:3px 9px}
 .ddt-mod-x{width:28px;height:28px;border-radius:50%;border:1px solid #F0C0C0;background:transparent;color:#B33A3A;cursor:pointer;font-family:inherit}
 .ddt-sc-line{display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px}
 .ddt-sc-line.short{color:#B33A3A}
@@ -1468,6 +1471,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
         <div class="modal-product-name" id="m-name"></div>
         <button class="modal-price-edit-btn" id="m-name-edit-btn" onclick="toggleNameEdit()" style="display:none;flex-shrink:0" title="Modifica nome">✏️</button>
       </div>
+      <div class="modal-codart" id="m-codart" style="display:none"></div>
       <div class="modal-price-input-row" id="name-input-row">
         <input type="text" class="modal-price-input" id="name-input" style="text-transform:uppercase;font-variant-numeric:normal">
         <button class="modal-price-save" onclick="saveName()">Salva</button>
@@ -2559,7 +2563,7 @@ function renderMateriali(){
         html+=`<div class="sub-header"><div class="sub-header-dot" style="background:${cfg.color}"></div><div class="sub-header-label" style="color:${cfg.color}">${sub}</div><div class="sub-header-line"></div>${arrows}</div>`;
         subItems.forEach(it=>{
           const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
-          html+=`<div class="item-card" onclick='openModal("${it.id}")'>
+          html+=`<div class="item-card" data-codart="${String(it.cod_art||'').replace(/["<>&]/g,'')}" onclick='openModal("${it.id}")'>
             <button class="item-delete" onclick="event.stopPropagation();deleteItem('${it.id}')">✕</button>
             <span class="item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
             <span class="item-name">${it.name}</span>
@@ -2575,7 +2579,7 @@ function renderMateriali(){
       }
       unsub.forEach(it=>{
         const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
-        html+=`<div class="item-card" onclick='openModal("${it.id}")'>
+        html+=`<div class="item-card" data-codart="${String(it.cod_art||'').replace(/["<>&]/g,'')}" onclick='openModal("${it.id}")'>
           <button class="item-delete" onclick="event.stopPropagation();deleteItem('${it.id}')">✕</button>
           <span class="item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
           <span class="item-name">${it.name}</span>
@@ -2585,7 +2589,7 @@ function renderMateriali(){
     } else {
       ci.forEach(it=>{
         const priceHTML=isResp()&&it.prezzo!=null?`<div class="item-price">€ ${Number(it.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2})}</div>`:'';
-        html+=`<div class="item-card" onclick='openModal("${it.id}")'>
+        html+=`<div class="item-card" data-codart="${String(it.cod_art||'').replace(/["<>&]/g,'')}" onclick='openModal("${it.id}")'>
           <button class="item-delete" onclick="event.stopPropagation();deleteItem('${it.id}')">✕</button>
           <span class="item-code" style="background:${cfg.bg};color:${cfg.color}">${it.code}</span>
           <span class="item-name">${it.name}</span>
@@ -2615,7 +2619,8 @@ window.filterItems=function(){
     cards.forEach(card=>{
       const nm=card.querySelector('.item-name').textContent.toLowerCase();
       const cd=card.querySelector('.item-code').textContent.toLowerCase();
-      const show=!q||nm.includes(q)||cd.includes(q);
+      const ca=(card.dataset.codart||'').toLowerCase();
+      const show=!q||nm.includes(q)||cd.includes(q)||(ca&&ca.includes(q));
       card.style.display=show?'flex':'none';if(show) any=true;
     });
     grp.style.display=(any||!q)?'block':'none';
@@ -2652,6 +2657,8 @@ window.openModal=function(id){
   document.getElementById('m-badge').style.color=cfg.color;
   document.getElementById('m-code').textContent=item.code;
   document.getElementById('m-name').textContent=item.name;
+  const mca=document.getElementById('m-codart');
+  if(mca){mca.textContent=item.cod_art?'🏷️ Codice articolo: '+item.cod_art:'';mca.style.display=item.cod_art?'inline-block':'none';}
   document.getElementById('m-qty').textContent=item.qty;
   document.getElementById('modal-operator-name').textContent=currentUser.nome;
   const um={pz:'pezzi disponibili',m:'metri disponibili',kit:'kit disponibili',mat:'matasse disponibili',conf:'confezioni disponibili',lt:'litri disponibili'};
@@ -4686,6 +4693,7 @@ function renderCaricaNew(){
             <div class="carica-input-label">Prezzo €/unità</div>
             <input class="carica-input" type="number" min="0" step="0.01" placeholder="0.00" id="na-price" inputmode="decimal">
           </div>
+          ${_codArtFieldHtml('na-codart','')}
           <div class="carica-input-wrap" id="na-sub-wrap" style="display:none">
             <div class="carica-input-label">Sottocategoria</div>
             <select class="carica-input" id="na-sub"><option value="">Nessuna</option></select>
@@ -4751,6 +4759,30 @@ window.apriNuovoProdottoDaRicerca=function(){
 };
 
 // ── Risultati della ricerca (righe compatte, una scheda aperta alla volta) ──
+// ── Codice articolo (es. codice del fornitore) associato al prodotto ──
+// Serve a riconoscere un articolo già presente ed evitare doppioni.
+function _normCodArt(v){return String(v||'').trim().replace(/\s+/g,' ').toUpperCase();}
+// Articolo che usa già quel codice (escluso exceptId), anche tra le righe dell'elenco massivo
+function _codArtConflict(cod,exceptId){
+  const c=_normCodArt(cod); if(!c) return null;
+  const it=itemsList.find(i=>i.id!==exceptId&&_normCodArt(i.cod_art)===c);
+  if(it) return it;
+  const l=batchLines.find(x=>x.itemId!==exceptId&&_normCodArt(x.cod_art)===c);
+  if(l) return itemsList.find(i=>i.id===l.itemId)||{code:'?',name:'articolo in elenco'};
+  return null;
+}
+function _codArtCheck(cod,exceptId){
+  const k=_codArtConflict(cod,exceptId);
+  if(k){showToast('⚠️ Codice articolo «'+_normCodArt(cod)+'» già associato a '+k.code+' — '+k.name,'toast-danger');return false;}
+  return true;
+}
+function _codArtFieldHtml(id,val){
+  return `<div class="carica-input-wrap carica-add-full">
+    <div class="carica-input-label">🏷️ Codice articolo (opzionale)</div>
+    <input class="carica-input" id="${id}" type="text" style="text-align:left;text-transform:uppercase" placeholder="es. codice del fornitore" value="${_cEsc(val||'')}" autocomplete="off" autocapitalize="characters">
+  </div>`;
+}
+
 function _caricaBodyHtml(it,destOptsCache){
   const priceVal=it.prezzo!=null?it.prezzo:'';
   if(it.cat==='Carburante'){
@@ -4774,6 +4806,7 @@ function _caricaBodyHtml(it,destOptsCache){
         <input class="carica-input" type="number" min="0" step="0.01"
           placeholder="${priceVal||'—'}" id="cp-${it.id}" value="" inputmode="decimal">
       </div>
+      ${_codArtFieldHtml('cc-'+it.id,(batchDdt.active&&(batchLines.find(l=>l.itemId===it.id)||{}).cod_art)||it.cod_art||'')}
       ${batchDdt.active?_batchNoticeHtml(true):`<div class="carica-input-wrap carica-add-full">
         <div class="carica-input-label">Fornitore</div>
         <select class="carica-input" id="cf-${it.id}" style="text-align:left">${_fornOptionsHtml('')}</select>
@@ -4818,7 +4851,7 @@ function renderCaricaList(){
   }
 
   // Ricerca ESTESA A TUTTE LE CATEGORIE, carburante incluso.
-  const all=itemsList.filter(it=>it.name.toLowerCase().includes(q)||it.code.toLowerCase().includes(q))
+  const all=itemsList.filter(it=>it.name.toLowerCase().includes(q)||it.code.toLowerCase().includes(q)||(it.cod_art&&it.cod_art.toLowerCase().includes(q)))
     .sort((a,b)=>a.code.localeCompare(b.code));
   const items=all.slice(0,CARICA_MAX_RESULTS);
   if(caricaOpenId&&!items.some(it=>it.id===caricaOpenId)) caricaOpenId=null;
@@ -4839,7 +4872,8 @@ function renderCaricaList(){
   const destOptsCache=destOptionsHtml('');
   const rows=items.map(it=>{
     const icfg=categories[it.cat]||{bg:'',color:'var(--text)'};
-    const catTag=categories[it.cat]?` <span style="font-weight:500;color:var(--text-muted);font-size:11px">· ${_cEsc(categories[it.cat].label)}</span>`:'';
+    const catTag=(categories[it.cat]?` <span style="font-weight:500;color:var(--text-muted);font-size:11px">· ${_cEsc(categories[it.cat].label)}</span>`:'')+
+      (it.cod_art?` <span style="font-weight:500;color:var(--text-muted);font-size:11px">· 🏷️ ${_cEsc(it.cod_art)}</span>`:'');
     const open=it.id===caricaOpenId;
     return `<div class="carica-item carica-row${open?' open':''}" id="carica-row-${it.id}">
       <div class="carica-item-top carica-row-head" onclick="toggleCaricaItem('${it.id}')">
@@ -4879,6 +4913,8 @@ window.submitNuovoProdottoCarica=async function(){
   const subEl=document.getElementById('na-sub');
   const sub=subEl&&subEl.value?subEl.value:null;
   if(!name){showToast('Inserisci il nome del prodotto','toast-danger');document.getElementById('na-name')?.focus();return;}
+  const codArtN=_normCodArt(document.getElementById('na-codart')?.value);
+  if(codArtN&&!_codArtCheck(codArtN,null)){document.getElementById('na-codart')?.focus();return;}
   // In carico massivo il fornitore è quello scelto una sola volta in alto
   const fornitore=batchDdt.active?(batchDdt.forn||''):(document.getElementById('na-fornitore')?.value||'');
   _submitNuovoProdottoCaricaBusy=true;
@@ -4895,6 +4931,7 @@ window.submitNuovoProdottoCarica=async function(){
     // verrà caricata insieme agli altri articoli premendo «Carica».
     const inElenco=batchDdt.active;
     const item={id,name,cat,qty:inElenco?0:qty,unit,code,prezzo,sub,step};
+    if(codArtN) item.cod_art=codArtN;
     itemsList.push(item);
     await saveItem(item);
     if(inElenco&&qty>0){
@@ -4908,10 +4945,11 @@ window.submitNuovoProdottoCarica=async function(){
       const entry={id:genId(),itemId:id,code,name,delta:qty,prevQty:0,
         operator:currentUser.nome,operatorUid:currentUser.uid,time:getBackdatedTime('carnew'),backdated:isBackdated('carnew'),createdAt:Date.now(),type:'load',fornitore,
         tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc,destinatario:ddtInfo.destinatario||''};
+      if(codArtN) entry.cod_art=codArtN;
       await saveMovimento(entry);
     }
     // Svuota i campi del form (resta aperto con la stessa categoria, utile per inserimenti in serie)
-    ['na-name','na-price','na-ddt-num','na-ddt-date'].forEach(i=>{const e=document.getElementById(i);if(e) e.value='';});
+    ['na-name','na-price','na-ddt-num','na-ddt-date','na-codart'].forEach(i=>{const e=document.getElementById(i);if(e) e.value='';});
     const nq=document.getElementById('na-qty'); if(nq) nq.value='0';
     const nu=document.getElementById('na-unit'); if(nu){nu.value='pz';nu.dataset.prev='pz';}
     ['na-sub','na-fornitore','na-ddt-dest'].forEach(i=>{const e=document.getElementById(i);if(e){e.value='';e.dataset.prev='';}});
@@ -4939,6 +4977,9 @@ window.confirmCarico=async function(itemId){
     else {showToast('⚠️ Seleziona il fornitore!','toast-danger');fornEl?.focus();}
     return;
   }
+  // Codice articolo: se scritto, viene associato al prodotto (campo vuoto = nessuna modifica)
+  const codArt=_normCodArt(document.getElementById('cc-'+itemId)?.value);
+  if(codArt&&!_codArtCheck(codArt,itemId)){document.getElementById('cc-'+itemId)?.focus();return;}
 
   const newPrezzo=priceEl.value!==''?Math.round(parseFloat(priceEl.value)*100)/100:null;
   // Dati letti PRIMA del salvataggio: il listener in tempo reale può ridisegnare la scheda
@@ -4951,6 +4992,7 @@ window.confirmCarico=async function(itemId){
     const prevQty=item.qty;
     item.qty+=qty;
     if(newPrezzo!==null&&!isNaN(newPrezzo)) item.prezzo=newPrezzo;
+    if(codArt) item.cod_art=codArt;
 
     await saveItem(item);
 
@@ -4958,6 +5000,7 @@ window.confirmCarico=async function(itemId){
       delta:qty,prevQty,operator:currentUser.nome,operatorUid:currentUser.uid,
       time:bdTime,backdated:bdFlag,createdAt:Date.now(),type:'load',fornitore,
       tipo_doc:ddtInfo.tipo_doc,num_doc:ddtInfo.num_doc,data_doc:ddtInfo.data_doc,destinatario:ddtInfo.destinatario||''};
+    if(item.cod_art) entry.cod_art=item.cod_art;
     await saveMovimento(entry);
   } finally { _caricoBusy.delete(itemId); }
 
@@ -5710,6 +5753,7 @@ function renderBatchList(){
     const cfg=it&&categories[it.cat]||{bg:'var(--bg)',color:'var(--text)'};
     const un=it?it.unit:'';
     const extra=(l.nuovo?'<span class="batch-line-tag">nuovo</span>':'')+
+      ((l.cod_art||(it&&it.cod_art))?'<span class="batch-line-price">🏷️ '+_cEsc(l.cod_art||it.cod_art)+'</span>':'')+
       (l.prezzo!=null?'<span class="batch-line-price">€ '+Number(l.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+'/'+_cEsc(un)+'</span>':'');
     return '<div class="batch-line">'+
       '<span class="carica-item-code" style="background:'+cfg.bg+';color:'+cfg.color+'">'+_cEsc(it?it.code:'?')+'</span>'+
@@ -5753,15 +5797,18 @@ window.aggiungiRigaBatch=function(itemId){
   const priceEl=document.getElementById('cp-'+itemId);
   const q=parseInt(qtyEl&&qtyEl.value);
   if(isNaN(q)||q<=0){showToast('Inserisci una quantità valida','toast-danger');qtyEl&&qtyEl.focus();return;}
+  const codArt=_normCodArt(document.getElementById('cc-'+itemId)?.value);
+  if(codArt&&!_codArtCheck(codArt,itemId)){document.getElementById('cc-'+itemId)?.focus();return;}
   if(!batchLines.some(l=>l.itemId===itemId)&&batchLines.length>=BATCH_MAX_LINES){showToast('Elenco pieno ('+BATCH_MAX_LINES+' articoli): carica questi e prosegui con un nuovo elenco','toast-danger');return;}
   const pr=priceEl&&priceEl.value!==''?Math.round(parseFloat(priceEl.value)*100)/100:null;
   const prezzo=(pr!==null&&!isNaN(pr))?pr:null;
   const ex=batchLines.find(l=>l.itemId===itemId);
   if(ex){
     ex.qty+=q; if(prezzo!==null) ex.prezzo=prezzo;
+    if(codArt) ex.cod_art=codArt;
     showToast(item.code+': quantità in elenco portata a '+ex.qty+' '+item.unit,'toast-info');
   } else {
-    batchLines.push({itemId,qty:q,prezzo});
+    batchLines.push(codArt?{itemId,qty:q,prezzo,cod_art:codArt}:{itemId,qty:q,prezzo});
     showToast('+'+q+' '+item.unit+' '+item.code+' aggiunti all\'elenco','toast-return');
   }
   if(qtyEl) qtyEl.value='';
@@ -5782,6 +5829,8 @@ window.caricaElencoBatch=async function(){
   if(!batchDdt.num){showToast('⚠️ Inserisci il numero del documento','toast-danger');document.getElementById('batch-ddt-num')?.focus();return;}
   if(!batchDdt.forn){showToast('⚠️ Seleziona il fornitore del documento','toast-danger');document.getElementById('batch-ddt-forn')?.focus();return;}
   if(n>BATCH_MAX_LINES){showToast('Troppi articoli in un solo carico (max '+BATCH_MAX_LINES+')','toast-danger');return;}
+  const dup=batchLines.find(l=>l.cod_art&&itemsList.some(i=>i.id!==l.itemId&&_normCodArt(i.cod_art)===l.cod_art));
+  if(dup){_codArtCheck(dup.cod_art,dup.itemId);return;}
   const tit=batchDdt.tipo+' n° '+batchDdt.num;
   if(!confirm('Confermi il carico di '+n+' articol'+(n===1?'o':'i')+' sul '+tit+' ('+batchDdt.forn+')?\nLe giacenze verranno aumentate delle quantità in elenco.')) return;
   _batchCommitBusy=true;
@@ -5804,11 +5853,13 @@ window.caricaElencoBatch=async function(){
       const prev=fresh[l.itemId];
       const upd={qty:prev+l.qty};
       if(l.prezzo!=null&&!isNaN(l.prezzo)) upd.prezzo=l.prezzo;
+      if(l.cod_art&&l.cod_art!==_normCodArt(it.cod_art)) upd.cod_art=l.cod_art;
       b.update(doc(db,'inventario',l.itemId),upd);
       b.set(doc(db,'movimenti',genId()),{itemId:l.itemId,code:it.code||'',name:it.name||'',
         delta:l.qty,prevQty:prev,operator:currentUser.nome,operatorUid:currentUser.uid,
         time:base+i,backdated:bd,createdAt:now+i,type:'load',fornitore:batchDdt.forn,
-        tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data,destinatario:batchDdt.dest||''});
+        tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data,destinatario:batchDdt.dest||'',
+        ...((l.cod_art||it.cod_art)?{cod_art:l.cod_art||it.cod_art}:{})});
       upds[l.itemId]=upd;
     });
     await b.commit();
@@ -6302,9 +6353,13 @@ window.eliminaDdt=async function(key){
 
 // ── MODIFICA DOCUMENTO ─────────────────────────────────────────
 let _ddtModRemoved=new Set();
+let _ddtModAdded=[];     // prodotti aggiunti nella modifica: [{itemId,qty}]
+let _ddtModGroup=null;
 window.openModificaDdt=function(key){
   const g=_ddtGroups.get(key); if(!g) return;
   _ddtModRemoved=new Set();
+  _ddtModAdded=[];
+  _ddtModGroup=g;
   const fornNomi=new Set(fornitoriList.map(f=>f.nome)); if(g.fornitore) fornNomi.add(g.fornitore);
   const fornOpts='<option value="">— Nessuno —</option>'+[...fornNomi].sort((a,b)=>a.localeCompare(b)).map(n=>'<option value="'+_ddtEsc(n)+'"'+(n===g.fornitore?' selected':'')+'>'+_ddtEsc(n)+'</option>').join('');
   let rows='';
@@ -6327,11 +6382,50 @@ window.openModificaDdt=function(key){
     '</div>'+
     '<div class="form-group"><label>Destinatario (opzionale)</label><select id="ddt-m-dest" onchange="onDestSelectChange(this)">'+destOptionsHtml(g.destinatario)+'</select></div>'+
     '<div class="form-group" style="margin-bottom:6px"><label>Prodotti e quantità caricate</label></div>'+
-    '<div style="max-height:34vh;overflow-y:auto;margin-bottom:14px">'+rows+'</div>'+
-    '<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Se cambi quantità o togli prodotti, la giacenza viene corretta di conseguenza (richiede il codice di sblocco).</div>'+
+    '<div style="max-height:34vh;overflow-y:auto;margin-bottom:10px">'+rows+'<div id="ddt-m-new"></div></div>'+
+    '<div class="form-group" style="margin-bottom:6px"><label>＋ Aggiungi prodotto al documento</label>'+
+      '<input id="ddt-m-add-q" placeholder="Cerca per nome, codice o codice articolo..." oninput="ddtModSuggest()" autocomplete="off"></div>'+
+    '<div id="ddt-m-add-sugg" class="aa-sugg" style="margin-bottom:12px"></div>'+
+    '<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Con ✕ togli un prodotto dal documento. Se cambi quantità o togli prodotti, la giacenza viene corretta di conseguenza (richiede il codice di sblocco). I prodotti aggiunti vengono caricati in magazzino come un normale carico.</div>'+
     '<div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" id="ddt-m-btn" onclick="salvaModificaDdt('+jsAttr(key)+')">Salva</button></div>';
   document.getElementById('form-backdrop').classList.add('open');
 };
+window.ddtModSuggest=function(){
+  const q=(document.getElementById('ddt-m-add-q')?.value||'').trim().toLowerCase();
+  const box=document.getElementById('ddt-m-add-sugg'); if(!box) return;
+  if(!q){box.innerHTML='';return;}
+  const hits=itemsList.filter(it=>it.cat!=='Carburante'&&((it.name||'').toLowerCase().includes(q)||(it.code||'').toLowerCase().includes(q)||(it.cod_art&&it.cod_art.toLowerCase().includes(q))))
+    .sort((a,b)=>(a.code||'').localeCompare(b.code||'')).slice(0,8);
+  box.innerHTML=hits.length===0?'<div class="aa-sugg-empty">Nessun prodotto trovato</div>':
+    hits.map(it=>{const cfg=categories[it.cat]||{bg:'#eee',color:'#333'};
+      return '<button type="button" class="aa-sugg-item" onclick="ddtModAddItem('+jsAttr(it.id)+')">'+
+        '<span class="item-code" style="background:'+cfg.bg+';color:'+cfg.color+'">'+_ddtEsc(it.code)+'</span>'+
+        '<span class="aa-sugg-name">'+_ddtEsc(it.name)+(it.cod_art?' <span style="color:var(--text-muted);font-size:11px">· 🏷️ '+_ddtEsc(it.cod_art)+'</span>':'')+'</span>'+
+        '<span class="aa-sugg-qty">'+it.qty+' '+_ddtEsc(it.unit||'')+'</span></button>';}).join('');
+};
+window.ddtModAddItem=function(id){
+  const g=_ddtModGroup; if(!g) return;
+  const it=itemsList.find(i=>i.id===id); if(!it) return;
+  if(g.lines.some(l=>l.itemId===id)){showToast(it.code+' è già nel documento: modifica la sua quantità','toast-info');return;}
+  if(_ddtModAdded.some(a=>a.itemId===id)){showToast(it.code+' è già tra i prodotti aggiunti','toast-info');return;}
+  _ddtModAdded.push({itemId:id,qty:''});
+  const q=document.getElementById('ddt-m-add-q'); if(q) q.value='';
+  const box=document.getElementById('ddt-m-add-sugg'); if(box) box.innerHTML='';
+  _renderDdtModNew();
+  document.getElementById('ddt-mn-q-'+(_ddtModAdded.length-1))?.focus();
+};
+window.ddtModSetQty=function(i,v){if(_ddtModAdded[i]) _ddtModAdded[i].qty=v;};
+window.ddtModRemoveNew=function(i){_ddtModAdded.splice(i,1);_renderDdtModNew();};
+function _renderDdtModNew(){
+  const box=document.getElementById('ddt-m-new'); if(!box) return;
+  box.innerHTML=_ddtModAdded.map((a,i)=>{
+    const it=itemsList.find(x=>x.id===a.itemId)||{code:'?',name:'',unit:''};
+    return '<div class="ddt-mod-line new"><div><span class="ddt-new-tag">nuovo</span> <b>'+_ddtEsc(it.code)+'</b> — '+_ddtEsc(it.name)+
+      (it.unit?' <span style="color:var(--text-muted)">('+_ddtEsc(it.unit)+')</span>':'')+'</div>'+
+      '<input type="number" min="1" step="1" inputmode="numeric" placeholder="Q.tà" id="ddt-mn-q-'+i+'" value="'+_ddtEsc(a.qty)+'" oninput="ddtModSetQty('+i+',this.value)">'+
+      '<button type="button" class="ddt-mod-x" title="Togli" onclick="ddtModRemoveNew('+i+')">✕</button></div>';
+  }).join('');
+}
 window.toggleRigaDdt=function(id){
   const row=document.getElementById('ddt-ml-'+id); if(!row) return;
   if(_ddtModRemoved.has(id)){_ddtModRemoved.delete(id);row.classList.remove('removed');}
@@ -6346,7 +6440,16 @@ window.salvaModificaDdt=async function(key){
   const forn=document.getElementById('ddt-m-forn').value||'';
   let dest=document.getElementById('ddt-m-dest').value||''; if(_isDestSpecial(dest)) dest='';
   if(!num){showToast('Il numero del documento è obbligatorio','toast-danger');return;}
-  if(_ddtModRemoved.size===g.lines.length){showToast('Per togliere tutti i prodotti usa "Elimina"','toast-danger');return;}
+  if(_ddtModRemoved.size===g.lines.length&&_ddtModAdded.length===0){showToast('Per togliere tutti i prodotti usa "Elimina"','toast-danger');return;}
+  // Prodotti aggiunti: quantità obbligatoria
+  const adds=[];
+  for(const a of _ddtModAdded){
+    const it=itemsList.find(x=>x.id===a.itemId);
+    const v=parseInt(a.qty,10);
+    if(!it){showToast('Un prodotto aggiunto non è più in magazzino: toglilo','toast-danger');return;}
+    if(isNaN(v)||v<1){showToast('Inserisci la quantità per '+it.code,'toast-danger');document.getElementById('ddt-mn-q-'+_ddtModAdded.indexOf(a))?.focus();return;}
+    adds.push({it,qty:v});
+  }
 
   // Variazioni di quantità per riga e per articolo
   const changes=[];const diffByItem={};
@@ -6358,12 +6461,14 @@ window.salvaModificaDdt=async function(key){
     if(v!==l.delta){changes.push({l,newQty:v});diffByItem[l.itemId]=(diffByItem[l.itemId]||0)+(v-l.delta);}
   }
   const headerChanged=tipo!==g.tipo||num!==g.num||data!==(g.data_doc||'')||forn!==(g.fornitore||'')||dest!==(g.destinatario||'');
-  if(!headerChanged&&changes.length===0){showToast('Nessuna modifica','toast-info');closeForm();return;}
+  if(!headerChanged&&changes.length===0&&adds.length===0){showToast('Nessuna modifica','toast-info');closeForm();return;}
 
   let fresh={},qty={};
-  if(changes.length>0){
-    fresh=await _ddtFreshQty(Object.keys(diffByItem));
+  if(changes.length>0||adds.length>0){
+    fresh=await _ddtFreshQty([...Object.keys(diffByItem),...adds.map(a=>a.it.id)]);
+    if(adds.some(a=>fresh[a.it.id]==null)){showToast('Un prodotto aggiunto non è più in magazzino: toglilo','toast-danger');return;}
     qty={...fresh};
+    adds.forEach(a=>{qty[a.it.id]+=a.qty;});
     const sottoZero=[];
     Object.keys(diffByItem).forEach(id=>{
       if(qty[id]==null) return;
@@ -6371,10 +6476,12 @@ window.salvaModificaDdt=async function(key){
       if(nv<0){const it=itemsList.find(i=>i.id===id);sottoZero.push(it?it.code:id);nv=0;}
       qty[id]=nv;
     });
-    const riepilogo=changes.map(c=>c.l.code+': '+(c.remove?'tolto ('+c.l.delta+')':c.l.delta+' → '+c.newQty)).join('\n');
-    if(!confirm('Confermi le modifiche alle quantità?\n\n'+riepilogo+'\n\nLa giacenza verrà corretta di conseguenza.'+
+    const riepilogo=changes.map(c=>c.l.code+': '+(c.remove?'tolto ('+c.l.delta+')':c.l.delta+' → '+c.newQty))
+      .concat(adds.map(a=>a.it.code+': aggiunto (+'+a.qty+' '+(a.it.unit||'')+')')).join('\n');
+    if(!confirm('Confermi le modifiche al documento?\n\n'+riepilogo+'\n\nLa giacenza verrà corretta di conseguenza.'+
       (sottoZero.length?'\n\n⚠️ Per '+sottoZero.join(', ')+' la giacenza andrebbe sotto zero: verrà portata a 0.':''))) return;
-    if(!requireUnlockCode()) return;
+    // Il codice di sblocco serve solo se si riducono o tolgono quantità già caricate
+    if(changes.length>0&&!requireUnlockCode()) return;
   }
   _ddtBusy=true;
   const btn=document.getElementById('ddt-m-btn'); if(btn){btn.disabled=true;btn.textContent='Salvataggio...';}
@@ -6395,11 +6502,20 @@ window.salvaModificaDdt=async function(key){
         }catch(e){}
       }
     }
+    // Nuove righe del documento: carico normale con gli stessi dati di testata
+    const now=Date.now();
+    adds.forEach((a,i)=>{
+      const m={itemId:a.it.id,code:a.it.code,name:a.it.name,delta:a.qty,prevQty:fresh[a.it.id],
+        operator:currentUser.nome,operatorUid:currentUser.uid,time:now+i,backdated:false,createdAt:now+i,type:'load',
+        fornitore:forn,tipo_doc:tipo,num_doc:num,data_doc:data,destinatario:dest};
+      if(a.it.cod_art) m.cod_art=a.it.cod_art;
+      batch.set(doc(db,'movimenti',genId()),m);
+    });
     Object.keys(qty).forEach(id=>{if(fresh[id]!=null&&qty[id]!==fresh[id]) batch.update(doc(db,'inventario',id),{qty:qty[id]});});
     await batch.commit();
     Object.keys(qty).forEach(id=>{const it=itemsList.find(i=>i.id===id);if(it&&qty[id]!=null) it.qty=qty[id];});
     closeForm();
-    showToast('Documento aggiornato','toast-return');
+    showToast('Documento aggiornato'+(adds.length?' ('+adds.length+' prodott'+(adds.length===1?'o aggiunto':'i aggiunti')+')':''),'toast-return');
     _ddtRefresh();
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
   finally{_ddtBusy=false;if(btn){btn.disabled=false;btn.textContent='Salva';}}
