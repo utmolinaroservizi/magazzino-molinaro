@@ -528,6 +528,26 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .ddt-mod-line input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;text-align:right}
 .ddt-mod-line.removed{opacity:.4;text-decoration:line-through}
 .ddt-mod-line.new{background:#F3FAEF}
+/* ── Materiale "non a bilancio" (arancione) ── */
+.neb-tag{display:inline-block;font-size:9.5px;font-weight:700;color:#c2410c;background:#FFEDD5;border:1px solid #FDBA74;border-radius:99px;padding:1px 7px;vertical-align:middle;letter-spacing:0;text-transform:none}
+.neb-txt{color:#c2410c;font-weight:700}
+.batch-neb{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 11px;border:1.5px dashed #FDBA74;border-radius:var(--radius-xs);background:var(--bg-card);cursor:pointer}
+.batch-neb input{width:20px;height:20px;accent-color:#EA580C;flex-shrink:0}
+.batch-neb-txt{display:flex;flex-direction:column;font-size:12.5px;color:var(--text)}
+.batch-neb-txt small{font-size:10.5px;color:var(--text-muted);font-weight:500}
+.batch-neb.on{border-style:solid;border-color:#EA580C;background:#FFF7ED}
+.batch-neb.on .batch-neb-txt b{color:#c2410c}
+.ddt-badge.neb{background:#FFEDD5;color:#c2410c}
+.ddt-sc-line.neb{color:#c2410c;background:#FFF7ED}
+.rie-tree-prod.neb,.rie-tree-prod.neb .rie-tree-prod-code,.rie-tree-prod.neb .rie-tree-prod-name,.rie-tree-prod.neb .rie-tree-prod-qty{color:#c2410c}
+.cs-prod-row.neb .cs-prod-name,.cs-prod-row.neb .cs-prod-cost{color:#c2410c}
+.neb-tot{margin:10px 0 4px;border:1.5px solid #FDBA74;background:#FFF7ED;border-radius:10px;padding:9px 12px}
+.neb-tot-title{font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.neb-tot-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:3px 0;color:var(--text)}
+.neb-tot-row.neb{color:#c2410c}
+.neb-tot-row.tot{border-top:1px solid #FDBA74;margin-top:3px;padding-top:6px;font-size:13.5px}
+.neb-tot-row.tot b{color:#c2410c}
+.aa-badge.neb{background:#FFEDD5;color:#c2410c}
 .ddt-new-tag{display:inline-block;font-size:9.5px;font-weight:700;color:#fff;background:var(--brand-500);border-radius:99px;padding:1px 6px;vertical-align:middle}
 .modal-codart{margin-top:6px;font-size:12px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-100);border-radius:8px;padding:3px 9px}
 .ddt-mod-x{width:28px;height:28px;border-radius:50%;border:1px solid #F0C0C0;background:transparent;color:#B33A3A;cursor:pointer;font-family:inherit}
@@ -1003,6 +1023,10 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
       <div class="carica-input-label">Fornitore (scelto una sola volta)</div>
       <select class="carica-input" id="batch-ddt-forn" style="text-align:left" onchange="syncBatchDdt()"></select>
     </div>
+    <label class="batch-neb" id="batch-neb-wrap">
+      <input type="checkbox" id="batch-ddt-neb" onchange="setBatchNeb(this.checked)">
+      <span class="batch-neb-txt"><b>🚫 Non entra a bilancio</b><small>Le giacenze restano invariate; allo scarico su cantiere il materiale compare in arancione nei report</small></span>
+    </label>
     <div class="batch-ddt-hint" id="batch-ddt-hint">Imposta tipo, numero, data, fornitore ed eventuale destinazione. Poi cerca i prodotti uno alla volta e premi «Aggiungi al documento»: l'elenco si costruisce qui sotto, dove puoi correggere le quantità o togliere un articolo. Le giacenze vengono aggiornate solo quando premi «Carica».</div>
     <div class="batch-list" id="batch-list"></div>
     <div id="batch-backdate"></div>
@@ -3029,6 +3053,7 @@ function _renderLogDdtGroup(g,dk,fmt){
         <div class="log-operator" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span>👷 ${_logEsc(ops)}</span>
           <span class="log-type-badge log-type-load">Carico merce</span>
+          ${g.items.some(e=>e.fuori_bilancio)?'<span class="neb-tag">🚫 non a bilancio</span>':''}
         </div>
         ${dest?`<div class="log-time" style="color:#2563EB;font-weight:600">${isCant?'🏗️':'📝'} ${_logEsc(dest)}</div>`:''}
         <div class="log-time">${n} articol${n===1?'o':'i'}${dataDoc?' · doc. del '+dataDoc:''} · ${ts}</div>
@@ -3075,7 +3100,8 @@ function renderLogItem(entry,isTake,ts){
   // Info cantiere
   const cantiereHTML=(entry.cantiere?`<div class="log-time" style="color:#2563EB;font-weight:600">🏗️ ${entry.cantiere}</div>`:'')+
     (entry.da_ddt&&entry.rif_num_doc?`<div class="log-time">📤 da ${entry.rif_tipo_doc||'DDT'} n° ${entry.rif_num_doc}</div>`:'')+
-    (entry.type==='load'&&entry.num_doc?`<div class="log-time">📄 ${entry.tipo_doc||'DDT'} n° ${entry.num_doc}${entry.destinatario?' · destinatario '+entry.destinatario:''}</div>`:'');
+    (entry.type==='load'&&entry.num_doc?`<div class="log-time">📄 ${entry.tipo_doc||'DDT'} n° ${entry.num_doc}${entry.destinatario?' · destinatario '+entry.destinatario:''}</div>`:'')+
+    (entry.fuori_bilancio?'<div class="log-time"><span class="neb-tag">🚫 non a bilancio · giacenza invariata</span></div>':'');
   // Info fornitore
   const fornitoreHTML=entry.fornitore?`<div class="log-time" style="color:#15803D;font-weight:600">🏭 ${entry.fornitore}</div>`:'';
 
@@ -3152,8 +3178,10 @@ window.undoLog=async function(logId){
   const amt=Math.abs(entry.delta);
   const item=itemsList.find(i=>i.id===entry.itemId);
   const un=item?item.unit:'';
-  if(!confirm('Eliminare questo movimento?\n\n'+entry.code+' — '+(isTake?'Prelevato':'Rimesso')+' '+amt+' '+un+'\nda '+entry.operator+'\n\nLa giacenza verrà ripristinata.')) return;
-  if(item){item.qty=Math.max(0,item.qty-entry.delta);await saveItem(item);}
+  if(entry.fuori_bilancio&&entry.num_doc){showToast('Carico non a bilancio: gestiscilo da «DDT / Fatture»','toast-info');return;}
+  if(!confirm('Eliminare questo movimento?\n\n'+entry.code+' — '+(isTake?'Prelevato':'Rimesso')+' '+amt+' '+un+'\nda '+entry.operator+'\n\n'+
+    (entry.fuori_bilancio?'Movimento non a bilancio: la giacenza non cambia.':'La giacenza verrà ripristinata.'))) return;
+  if(item&&!entry.fuori_bilancio){item.qty=Math.max(0,item.qty-entry.delta);await saveItem(item);}
   await deleteMovimento(logId);
   // ── Aggiorna UI immediatamente ──
   actLog=actLog.filter(e=>e.id!==logId);
@@ -3166,6 +3194,7 @@ window.undoLog=async function(logId){
 window.editLogEntry=async function(logId){
   const entry=actLog.find(e=>e.id===logId);if(!entry) return;
   if(entry.operatorUid!==currentUser.uid){showToast('Puoi modificare solo i tuoi movimenti','toast-danger');return;}
+  if(entry.fuori_bilancio){showToast('Movimento non a bilancio: gestiscilo da «DDT / Fatture»','toast-info');return;}
 
   const isTake=entry.delta<0;
   const oldAmt=Math.abs(entry.delta);
@@ -3660,11 +3689,11 @@ window.exportValoreMagazzino=async function(){
     ));
     carichiSnap.forEach(d=>{
       const e={id:d.id,...d.data()};
-      if(e.type==='load'&&e.time>=unAnnoFa.getTime()) tuttiCarichi.push(e);
+      if(e.type==='load'&&!e.fuori_bilancio&&e.time>=unAnnoFa.getTime()) tuttiCarichi.push(e);
     });
   }catch(err){
     // fallback su actLog se la query fallisce
-    tuttiCarichi=actLog.filter(e=>e.type==='load'&&e.time>=unAnnoFa.getTime());
+    tuttiCarichi=actLog.filter(e=>e.type==='load'&&!e.fuori_bilancio&&e.time>=unAnnoFa.getTime());
   }
   tuttiCarichi.sort((a,b)=>b.time-a.time);
   const dedupedF2=itemsListDeduped(); // usa lista senza doppioni anche per lookup
@@ -3713,7 +3742,7 @@ window.exportExcel=function(){
     const ora=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     const item=itemsList.find(i=>i.id===e.itemId);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
-    const opLabel=e.type==='adjust'?'Rettifica manuale':(e.type==='load'?'Carico':(e.delta<0?'Prelievo':'Reimmissione'));
+    const opLabel=(e.type==='adjust'?'Rettifica manuale':(e.type==='load'?'Carico':(e.delta<0?'Prelievo':'Reimmissione')))+(e.fuori_bilancio?' (non a bilancio)':'');
     csv+=`"${data}","${ora}","${e.code}","${e.name.replace(/"/g,'""')}","${catLabel}","${opLabel}","${e.delta}","${e.operator||'N/D'}"\n`;
   });
   downloadCSV(csv,'Report_Movimentazioni_'+dateStr()+'.csv');showToast('Report scaricato','toast-info');
@@ -4632,8 +4661,9 @@ function _resetBackdate(prefix){
 function _batchNoticeHtml(withForn){
   const doc=batchDdt.tipo+(batchDdt.num?' n° '+_cEsc(batchDdt.num):'');
   const forn=withForn?(batchDdt.forn?' · Fornitore: <strong>'+_cEsc(batchDdt.forn)+'</strong>':' · <strong style="color:#b45309">fornitore non ancora scelto</strong>'):'';
+  const neb=batchDdt.neb?' · <strong style="color:#c2410c">🚫 NON A BILANCIO</strong>':'';
   return `<div class="carica-input-wrap carica-add-full">
-    <div style="font-size:11.5px;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-200);border-radius:8px;padding:7px 10px">📄 Documento fissato in alto (${doc})${forn}</div>
+    <div style="font-size:11.5px;color:var(--brand-600);background:var(--brand-50);border:1px solid var(--brand-200);border-radius:8px;padding:7px 10px">📄 Documento fissato in alto (${doc})${forn}${neb}</div>
   </div>`;
 }
 
@@ -5285,7 +5315,7 @@ window.exportByCantiere=async function(){
   rows.push(['MOVIMENTAZIONI MATERIALE PER CANTIERE']);
   rows.push(['Cantiere: '+label+'  |  Generato il: '+new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})]);
   rows.push([]);
-  rows.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Quantità','Unità','Cantiere','Operatore']);
+  rows.push(['Data','Ora','Tipo','Codice','Prodotto','Categoria','Quantità','Unità','Cantiere','Operatore','Bilancio']);
 
   movimenti.sort((a,b)=>b.time-a.time);
   const dedupedBC=itemsListDeduped();
@@ -5297,7 +5327,7 @@ window.exportByCantiere=async function(){
     const item=dedupedBC.find(i=>i.id===e.itemId)||dedupedBC.find(i=>i.code===e.code);
     const catLabel=item?(categories[item.cat]?.label||item.cat):'';
     const tipo={take:'Prelievo',return:'Restituzione',load:'Carico'}[e.type]||'Movimento';
-    rows.push([data,ora,tipo,e.code,e.name,catLabel,e.delta,item?.unit||'',e.cantiere||'',e.operator||'']);
+    rows.push([data,ora,tipo,e.code,e.name,catLabel,e.delta,item?.unit||'',e.cantiere||'',e.operator||'',e.fuori_bilancio?'NON A BILANCIO':'']);
     if(e.delta<0) totPrelievi+=Math.abs(e.delta);
     else totRestituzioni+=e.delta;
   });
@@ -5306,8 +5336,8 @@ window.exportByCantiere=async function(){
   rows.push(['','','','','Totale movimenti:',movimenti.length,'Prelievi:',totPrelievi,'Restituzioni:',totRestituzioni]);
 
   const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:12},{wch:8},{wch:14},{wch:10},{wch:40},{wch:22},{wch:10},{wch:8},{wch:28},{wch:20}];
-  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}}];
+  ws['!cols']=[{wch:12},{wch:8},{wch:14},{wch:10},{wch:40},{wch:22},{wch:10},{wch:8},{wch:28},{wch:20},{wch:16}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:10}},{s:{r:1,c:0},e:{r:1,c:10}}];
   XLSX.utils.book_append_sheet(wb,ws,'Movimenti Cantiere');
 
   const fname='Cantiere_'+(cantFilter||'Tutti').replace(/\s/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.xlsx';
@@ -5470,6 +5500,16 @@ window.delSubcat=async function(cat,sub){
 // ═══════════════════════════════════
 //  ANALISI COSTI CANTIERE
 // ═══════════════════════════════════
+// Riquadro con i due totali (senza / con il materiale non a bilancio)
+function _nebTotaliHtml(totB,totN,nProd){
+  var f=function(v){return '€'+Math.round(v).toLocaleString('it-IT');};
+  return '<div class="neb-tot">'+
+    '<div class="neb-tot-title">🚫 Materiale non a bilancio presente</div>'+
+    '<div class="neb-tot-row"><span>Totale senza materiale non a bilancio</span><b>'+f(totB)+'</b></div>'+
+    '<div class="neb-tot-row neb"><span>Materiale non a bilancio ('+nProd+' prod.)</span><b>'+f(totN)+'</b></div>'+
+    '<div class="neb-tot-row tot"><span>Totale con materiale non a bilancio</span><b>'+f(totB+totN)+'</b></div>'+
+  '</div>';
+}
 window.renderCantiereStats=function(){
   var panel=document.getElementById('cantiere-stats-panel');
   if(!panel) return;
@@ -5487,12 +5527,18 @@ window.renderCantiereStats=function(){
     panel.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Nessun movimento nel periodo.</div>';
     return;
   }
-  var netto={};
+  var netto={},nettoN={};
   movs.forEach(function(e){
     var it=itemsList.filter(function(i){return i.id===e.itemId;})[0]||itemsList.filter(function(i){return i.code===e.code;})[0];
-    if(!netto[e.code]) netto[e.code]={nome:e.name,cat:it&&it.cat||'',qty:0,prezzo:it&&it.prezzo!=null?it.prezzo:null,unit:it&&it.unit||''};
-    netto[e.code].qty+=e.delta;
+    var T=e.fuori_bilancio?nettoN:netto; // il materiale non a bilancio è conteggiato a parte
+    if(!T[e.code]) T[e.code]={nome:e.name,cat:it&&it.cat||'',qty:0,prezzo:it&&it.prezzo!=null?it.prezzo:null,unit:it&&it.unit||''};
+    if(e.fuori_bilancio&&e.prezzo_unit!=null) T[e.code].prezzo=e.prezzo_unit;
+    T[e.code].qty+=e.delta;
   });
+  var listaN=Object.keys(nettoN).map(function(code){
+    var v=nettoN[code]; return {code:code,nome:v.nome,cat:v.cat,qtaFuori:-v.qty,prezzo:v.prezzo,unit:v.unit};
+  }).filter(function(v){return v.qtaFuori>0;});
+  var totNeb=listaN.reduce(function(s,v){return s+(v.prezzo||0)*v.qtaFuori;},0);
   var colori=['#4DAB3D','#2563EB','#E0A030','#A03A1E','#553687','#2f8472','#823560'];
   var lista=Object.keys(netto).map(function(code){
     var v=netto[code]; return {code:code,nome:v.nome,cat:v.cat,qtaFuori:-v.qty,prezzo:v.prezzo,unit:v.unit};
@@ -5511,6 +5557,7 @@ window.renderCantiereStats=function(){
   h+='<div class="cs-kpi"><div class="cs-kpi-val">'+lista.length+'</div><div class="cs-kpi-label">Prodotti</div></div>';
   h+='<div class="cs-kpi"><div class="cs-kpi-val">'+movs.length+'</div><div class="cs-kpi-label">Movimenti</div></div>';
   h+='</div>';
+  if(listaN.length) h+=_nebTotaliHtml(totCosto,totNeb,listaN.length);
   if(catRank.length){
     h+='<div class="cs-section-title">Per categoria</div>';
     catRank.forEach(function(r,i){
@@ -5528,6 +5575,14 @@ window.renderCantiereStats=function(){
     h+='<div class="cs-prod-row"><span class="cs-prod-name">'+v.code+' — '+v.nome+'</span>';
     h+='<span class="cs-prod-cost">'+(c>0?'€'+Math.round(c).toLocaleString('it-IT'):v.qtaFuori+' '+v.unit)+'</span></div>';
   });
+  if(listaN.length){
+    h+='<div class="cs-section-title" style="color:#c2410c">Non a bilancio</div>';
+    listaN.forEach(function(v){
+      var c=(v.prezzo||0)*v.qtaFuori;
+      h+='<div class="cs-prod-row neb"><span class="cs-prod-name">'+v.code+' — '+v.nome+' · '+v.qtaFuori+' '+v.unit+'</span>';
+      h+='<span class="cs-prod-cost">'+(c>0?'€'+Math.round(c).toLocaleString('it-IT'):'—')+'</span></div>';
+    });
+  }
   panel.innerHTML=h;
 };
 
@@ -5657,7 +5712,7 @@ window.saveSubcategoria=async function(){
 //  Gli articoli si aggiungono a un ELENCO (correggibile) e le giacenze
 //  vengono aggiornate tutte insieme solo premendo «Carica».
 // ═══════════════════════════════════
-let batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:'',forn:''};
+let batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:'',forn:'',neb:false};
 let batchLines=[];            // [{itemId,qty,prezzo,nuovo}]
 let _batchRestored=false;
 const BATCH_MAX_LINES=140;    // limite di sicurezza per un batch Firestore (≤500 operazioni)
@@ -5676,7 +5731,7 @@ function _restoreBatchState(){
     const raw=localStorage.getItem(_batchStoreKey()); if(!raw) return;
     const o=JSON.parse(raw);
     if(!o||!o.ddt) return;
-    batchDdt=Object.assign({active:false,tipo:'DDT',num:'',data:'',dest:'',forn:''},o.ddt);
+    batchDdt=Object.assign({active:false,tipo:'DDT',num:'',data:'',dest:'',forn:'',neb:false},o.ddt);
     batchLines=(Array.isArray(o.lines)?o.lines:[]).filter(l=>l&&l.itemId&&l.qty>0);
     if(batchLines.length) showToast('Ripreso il carico massivo in corso ('+batchLines.length+' articol'+(batchLines.length===1?'o':'i')+')','toast-info');
   }catch(e){}
@@ -5698,7 +5753,19 @@ function _applyBatchUi(){
   if(bdest){bdest.innerHTML=destOptionsHtml(batchDdt.dest);bdest.value=batchDdt.dest||'';bdest.dataset.prev=batchDdt.dest||'';}
   const bforn=document.getElementById('batch-ddt-forn');
   if(bforn){bforn.innerHTML=_fornOptionsHtml(batchDdt.forn);bforn.value=batchDdt.forn||'';}
+  const bneb=document.getElementById('batch-ddt-neb');
+  if(bneb) bneb.checked=!!batchDdt.neb;
+  document.getElementById('batch-neb-wrap')?.classList.toggle('on',!!batchDdt.neb);
 }
+window.setBatchNeb=function(v){
+  batchDdt.neb=!!v;
+  document.getElementById('batch-neb-wrap')?.classList.toggle('on',batchDdt.neb);
+  _saveBatchState();
+  renderBatchList();
+  renderCaricaNew();
+  renderCaricaList();
+  showToast(batchDdt.neb?'🚫 Documento NON a bilancio: le giacenze non verranno modificate':'Documento a bilancio: le giacenze verranno aggiornate','toast-info');
+};
 window.toggleBatchDdt=function(){
   if(batchDdt.active&&batchLines.length){
     if(!confirm('Nell\'elenco ci sono '+batchLines.length+' articoli non ancora caricati.\nDisattivando il carico massivo l\'elenco verrà svuotato (nessuna giacenza viene modificata).\n\nContinuare?')) return;
@@ -5744,7 +5811,7 @@ function renderBatchList(){
   if(btn){btn.textContent=n?'📦 Carica '+n+' articol'+(n===1?'o':'i'):'📦 Carica';btn.disabled=!n||_batchCommitBusy;}
   if(clr) clr.style.display=n?'':'none';
   if(!n){
-    box.innerHTML='<div class="batch-list-title">🧾 Articoli del documento</div>'+
+    box.innerHTML='<div class="batch-list-title">🧾 Articoli del documento'+(batchDdt.neb?'<span class="neb-tag">non a bilancio</span>':'')+'</div>'+
       '<div class="batch-list-empty">Nessun articolo ancora. Cerca un prodotto qui sotto e premi «Aggiungi al documento».</div>';
     return;
   }
@@ -5763,7 +5830,8 @@ function renderBatchList(){
       '<button type="button" class="batch-line-del" onclick="rimuoviRigaBatch('+i+')" title="Togli dall\'elenco">✕</button>'+
     '</div>';
   }).join('');
-  box.innerHTML='<div class="batch-list-title">🧾 Articoli del documento <span class="batch-list-count">'+n+'</span></div>'+rows;
+  box.innerHTML='<div class="batch-list-title">🧾 Articoli del documento <span class="batch-list-count">'+n+'</span>'+
+    (batchDdt.neb?'<span class="neb-tag">non a bilancio</span>':'')+'</div>'+rows;
 }
 window.modificaRigaBatch=function(i,v){
   const l=batchLines[i]; if(!l) return;
@@ -5832,7 +5900,9 @@ window.caricaElencoBatch=async function(){
   const dup=batchLines.find(l=>l.cod_art&&itemsList.some(i=>i.id!==l.itemId&&_normCodArt(i.cod_art)===l.cod_art));
   if(dup){_codArtCheck(dup.cod_art,dup.itemId);return;}
   const tit=batchDdt.tipo+' n° '+batchDdt.num;
-  if(!confirm('Confermi il carico di '+n+' articol'+(n===1?'o':'i')+' sul '+tit+' ('+batchDdt.forn+')?\nLe giacenze verranno aumentate delle quantità in elenco.')) return;
+  const neb=!!batchDdt.neb;
+  if(!confirm('Confermi il carico di '+n+' articol'+(n===1?'o':'i')+' sul '+tit+' ('+batchDdt.forn+')?\n'+
+    (neb?'🚫 Documento NON a bilancio: le giacenze NON verranno modificate.':'Le giacenze verranno aumentate delle quantità in elenco.'))) return;
   _batchCommitBusy=true;
   const btn=document.getElementById('batch-commit-btn');
   if(btn){btn.disabled=true;btn.textContent='Caricamento in corso...';}
@@ -5851,22 +5921,25 @@ window.caricaElencoBatch=async function(){
     batchLines.forEach((l,i)=>{
       const it=itemsList.find(x=>x.id===l.itemId)||{};
       const prev=fresh[l.itemId];
-      const upd={qty:prev+l.qty};
-      if(l.prezzo!=null&&!isNaN(l.prezzo)) upd.prezzo=l.prezzo;
+      // Non a bilancio: giacenza e prezzo del prodotto NON vengono toccati
+      const upd=neb?{}:{qty:prev+l.qty};
+      if(!neb&&l.prezzo!=null&&!isNaN(l.prezzo)) upd.prezzo=l.prezzo;
       if(l.cod_art&&l.cod_art!==_normCodArt(it.cod_art)) upd.cod_art=l.cod_art;
-      b.update(doc(db,'inventario',l.itemId),upd);
+      if(Object.keys(upd).length) b.update(doc(db,'inventario',l.itemId),upd);
+      const prz=(l.prezzo!=null&&!isNaN(l.prezzo))?l.prezzo:(it.prezzo!=null?it.prezzo:null);
       b.set(doc(db,'movimenti',genId()),{itemId:l.itemId,code:it.code||'',name:it.name||'',
         delta:l.qty,prevQty:prev,operator:currentUser.nome,operatorUid:currentUser.uid,
         time:base+i,backdated:bd,createdAt:now+i,type:'load',fornitore:batchDdt.forn,
         tipo_doc:batchDdt.tipo,num_doc:batchDdt.num,data_doc:batchDdt.data,destinatario:batchDdt.dest||'',
-        ...((l.cod_art||it.cod_art)?{cod_art:l.cod_art||it.cod_art}:{})});
+        ...((l.cod_art||it.cod_art)?{cod_art:l.cod_art||it.cod_art}:{}),
+        ...(neb?{fuori_bilancio:true,prezzo_unit:prz}:{})});
       upds[l.itemId]=upd;
     });
     await b.commit();
     Object.entries(upds).forEach(([id,u])=>{const it=itemsList.find(x=>x.id===id);if(it) Object.assign(it,u);});
     // Documento completato: elenco svuotato e modalità chiusa
     batchLines=[];
-    batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:'',forn:''};
+    batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:'',forn:'',neb:false};
     _resetBackdate('batch');
     _saveBatchState();
     _applyBatchUi();
@@ -5874,7 +5947,7 @@ window.caricaElencoBatch=async function(){
     renderCaricaNew();
     renderCaricaList();
     renderDashboard();
-    showToast('✓ '+tit+': '+n+' articol'+(n===1?'o':'i')+' caricat'+(n===1?'o':'i'),'toast-return');
+    showToast('✓ '+tit+': '+n+' articol'+(n===1?'o':'i')+' caricat'+(n===1?'o':'i')+(neb?' (non a bilancio, giacenze invariate)':''),'toast-return');
   }catch(e){
     showToast('Errore durante il carico: '+e.message+' — nessuna giacenza modificata','toast-danger');
   }finally{
@@ -6101,6 +6174,8 @@ function _ddtBuildGroups(loads){
     g.lines.sort((a,b)=>(a.time||0)-(b.time||0));
     const sc=g.lines.filter(l=>l.scarico_mov_id);
     g.scaricate=sc.length;
+    g.neb=g.lines.length>0&&g.lines.every(l=>l.fuori_bilancio);
+    g.nebAny=g.lines.some(l=>l.fuori_bilancio);
     g.cantieriScarico=[...new Set(sc.map(l=>l.scarico_cantiere).filter(Boolean))];
   });
   return m;
@@ -6161,6 +6236,7 @@ function _ddtCardHtml(g,fProd){
     '<div class="carica-item-top">'+
       '<span class="carica-item-code" style="background:var(--brand-50);color:var(--brand-600)">'+_ddtEsc(g.tipo)+'</span>'+
       '<span class="carica-item-name">N° '+_ddtEsc(g.num)+'</span>'+badge+
+      (g.nebAny?'<span class="ddt-badge neb">🚫 Non a bilancio</span>':'')+
     '</div>'+
     '<div class="ddt-card-meta">📅 '+_ddtFmtData(g.data_doc)+(g.fornitore?' · 🏭 '+_ddtEsc(g.fornitore):'')+
       (g.destinatario?(cantieriList.some(c=>c.nome===g.destinatario)?' · 🏗️ Destinatario: <b>':' · 📝 Destinazione: <b>')+_ddtEsc(g.destinatario)+'</b>':'')+
@@ -6170,6 +6246,7 @@ function _ddtCardHtml(g,fProd){
     const hit=fProd&&(((e.code||'').toLowerCase().includes(fProd))||((e.name||'').toLowerCase().includes(fProd)));
     h+='<div class="ddt-line"'+(hit?' style="background:#FFFBEA"':'')+'>'+
       '<div><strong>'+_ddtEsc(e.code)+'</strong> — '+_ddtEsc(e.name)+
+        (e.fuori_bilancio&&!g.neb?' <span class="neb-tag">non a bilancio</span>':'')+
         (e.scarico_mov_id?'<br><span class="ddt-line-sc">↘ scaricato '+(e.scarico_qty||'')+' '+_ddtEsc(un)+' su '+_ddtEsc(e.scarico_cantiere||'')+'</span>':'')+'</div>'+
       '<div style="text-align:right;color:var(--text-muted);flex-shrink:0"><span style="color:var(--brand-600);font-weight:700">+'+e.delta+(un?' '+_ddtEsc(un):'')+'</span><br>'+new Date(e.time).toLocaleDateString('it-IT')+'</div>'+
     '</div>';
@@ -6215,6 +6292,13 @@ window.openScaricoDdt=async function(key){
   const avail={...fresh};
   let rows='',short=0;
   lines.forEach(l=>{
+    if(l.fuori_bilancio){
+      // Non a bilancio: si scarica tutta la quantità del documento, la giacenza non cambia
+      rows+='<div class="ddt-sc-line neb"><div><b>'+_ddtEsc(l.code)+'</b> — '+_ddtEsc(l.name)+
+        '<br><span style="font-size:10.5px">non a bilancio · giacenza invariata</span></div>'+
+        '<div style="font-weight:700;white-space:nowrap">−'+l.delta+' '+_ddtEsc(_ddtUnit(l))+'</div></div>';
+      return;
+    }
     const a=avail[l.itemId];
     const q=a==null?0:Math.min(l.delta,Math.max(0,a));
     if(a!=null) avail[l.itemId]=a-q;
@@ -6257,6 +6341,20 @@ window.confermaScaricoDdt=async function(key){
     const batch=writeBatch(db);
     let nScaricati=0,nSaltati=0;
     lines.forEach(l=>{
+      if(l.fuori_bilancio){
+        // Non a bilancio: prelievo registrato per il cantiere, giacenza invariata
+        const takeId=genId();
+        const cur=qty[l.itemId];
+        batch.set(doc(db,'movimenti',takeId),{
+          itemId:l.itemId,code:l.code,name:l.name,delta:-l.delta,prevQty:cur==null?0:cur,
+          operator:currentUser.nome,operatorUid:currentUser.uid,time:now,createdAt:now,type:'take',cantiere,
+          da_ddt:true,rif_tipo_doc:g.tipo,rif_num_doc:g.num,rif_fornitore:g.fornitore||'',rif_load_id:l.id,
+          fuori_bilancio:true,prezzo_unit:(l.prezzo_unit!=null?l.prezzo_unit:null)
+        });
+        batch.update(doc(db,'movimenti',l.id),{scarico_mov_id:takeId,scarico_cantiere:cantiere,scarico_qty:l.delta,scarico_time:now});
+        nScaricati++;
+        return;
+      }
       const a=qty[l.itemId];
       if(a==null){nSaltati++;return;}
       const q=Math.min(l.delta,Math.max(0,a));
@@ -6304,7 +6402,7 @@ window.annullaScaricoDdt=async function(key){
       try{exists=(await getDoc(doc(db,'movimenti',l.scarico_mov_id))).exists();}catch(e){}
       if(exists){
         batch.delete(doc(db,'movimenti',l.scarico_mov_id));
-        if(qty[l.itemId]!=null) qty[l.itemId]+=Number(l.scarico_qty)||0;
+        if(qty[l.itemId]!=null&&!l.fuori_bilancio) qty[l.itemId]+=Number(l.scarico_qty)||0;
       }
       // se il prelievo era già stato eliminato dal registro, la giacenza è già stata ripristinata: si pulisce solo il riferimento
       batch.update(doc(db,'movimenti',l.id),{scarico_mov_id:null,scarico_cantiere:null,scarico_qty:null,scarico_time:null});
@@ -6328,7 +6426,7 @@ window.eliminaDdt=async function(key){
   const qty={...fresh};
   const sottoZero=[];
   g.lines.forEach(l=>{
-    if(qty[l.itemId]==null) return;
+    if(qty[l.itemId]==null||l.fuori_bilancio) return; // non a bilancio: giacenza non toccata
     const nv=qty[l.itemId]-l.delta;
     if(nv<0) sottoZero.push(l.code);
     qty[l.itemId]=nv;
@@ -6455,10 +6553,12 @@ window.salvaModificaDdt=async function(key){
   const changes=[];const diffByItem={};
   for(const l of g.lines){
     if(l.scarico_mov_id) continue;
-    if(_ddtModRemoved.has(l.id)){changes.push({l,remove:true});diffByItem[l.itemId]=(diffByItem[l.itemId]||0)-l.delta;continue;}
+    // le righe non a bilancio non incidono sulla giacenza
+    const sb=l.fuori_bilancio?0:1;
+    if(_ddtModRemoved.has(l.id)){changes.push({l,remove:true});if(sb) diffByItem[l.itemId]=(diffByItem[l.itemId]||0)-l.delta;continue;}
     const v=parseInt(document.getElementById('ddt-mq-'+l.id)?.value,10);
     if(isNaN(v)||v<1){showToast('Quantità non valida per '+l.code,'toast-danger');return;}
-    if(v!==l.delta){changes.push({l,newQty:v});diffByItem[l.itemId]=(diffByItem[l.itemId]||0)+(v-l.delta);}
+    if(v!==l.delta){changes.push({l,newQty:v});if(sb) diffByItem[l.itemId]=(diffByItem[l.itemId]||0)+(v-l.delta);}
   }
   const headerChanged=tipo!==g.tipo||num!==g.num||data!==(g.data_doc||'')||forn!==(g.fornitore||'')||dest!==(g.destinatario||'');
   if(!headerChanged&&changes.length===0&&adds.length===0){showToast('Nessuna modifica','toast-info');closeForm();return;}
@@ -6468,7 +6568,8 @@ window.salvaModificaDdt=async function(key){
     fresh=await _ddtFreshQty([...Object.keys(diffByItem),...adds.map(a=>a.it.id)]);
     if(adds.some(a=>fresh[a.it.id]==null)){showToast('Un prodotto aggiunto non è più in magazzino: toglilo','toast-danger');return;}
     qty={...fresh};
-    adds.forEach(a=>{qty[a.it.id]+=a.qty;});
+    // In un documento non a bilancio anche i prodotti aggiunti non toccano la giacenza
+    if(!g.neb) adds.forEach(a=>{qty[a.it.id]+=a.qty;});
     const sottoZero=[];
     Object.keys(diffByItem).forEach(id=>{
       if(qty[id]==null) return;
@@ -6478,7 +6579,7 @@ window.salvaModificaDdt=async function(key){
     });
     const riepilogo=changes.map(c=>c.l.code+': '+(c.remove?'tolto ('+c.l.delta+')':c.l.delta+' → '+c.newQty))
       .concat(adds.map(a=>a.it.code+': aggiunto (+'+a.qty+' '+(a.it.unit||'')+')')).join('\n');
-    if(!confirm('Confermi le modifiche al documento?\n\n'+riepilogo+'\n\nLa giacenza verrà corretta di conseguenza.'+
+    if(!confirm('Confermi le modifiche al documento?\n\n'+riepilogo+'\n\n'+(g.neb?'Documento non a bilancio: la giacenza non cambia.':'La giacenza verrà corretta di conseguenza.')+
       (sottoZero.length?'\n\n⚠️ Per '+sottoZero.join(', ')+' la giacenza andrebbe sotto zero: verrà portata a 0.':''))) return;
     // Il codice di sblocco serve solo se si riducono o tolgono quantità già caricate
     if(changes.length>0&&!requireUnlockCode()) return;
@@ -6509,6 +6610,7 @@ window.salvaModificaDdt=async function(key){
         operator:currentUser.nome,operatorUid:currentUser.uid,time:now+i,backdated:false,createdAt:now+i,type:'load',
         fornitore:forn,tipo_doc:tipo,num_doc:num,data_doc:data,destinatario:dest};
       if(a.it.cod_art) m.cod_art=a.it.cod_art;
+      if(g.neb){m.fuori_bilancio=true;m.prezzo_unit=a.it.prezzo!=null?a.it.prezzo:null;}
       batch.set(doc(db,'movimenti',genId()),m);
     });
     Object.keys(qty).forEach(id=>{if(fresh[id]!=null&&qty[id]!==fresh[id]) batch.update(doc(db,'inventario',id),{qty:qty[id]});});
@@ -6529,6 +6631,7 @@ let _aaItem=null;      // articolo selezionato
 let _aaMovs=[];        // tutti i suoi movimenti (da sempre)
 function _aaEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function _aaKind(e){
+  if(e.fuori_bilancio) return {k:'neb',label:(e.delta>0?'Carico':'Scarico')+' non a bilancio'};
   const isRett=e.type==='adjust'||/^rettifica/i.test(e.note||'');
   if(isRett) return {k:'rett',label:'Rettifica'};
   if(e.type==='load') return {k:'in',label:'Carico'};
@@ -6590,7 +6693,7 @@ function _aaPeriodo(){
 }
 function _aaTotali(list){
   let ent=0,usc=0,rett=0;
-  list.forEach(e=>{const k=_aaKind(e).k;if(k==='in') ent+=e.delta;else if(k==='out') usc+=Math.abs(e.delta);else rett+=e.delta;});
+  list.forEach(e=>{const k=_aaKind(e).k;if(k==='neb') return;if(k==='in') ent+=e.delta;else if(k==='out') usc+=Math.abs(e.delta);else rett+=e.delta;});
   return {ent,usc,rett,saldo:ent-usc+rett};
 }
 window.renderAnalisiArticolo=function(){
@@ -6623,7 +6726,7 @@ window.renderAnalisiArticolo=function(){
 
   // Uscite per cantiere (prelievi al netto delle reimmissioni)
   const perCant={};
-  list.forEach(e=>{const k=_aaKind(e).k;if(k==='rett'||e.type==='load') return;const c=e.cantiere||(e.mezzo?'🚛 '+e.mezzo:'(senza cantiere)');perCant[c]=(perCant[c]||0)+(-e.delta);});
+  list.forEach(e=>{const k=_aaKind(e).k;if(k==='rett'||k==='neb'||e.type==='load') return;const c=e.cantiere||(e.mezzo?'🚛 '+e.mezzo:'(senza cantiere)');perCant[c]=(perCant[c]||0)+(-e.delta);});
   const cantRows=Object.entries(perCant).filter(([,v])=>v!==0).sort((a,b)=>b[1]-a[1]);
   if(cantRows.length){
     h+='<div class="fuel-vehicle-label" style="margin:4px 0 6px">Consumo netto per destinazione</div><div class="aa-cant">'+
@@ -6722,22 +6825,28 @@ window.aggiornaRiepilogo=function(){
     return;
   }
 
-  // Netto per prodotto
-  var netto={};
-  movs.forEach(function(e){
-    var it=itemsList.filter(function(i){return i.id===e.itemId;})[0]||
-           itemsList.filter(function(i){return i.code===e.code;})[0];
-    var k=e.code;
-    if(!netto[k]) netto[k]={code:k,nome:e.name,cat:it&&it.cat||'',sub:it&&it.sub||'',qty:0,prezzo:it&&it.prezzo||0,unit:it&&it.unit||''};
-    netto[k].qty+=e.delta;
-  });
-  var consumati=Object.keys(netto).map(function(k){
-    var v=netto[k]; return Object.assign({},v,{qtaFuori:Math.max(0,-v.qty)});
-  }).filter(function(v){return v.qtaFuori>0;});
+  // Netto per prodotto — il materiale "non a bilancio" è conteggiato a parte
+  function _nettoDi(lista,neb){
+    var netto={};
+    lista.forEach(function(e){
+      var it=itemsList.filter(function(i){return i.id===e.itemId;})[0]||
+             itemsList.filter(function(i){return i.code===e.code;})[0];
+      var k=e.code;
+      if(!netto[k]) netto[k]={code:k,nome:e.name,cat:it&&it.cat||'',sub:it&&it.sub||'',qty:0,prezzo:it&&it.prezzo||0,unit:it&&it.unit||'',neb:neb};
+      if(neb&&e.prezzo_unit!=null) netto[k].prezzo=e.prezzo_unit;
+      netto[k].qty+=e.delta;
+    });
+    return Object.keys(netto).map(function(k){
+      var v=netto[k]; return Object.assign({},v,{qtaFuori:Math.max(0,-v.qty)});
+    }).filter(function(v){return v.qtaFuori>0;});
+  }
+  var consumati=_nettoDi(movs.filter(function(e){return !e.fuori_bilancio;}),false);
+  var consumatiNeb=_nettoDi(movs.filter(function(e){return !!e.fuori_bilancio;}),true);
 
   // Totali
   var totCosto=consumati.reduce(function(s,v){return s+v.prezzo*v.qtaFuori;},0);
-  var totProd=consumati.length;
+  var totNeb=consumatiNeb.reduce(function(s,v){return s+v.prezzo*v.qtaFuori;},0);
+  var totProd=new Set(consumati.concat(consumatiNeb).map(function(v){return v.code;})).size;
   var topProd=consumati.slice().sort(function(a,b){return b.prezzo*b.qtaFuori-a.prezzo*a.qtaFuori;})[0];
 
   // Operatori
@@ -6766,6 +6875,7 @@ window.aggiornaRiepilogo=function(){
     '<div class="rie-kpi-label">Operatori</div>'+
     '<div class="rie-kpi-val" style="color:#553687">'+numOp+'</div>'+
     '<div class="rie-kpi-sub">hanno lavorato qui</div></div>';
+  if(consumatiNeb.length) kpiH+='<div style="grid-column:1/-1">'+_nebTotaliHtml(totCosto,totNeb,consumatiNeb.length)+'</div>';
   document.getElementById('rie-kpi-grid').innerHTML=kpiH;
 
   // ── BARRE CATEGORIA ──
@@ -6774,6 +6884,12 @@ window.aggiornaRiepilogo=function(){
     if(!perCat[v.cat]) perCat[v.cat]={costo:0,n:0};
     perCat[v.cat].costo+=v.prezzo*v.qtaFuori;
     perCat[v.cat].n++;
+  });
+  var perCatN={};
+  consumatiNeb.forEach(function(v){
+    if(!perCatN[v.cat]) perCatN[v.cat]={costo:0,n:0};
+    perCatN[v.cat].costo+=v.prezzo*v.qtaFuori; perCatN[v.cat].n++;
+    if(!perCat[v.cat]) perCat[v.cat]={costo:0,n:0};
   });
   var catRank=Object.keys(perCat).map(function(c){return {cat:c,costo:perCat[c].costo,n:perCat[c].n};})
     .sort(function(a,b){return b.costo-a.costo;});
@@ -6786,7 +6902,8 @@ window.aggiornaRiepilogo=function(){
     barH+='<div class="rie-cat-item">'+
       '<div class="rie-cat-top">'+
       '<span class="rie-cat-name" style="color:'+color+'">'+(cfg&&cfg.icon||'📦')+' '+(cfg&&cfg.label||r.cat)+'</span>'+
-      '<span class="rie-cat-cost">€'+Math.round(r.costo).toLocaleString('it-IT')+' · '+r.n+' prod.</span>'+
+      '<span class="rie-cat-cost">€'+Math.round(r.costo).toLocaleString('it-IT')+' · '+r.n+' prod.'+
+        (perCatN[r.cat]?' <span class="neb-txt">+ €'+Math.round(perCatN[r.cat].costo).toLocaleString('it-IT')+' non a bilancio</span>':'')+'</span>'+
       '</div>'+
       '<div class="rie-bar-bg"><div class="rie-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
       '</div>';
@@ -6795,7 +6912,7 @@ window.aggiornaRiepilogo=function(){
 
   // ── ALBERO MATERIALI (cat → prodotti) ──
   var bycat={};
-  consumati.forEach(function(v){
+  consumati.concat(consumatiNeb).forEach(function(v){
     if(!bycat[v.cat]) bycat[v.cat]=[];
     bycat[v.cat].push(v);
   });
@@ -6816,9 +6933,9 @@ window.aggiornaRiepilogo=function(){
       '<div class="rie-tree-products'+(isOpen?' open':'')+'" id="'+catKey+'">';
     prods.forEach(function(v){
       var costo=v.prezzo*v.qtaFuori;
-      treeH+='<div class="rie-tree-prod">'+
+      treeH+='<div class="rie-tree-prod'+(v.neb?' neb':'')+'">'+
         '<span class="rie-tree-prod-code">'+v.code+'</span>'+
-        '<span class="rie-tree-prod-name">'+v.nome+'</span>'+
+        '<span class="rie-tree-prod-name">'+v.nome+(v.neb?' <span class="neb-tag">non a bilancio</span>':'')+'</span>'+
         '<span class="rie-tree-prod-qty">'+v.qtaFuori+' '+v.unit+(costo>0?' · €'+Math.round(costo).toLocaleString('it-IT'):'')+'</span>'+
         '</div>';
     });
@@ -7658,6 +7775,7 @@ window.ricalcolaGiacenze=async function(){
     var perItem={};
     movAll.forEach(function(m){
       if(!m.itemId) return;
+      if(m.fuori_bilancio) return; // non a bilancio: non incide sulla giacenza
       if(!perItem[m.itemId]) perItem[m.itemId]=[];
       perItem[m.itemId].push(m);
     });
