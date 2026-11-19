@@ -489,6 +489,21 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .batch-ddt-banner-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-600);margin-bottom:9px}
 .batch-ddt-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .ddt-filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.ddt-bil-seg{display:flex;gap:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:3px}
+.ddt-bil-seg button{flex:1;border:none;background:transparent;padding:7px 4px;border-radius:7px;font-size:12px;font-weight:700;font-family:inherit;color:var(--text-muted);cursor:pointer}
+.ddt-bil-seg button.active{background:var(--bg-card);color:var(--brand-600);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.ddt-bil-seg button[data-v="no"].active{color:#c2410c;background:#FFF7ED}
+.na-sugg{margin-top:6px;border:1.5px solid #FDE68A;background:#FFFBEB;border-radius:var(--radius-xs);padding:7px 9px}
+.na-sugg-title{font-size:11px;font-weight:700;color:#92400E;margin-bottom:4px}
+.na-sugg-row{display:flex;align-items:center;gap:7px;padding:6px 0;border-top:1px solid #FDE68A}
+.na-sugg-title + .na-sugg-row{border-top:none}
+.na-sugg-row.same{background:#FEF3C7;margin:0 -9px;padding:6px 9px}
+.na-sugg-name{flex:1;min-width:0;font-size:12px;font-weight:600;line-height:1.3}
+.na-sugg-name small{display:block;font-size:10.5px;font-weight:500;color:var(--text-muted)}
+.na-sugg-acts{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.na-sugg-acts button{border:none;border-radius:7px;padding:5px 8px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap}
+.na-sugg-use{background:var(--brand-500);color:#fff}
+.na-sugg-copy{background:var(--bg-card);color:var(--text);border:1px solid var(--border)!important}
 .aa-sugg{display:flex;flex-direction:column;gap:4px}
 .aa-sugg-item{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);font-family:inherit;font-size:12.5px;text-align:left;cursor:pointer;color:var(--text)}
 .aa-sugg-item:active{transform:scale(.99)}
@@ -1223,6 +1238,19 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <div class="ddt-f">
       <div class="carica-input-label">Prodotto</div>
       <input class="carica-input" id="ddt-f-prod" type="text" placeholder="Nome o codice" onkeydown="if(event.key==='Enter') eseguiRicercaDdt()">
+    </div>
+    <div class="ddt-f" style="grid-column:1/-1">
+      <div class="carica-input-label">Cantiere di scarico</div>
+      <input class="carica-input" id="ddt-f-cant" type="text" list="ddt-f-cant-list" placeholder="es. Montesarchio" autocomplete="off" onkeydown="if(event.key==='Enter') eseguiRicercaDdt()">
+      <datalist id="ddt-f-cant-list"></datalist>
+    </div>
+    <div class="ddt-f" style="grid-column:1/-1">
+      <div class="carica-input-label">Bilancio</div>
+      <div class="ddt-bil-seg" id="ddt-f-bil">
+        <button type="button" class="active" data-v="all" onclick="setDdtFiltroBil('all')">Tutti</button>
+        <button type="button" data-v="si" onclick="setDdtFiltroBil('si')">A bilancio</button>
+        <button type="button" data-v="no" onclick="setDdtFiltroBil('no')">🚫 Non a bilancio</button>
+      </div>
     </div>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:16px">
@@ -4709,7 +4737,8 @@ function renderCaricaNew(){
         <div class="carica-add-grid">
           <div class="carica-input-wrap carica-add-full">
             <div class="carica-input-label">Nome prodotto</div>
-            <input class="carica-input" id="na-name" placeholder="es. PANNELLO 550W" style="text-transform:uppercase">
+            <input class="carica-input" id="na-name" placeholder="es. PANNELLO 550W" style="text-transform:uppercase" oninput="naNameSuggest()" autocomplete="off">
+            <div id="na-name-sugg"></div>
           </div>
           <div class="carica-input-wrap">
             <div class="carica-input-label">${batchDdt.active?'Quantità (va in elenco)':'Quantità iniziale'}</div>
@@ -4756,7 +4785,91 @@ function renderCaricaNew(){
   if(snap['na-cat']&&[...catSel.options].some(o=>o.value===snap['na-cat'].v)) catSel.value=snap['na-cat'].v;
   onNaCatChange();
   _restoreInputs(box,snap);
+  naNameSuggest();
 }
+// ── Articoli simili al nome che si sta scrivendo ──────────────
+// Confronto per parole, indipendente dall'ordine ("cavo 1x2 unipolare" ≈ "CAVO UNIPOLARE 1X2"),
+// con tolleranza per piccoli refusi. Serve a evitare doppioni e a mantenere nomi coerenti.
+function _simNorm(v){
+  return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/(\d)\s*[x×*]\s*(\d)/g,'$1x$2').replace(/[^a-z0-9.,+x]+/g,' ').trim();
+}
+function _simTok(v){return _simNorm(v).split(/\s+/).filter(Boolean);}
+function _lev1(a,b){ // distanza di modifica ≤ 1?
+  if(a===b) return true;
+  const la=a.length,lb=b.length; if(Math.abs(la-lb)>1) return false;
+  let i=0,j=0,d=0;
+  while(i<la&&j<lb){
+    if(a[i]===b[j]){i++;j++;continue;}
+    if(++d>1) return false;
+    if(la>lb) i++; else if(lb>la) j++; else {i++;j++;}
+  }
+  return d+(la-i)+(lb-j)<=1;
+}
+function _simTokMatch(q,t){
+  if(t===q) return true;
+  if(q.length>=2&&t.startsWith(q)) return true;
+  if(t.length>=3&&q.startsWith(t)) return true;
+  if(q.length>=4&&t.length>=4&&_lev1(q,t)) return true;
+  return false;
+}
+function articoliSimili(nome,max){
+  const qt=_simTok(nome);
+  if(!qt.length||_simNorm(nome).replace(/\s/g,'').length<3) return [];
+  const out=[];
+  itemsList.forEach(it=>{
+    const tt=_simTok(it.name);
+    let m=0,forte=false;
+    qt.forEach(q=>{if(tt.some(t=>_simTokMatch(q,t))){m++;if(q.length>=3) forte=true;}});
+    if(!m||!forte) return;
+    const score=m/qt.length;
+    if(score<0.5) return;
+    const cover=tt.filter(t=>qt.some(q=>_simTokMatch(q,t))).length/Math.max(tt.length,1);
+    const uguale=qt.length===tt.length&&score===1&&cover===1;
+    out.push({it,score:score+cover*0.5+(uguale?1:0),uguale});
+  });
+  return out.sort((a,b)=>b.score-a.score||(a.it.code||'').localeCompare(b.it.code||'')).slice(0,max||6);
+}
+window.naNameSuggest=function(){
+  const box=document.getElementById('na-name-sugg'); if(!box) return;
+  const v=document.getElementById('na-name')?.value||'';
+  const sim=articoliSimili(v,6);
+  if(!sim.length){box.innerHTML='';return;}
+  box.innerHTML='<div class="na-sugg">'+
+    '<div class="na-sugg-title">⚠️ Articoli simili già presenti — verifica che non sia lo stesso</div>'+
+    sim.map(x=>{const it=x.it;const cfg=categories[it.cat]||{bg:'#eee',color:'#333',label:it.cat};
+      return '<div class="na-sugg-row'+(x.uguale?' same':'')+'">'+
+        '<span class="carica-item-code" style="background:'+cfg.bg+';color:'+cfg.color+'">'+_cEsc(it.code)+'</span>'+
+        '<span class="na-sugg-name">'+_cEsc(it.name)+'<small>'+_cEsc(cfg.label||'')+' · '+it.qty+' '+_cEsc(it.unit||'')+(it.cod_art?' · 🏷️ '+_cEsc(it.cod_art):'')+'</small></span>'+
+        '<span class="na-sugg-acts">'+
+          '<button type="button" class="na-sugg-use" onclick="caricaUsaEsistente('+jsAttr(it.id)+')">Carica questo</button>'+
+          '<button type="button" class="na-sugg-copy" onclick="naCopiaNome('+jsAttr(it.id)+')">Usa nome</button>'+
+        '</span></div>';}).join('')+
+  '</div>';
+};
+// L'articolo esiste già: chiude il nuovo prodotto e apre la sua scheda di carico
+window.caricaUsaEsistente=function(id){
+  const it=itemsList.find(i=>i.id===id); if(!it) return;
+  const nm=document.getElementById('na-name'); if(nm) nm.value='';
+  naNameSuggest();
+  toggleCaricaNew(false);
+  const s=document.getElementById('carica-search-input');
+  if(s) s.value=it.code;
+  _caricaLastQ=it.code.toLowerCase();
+  caricaOpenId=id;
+  renderCaricaList();
+  document.getElementById('carica-row-'+id)?.scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById('cq-'+id)?.focus();
+  showToast('Scheda di carico di '+it.code+' aperta','toast-info');
+};
+// Articolo diverso ma simile: ne riprende il nome come base, per una nomenclatura coerente
+window.naCopiaNome=function(id){
+  const it=itemsList.find(i=>i.id===id); if(!it) return;
+  const nm=document.getElementById('na-name'); if(!nm) return;
+  nm.value=it.name; nm.focus();
+  try{nm.setSelectionRange(nm.value.length,nm.value.length);}catch(e){}
+  naNameSuggest();
+};
 window.onNaCatChange=function(){
   const cat=document.getElementById('na-cat')?.value||'';
   const fields=document.getElementById('na-fields');
@@ -4783,6 +4896,7 @@ window.apriNuovoProdottoDaRicerca=function(){
   const q=(document.getElementById('carica-search-input')?.value||'').trim().toUpperCase();
   const nm=document.getElementById('na-name');
   if(nm&&!nm.value) nm.value=q;
+  naNameSuggest();
   const box=document.getElementById('carica-new');
   if(box) box.scrollIntoView({behavior:'smooth',block:'start'});
   document.getElementById('na-cat')?.focus();
@@ -4943,6 +5057,8 @@ window.submitNuovoProdottoCarica=async function(){
   const subEl=document.getElementById('na-sub');
   const sub=subEl&&subEl.value?subEl.value:null;
   if(!name){showToast('Inserisci il nome del prodotto','toast-danger');document.getElementById('na-name')?.focus();return;}
+  const gemello=articoliSimili(name,1).find(x=>x.uguale);
+  if(gemello&&!confirm('Esiste già un articolo con lo stesso nome:\n\n'+gemello.it.code+' — '+gemello.it.name+'\n\nCreare comunque un nuovo prodotto?')) return;
   const codArtN=_normCodArt(document.getElementById('na-codart')?.value);
   if(codArtN&&!_codArtCheck(codArtN,null)){document.getElementById('na-codart')?.focus();return;}
   // In carico massivo il fornitore è quello scelto una sola volta in alto
@@ -4979,6 +5095,7 @@ window.submitNuovoProdottoCarica=async function(){
       await saveMovimento(entry);
     }
     // Svuota i campi del form (resta aperto con la stessa categoria, utile per inserimenti in serie)
+    const _sg=document.getElementById('na-name-sugg'); if(_sg) _sg.innerHTML='';
     ['na-name','na-price','na-ddt-num','na-ddt-date','na-codart'].forEach(i=>{const e=document.getElementById(i);if(e) e.value='';});
     const nq=document.getElementById('na-qty'); if(nq) nq.value='0';
     const nu=document.getElementById('na-unit'); if(nu){nu.value='pz';nu.dataset.prev='pz';}
@@ -6188,8 +6305,21 @@ function _ddtPopolaFornitori(loads){
   sel.innerHTML='<option value="">— Tutti —</option>'+[...nomi].sort((a,b)=>a.localeCompare(b)).map(n=>'<option value="'+_ddtEsc(n)+'">'+_ddtEsc(n)+'</option>').join('');
   sel.value=prev;
 }
+// Filtro bilancio: 'all' = tutti, 'si' = solo a bilancio, 'no' = solo non a bilancio
+let _ddtFBil='all';
+window.setDdtFiltroBil=function(v){
+  _ddtFBil=v;
+  document.querySelectorAll('#ddt-f-bil button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+  eseguiRicercaDdt();
+};
+function _ddtPopolaCantieri(){
+  const dl=document.getElementById('ddt-f-cant-list'); if(!dl) return;
+  dl.innerHTML=[...new Set(cantieriList.map(c=>c.nome))].sort((a,b)=>a.localeCompare(b)).map(n=>'<option value="'+_ddtEsc(n)+'"></option>').join('');
+}
 window.azzeraFiltriDdt=function(){
-  ['ddt-f-num','ddt-f-data','ddt-f-prod'].forEach(id=>{const el=document.getElementById(id);if(el) el.value='';});
+  _ddtFBil='all';
+  document.querySelectorAll('#ddt-f-bil button').forEach(b=>b.classList.toggle('active',b.dataset.v==='all'));
+  ['ddt-f-num','ddt-f-data','ddt-f-prod','ddt-f-cant'].forEach(id=>{const el=document.getElementById(id);if(el) el.value='';});
   const f=document.getElementById('ddt-f-forn');if(f) f.value='';
   eseguiRicercaDdt();
 };
@@ -6201,7 +6331,9 @@ window.eseguiRicercaDdt=async function(){
   const fData=document.getElementById('ddt-f-data')?.value||'';
   const fForn=document.getElementById('ddt-f-forn')?.value||'';
   const fProd=(document.getElementById('ddt-f-prod')?.value||'').trim().toLowerCase();
-  const hasFilter=!!(fNum||fData||fForn||fProd);
+  const fCant=(document.getElementById('ddt-f-cant')?.value||'').trim().toLowerCase();
+  const hasFilter=!!(fNum||fData||fForn||fProd||fCant||_ddtFBil!=='all');
+  _ddtPopolaCantieri();
   resultsEl.innerHTML='<div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:13px">Ricerca in corso...</div>';
 
   const loads=await _ddtLoadAll();
@@ -6211,6 +6343,10 @@ window.eseguiRicercaDdt=async function(){
   if(fNum) groups=groups.filter(g=>g.num.toLowerCase().includes(fNum));
   if(fData) groups=groups.filter(g=>g.lines.some(l=>l.data_doc===fData));
   if(fForn) groups=groups.filter(g=>_ddtNorm(g.fornitore)===_ddtNorm(fForn));
+  // Cantiere di scarico: documenti con almeno un prodotto scaricato su quel cantiere (ricerca parziale)
+  if(fCant) groups=groups.filter(g=>g.lines.some(l=>l.scarico_mov_id&&(l.scarico_cantiere||'').toLowerCase().includes(fCant)));
+  if(_ddtFBil==='si') groups=groups.filter(g=>!g.nebAny);
+  if(_ddtFBil==='no') groups=groups.filter(g=>g.nebAny);
   if(fProd) groups=groups.filter(g=>g.lines.some(l=>(l.code||'').toLowerCase().includes(fProd)||(l.name||'').toLowerCase().includes(fProd)));
   groups.sort((a,b)=>b.lastTime-a.lastTime);
   const LIM=hasFilter?100:30;
@@ -6228,6 +6364,7 @@ window.eseguiRicercaDdt=async function(){
 };
 
 function _ddtCardHtml(g,fProd){
+  const fCant=(document.getElementById('ddt-f-cant')?.value||'').trim().toLowerCase();
   const n=g.lines.length;
   let badge='';
   if(g.scaricate===n) badge='<span class="ddt-badge ok">✓ Scaricato su '+_ddtEsc(g.cantieriScarico.join(', '))+'</span>';
@@ -6243,7 +6380,8 @@ function _ddtCardHtml(g,fProd){
       ' · '+n+' prodott'+(n===1?'o':'i')+'</div>';
   g.lines.forEach(e=>{
     const un=_ddtUnit(e);
-    const hit=fProd&&(((e.code||'').toLowerCase().includes(fProd))||((e.name||'').toLowerCase().includes(fProd)));
+    const hit=(fProd&&(((e.code||'').toLowerCase().includes(fProd))||((e.name||'').toLowerCase().includes(fProd))))||
+      (fCant&&e.scarico_mov_id&&(e.scarico_cantiere||'').toLowerCase().includes(fCant));
     h+='<div class="ddt-line"'+(hit?' style="background:#FFFBEA"':'')+'>'+
       '<div><strong>'+_ddtEsc(e.code)+'</strong> — '+_ddtEsc(e.name)+
         (e.fuori_bilancio&&!g.neb?' <span class="neb-tag">non a bilancio</span>':'')+
