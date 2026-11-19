@@ -550,6 +550,13 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .batch-neb input{width:20px;height:20px;accent-color:#EA580C;flex-shrink:0}
 .batch-neb-txt{display:flex;flex-direction:column;font-size:12.5px;color:var(--text)}
 .batch-neb-txt small{font-size:10.5px;color:var(--text-muted);font-weight:500}
+.batch-ddt-banner.editing{border-color:#2563EB;background:#EFF6FF}
+.batch-ddt-banner.editing .batch-ddt-banner-title{color:#1D4ED8}
+.batch-ddt-toggle.editing{border-color:#2563EB;color:#1D4ED8;background:#EFF6FF}
+.batch-line-tag.add{color:#fff;background:var(--brand-500)}
+.batch-line-tag.lock{color:#475569;background:#E2E8F0}
+.batch-line-qty:disabled{opacity:.6;background:var(--bg-surface)}
+.batch-neb input:disabled{opacity:.5}
 .batch-neb.on{border-style:solid;border-color:#EA580C;background:#FFF7ED}
 .batch-neb.on .batch-neb-txt b{color:#c2410c}
 .ddt-badge.neb{background:#FFEDD5;color:#c2410c}
@@ -1021,7 +1028,7 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
     <span id="batch-ddt-toggle-label">Carico massivo su stesso DDT / Fattura</span>
   </button>
   <div class="batch-ddt-banner" id="batch-ddt-banner" style="display:none">
-    <div class="batch-ddt-banner-title">📄 Documento fissato per tutti i carichi</div>
+    <div class="batch-ddt-banner-title" id="batch-ddt-title">📄 Documento fissato per tutti i carichi</div>
     <div class="batch-ddt-row">
       <div class="ddt-type-btns">
         <button type="button" class="ddt-type-btn active" id="batch-ddt-btn-ddt" onclick="setBatchDdtType('DDT')">DDT</button>
@@ -4969,7 +4976,7 @@ function _caricaBodyHtml(it,destOptsCache){
         <select class="carica-input" id="ddt-dest-${it.id}" style="text-align:left" onchange="onDestSelectChange(this)">${destOptsCache}</select>
       </div>`}
     </div>
-    ${batchDdt.active?(()=>{const inL=batchLines.find(l=>l.itemId===it.id);
+    ${batchDdt.active?(()=>{const inL=batchLines.find(l=>l.itemId===it.id&&!l.locked);
       return (inL?`<div class="batch-inlist">Già nell'elenco: <b>${inL.qty} ${it.unit}</b> — la quantità inserita verrà sommata</div>`:'')+
         `<button class="carica-confirm-btn" onclick="aggiungiRigaBatch('${it.id}')">➕ Aggiungi al documento</button>`;})()
     :`${backdateBlockHtml('car-'+it.id)}
@@ -5871,7 +5878,18 @@ function _applyBatchUi(){
   const bforn=document.getElementById('batch-ddt-forn');
   if(bforn){bforn.innerHTML=_fornOptionsHtml(batchDdt.forn);bforn.value=batchDdt.forn||'';}
   const bneb=document.getElementById('batch-ddt-neb');
-  if(bneb) bneb.checked=!!batchDdt.neb;
+  if(bneb){bneb.checked=!!batchDdt.neb;bneb.disabled=!!batchDdt.edit;}
+  const ed=batchDdt.edit;
+  const ttl=document.getElementById('batch-ddt-title');
+  if(ttl) ttl.textContent=ed?'✏️ Modifica '+ed.hdr.tipo+' n° '+ed.hdr.num+(ed.hdr.forn?' ('+ed.hdr.forn+')':''):'📄 Documento fissato per tutti i carichi';
+  if(label&&ed) label.textContent='Modifica documento in corso — tocca per annullare';
+  if(banner) banner.classList.toggle('editing',!!ed);
+  const hint=document.getElementById('batch-ddt-hint');
+  if(hint){
+    if(!hint.dataset.base) hint.dataset.base=hint.textContent;
+    hint.textContent=ed?'Correggi le quantità, togli un prodotto con ✕ oppure cercane altri qui sotto (anche nuovi) e premi «Aggiungi al documento». Le giacenze vengono corrette solo quando premi «Salva modifiche»; i prodotti già scaricati su cantiere restano bloccati.':hint.dataset.base;
+  }
+  if(toggle) toggle.classList.toggle('editing',!!ed);
   document.getElementById('batch-neb-wrap')?.classList.toggle('on',!!batchDdt.neb);
 }
 window.setBatchNeb=function(v){
@@ -5884,6 +5902,14 @@ window.setBatchNeb=function(v){
   showToast(batchDdt.neb?'🚫 Documento NON a bilancio: le giacenze non verranno modificate':'Documento a bilancio: le giacenze verranno aggiornate','toast-info');
 };
 window.toggleBatchDdt=function(){
+  if(batchDdt.edit){
+    // Modifica di un documento esistente: annulla senza salvare nulla
+    if(!confirm('Annullare la modifica del documento?\nNessuna modifica verrà salvata e le giacenze restano invariate.')) return;
+    batchLines=[];
+    batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:'',forn:'',neb:false};
+    _applyBatchUi(); renderBatchList(); _saveBatchState(); renderCaricaNew(); renderCaricaList();
+    return;
+  }
   if(batchDdt.active&&batchLines.length){
     if(!confirm('Nell\'elenco ci sono '+batchLines.length+' articoli non ancora caricati.\nDisattivando il carico massivo l\'elenco verrà svuotato (nessuna giacenza viene modificata).\n\nContinuare?')) return;
     batchLines=[];
@@ -5925,8 +5951,9 @@ function renderBatchList(){
   const btn=document.getElementById('batch-commit-btn');
   const clr=document.getElementById('batch-clear-btn');
   const n=batchLines.length;
-  if(btn){btn.textContent=n?'📦 Carica '+n+' articol'+(n===1?'o':'i'):'📦 Carica';btn.disabled=!n||_batchCommitBusy;}
-  if(clr) clr.style.display=n?'':'none';
+  const ed=batchDdt.edit;
+  if(btn){btn.textContent=ed?'💾 Salva modifiche':(n?'📦 Carica '+n+' articol'+(n===1?'o':'i'):'📦 Carica');btn.disabled=ed?_batchCommitBusy:(!n||_batchCommitBusy);}
+  if(clr) clr.style.display=(n&&!ed)?'':'none';
   if(!n){
     box.innerHTML='<div class="batch-list-title">🧾 Articoli del documento'+(batchDdt.neb?'<span class="neb-tag">non a bilancio</span>':'')+'</div>'+
       '<div class="batch-list-empty">Nessun articolo ancora. Cerca un prodotto qui sotto e premi «Aggiungi al documento».</div>';
@@ -5936,15 +5963,19 @@ function renderBatchList(){
     const it=itemsList.find(x=>x.id===l.itemId);
     const cfg=it&&categories[it.cat]||{bg:'var(--bg)',color:'var(--text)'};
     const un=it?it.unit:'';
+    const orig=ed&&l.loadId?(ed.lines.find(x=>x.id===l.loadId)||{}).delta:null;
     const extra=(l.nuovo?'<span class="batch-line-tag">nuovo</span>':'')+
+      (ed&&!l.loadId?'<span class="batch-line-tag add">aggiunto</span>':'')+
+      (l.locked?'<span class="batch-line-tag lock">scaricato</span>':'')+
+      (orig!=null&&orig!==l.qty?'<span class="batch-line-price">era '+orig+' '+_cEsc(un)+'</span>':'')+
       ((l.cod_art||(it&&it.cod_art))?'<span class="batch-line-price">🏷️ '+_cEsc(l.cod_art||it.cod_art)+'</span>':'')+
       (l.prezzo!=null?'<span class="batch-line-price">€ '+Number(l.prezzo).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2})+'/'+_cEsc(un)+'</span>':'');
     return '<div class="batch-line">'+
       '<span class="carica-item-code" style="background:'+cfg.bg+';color:'+cfg.color+'">'+_cEsc(it?it.code:'?')+'</span>'+
       '<span class="batch-line-name">'+_cEsc(it?it.name:'Articolo non più presente')+extra+'</span>'+
-      '<input class="batch-line-qty" type="number" min="1" inputmode="numeric" value="'+l.qty+'" onchange="modificaRigaBatch('+i+',this.value)" aria-label="Quantità">'+
+      '<input class="batch-line-qty" type="number" min="1" inputmode="numeric" value="'+l.qty+'" onchange="modificaRigaBatch('+i+',this.value)" aria-label="Quantità"'+(l.locked?' disabled':'')+'>'+
       '<span class="batch-line-unit">'+_cEsc(un)+'</span>'+
-      '<button type="button" class="batch-line-del" onclick="rimuoviRigaBatch('+i+')" title="Togli dall\'elenco">✕</button>'+
+      (l.locked?'<span style="width:30px;flex-shrink:0"></span>':'<button type="button" class="batch-line-del" onclick="rimuoviRigaBatch('+i+')" title="Togli dall\'elenco">✕</button>')+
     '</div>';
   }).join('');
   box.innerHTML='<div class="batch-list-title">🧾 Articoli del documento <span class="batch-list-count">'+n+'</span>'+
@@ -5952,6 +5983,7 @@ function renderBatchList(){
 }
 window.modificaRigaBatch=function(i,v){
   const l=batchLines[i]; if(!l) return;
+  if(l.locked){showToast('Prodotto già scaricato su cantiere: quantità bloccata','toast-info');renderBatchList();return;}
   const q=parseInt(v);
   if(isNaN(q)||q<=0){showToast('Quantità non valida (per togliere l\'articolo usa ✕)','toast-danger');renderBatchList();return;}
   l.qty=q;
@@ -5961,6 +5993,7 @@ window.modificaRigaBatch=function(i,v){
 };
 window.rimuoviRigaBatch=function(i){
   const l=batchLines[i]; if(!l) return;
+  if(l.locked){showToast('Prodotto già scaricato su cantiere: non si può togliere','toast-info');return;}
   batchLines.splice(i,1);
   _saveBatchState();
   renderBatchList();
@@ -5987,7 +6020,7 @@ window.aggiungiRigaBatch=function(itemId){
   if(!batchLines.some(l=>l.itemId===itemId)&&batchLines.length>=BATCH_MAX_LINES){showToast('Elenco pieno ('+BATCH_MAX_LINES+' articoli): carica questi e prosegui con un nuovo elenco','toast-danger');return;}
   const pr=priceEl&&priceEl.value!==''?Math.round(parseFloat(priceEl.value)*100)/100:null;
   const prezzo=(pr!==null&&!isNaN(pr))?pr:null;
-  const ex=batchLines.find(l=>l.itemId===itemId);
+  const ex=batchLines.find(l=>l.itemId===itemId&&!l.locked);
   if(ex){
     ex.qty+=q; if(prezzo!==null) ex.prezzo=prezzo;
     if(codArt) ex.cod_art=codArt;
@@ -6009,6 +6042,7 @@ let _batchCommitBusy=false;
 window.caricaElencoBatch=async function(){
   if(_batchCommitBusy) return;
   syncBatchDdt();
+  if(batchDdt.edit) return _salvaModificaDaCarica();
   const n=batchLines.length;
   if(!n){showToast('L\'elenco è vuoto','toast-danger');return;}
   if(!batchDdt.num){showToast('⚠️ Inserisci il numero del documento','toast-danger');document.getElementById('batch-ddt-num')?.focus();return;}
@@ -6391,7 +6425,7 @@ function _ddtCardHtml(g,fProd){
   });
   const allSc=g.scaricate===n, anySc=g.scaricate>0;
   h+='<div class="ddt-actions">'+
-    '<button class="ddt-act" onclick="openModificaDdt('+jsAttr(g.key)+')">✏️ Modifica</button>'+
+    '<button class="ddt-act" onclick="modificaDdtInCarica('+jsAttr(g.key)+')">✏️ Modifica</button>'+
     (allSc?'':'<button class="ddt-act primary" onclick="openScaricoDdt('+jsAttr(g.key)+')">📤 Scarica su cantiere</button>')+
     (anySc?'<button class="ddt-act" onclick="annullaScaricoDdt('+jsAttr(g.key)+')">↩️ Annulla scarico</button>':'')+
     '<button class="ddt-act danger" onclick="eliminaDdt('+jsAttr(g.key)+')">🗑️ Elimina</button>'+
@@ -6760,6 +6794,138 @@ window.salvaModificaDdt=async function(key){
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
   finally{_ddtBusy=false;if(btn){btn.disabled=false;btn.textContent='Salva';}}
 };
+
+// ── MODIFICA DOCUMENTO NELLA PAGINA CARICA ─────────────────────
+// Il documento viene aperto nel carico massivo con i suoi prodotti già in elenco:
+// si possono correggere/togliere quelli presenti e aggiungerne altri (anche nuovi).
+// Nulla viene scritto finché non si preme «Salva modifiche».
+window.modificaDdtInCarica=function(key){
+  const g=_ddtGroups.get(key); if(!g) return;
+  if(batchDdt.edit&&batchDdt.edit.key!==key){
+    if(!confirm('È già aperta in Carica la modifica di un altro documento. Abbandonarla (nulla verrà salvato)?')) return;
+  } else if(!batchDdt.edit&&batchLines.length){
+    if(!confirm('In Carica c\'è un carico massivo non ancora caricato ('+batchLines.length+' articoli). Abbandonarlo per modificare questo documento? Le giacenze non vengono toccate.')) return;
+  }
+  const hdr={tipo:g.tipo,num:g.num,data:g.data_doc||'',forn:g.fornitore||'',dest:g.destinatario||''};
+  batchDdt={active:true,tipo:hdr.tipo,num:hdr.num,data:hdr.data,dest:hdr.dest,forn:hdr.forn,neb:!!g.neb,
+    edit:{key,hdr,neb:!!g.neb,lines:g.lines.map(l=>({id:l.id,itemId:l.itemId,code:l.code,delta:l.delta,locked:!!l.scarico_mov_id,neb:!!l.fuori_bilancio,scarico_mov_id:l.scarico_mov_id||null}))}};
+  batchLines=g.lines.map(l=>({itemId:l.itemId,qty:l.delta,prezzo:null,loadId:l.id,locked:!!l.scarico_mov_id}));
+  _saveBatchState();
+  _batchRestored=true; // lo stato è già in memoria: niente avviso di «ripresa»
+  caricaOpenId=null;
+  const s=document.getElementById('carica-search-input'); if(s) s.value='';
+  showPage('carica');
+  _applyBatchUi();
+  renderBatchList();
+  renderCaricaNew();
+  renderCaricaList();
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+async function _salvaModificaDaCarica(){
+  const E=batchDdt.edit; if(!E) return;
+  const tipo=batchDdt.tipo, num=(batchDdt.num||'').trim(), data=batchDdt.data||'', forn=batchDdt.forn||'', dest=batchDdt.dest||'';
+  if(!num){showToast('⚠️ Il numero del documento è obbligatorio','toast-danger');document.getElementById('batch-ddt-num')?.focus();return;}
+  if(!batchLines.length){showToast('Per togliere tutti i prodotti usa «Elimina» in DDT / Fatture','toast-danger');return;}
+  const dup=batchLines.find(l=>l.cod_art&&itemsList.some(i=>i.id!==l.itemId&&_normCodArt(i.cod_art)===l.cod_art));
+  if(dup){_codArtCheck(dup.cod_art,dup.itemId);return;}
+  const origById=new Map(E.lines.map(l=>[l.id,l]));
+  const kept=new Set(batchLines.filter(l=>l.loadId).map(l=>l.loadId));
+  const removed=E.lines.filter(l=>!l.locked&&!kept.has(l.id));
+  const changed=batchLines.filter(l=>l.loadId&&!l.locked&&origById.get(l.loadId)&&l.qty!==origById.get(l.loadId).delta);
+  const added=batchLines.filter(l=>!l.loadId);
+  const extraUpd=batchLines.some(l=>l.prezzo!=null||l.cod_art);
+  const headerChanged=tipo!==E.hdr.tipo||num!==E.hdr.num||data!==E.hdr.data||forn!==E.hdr.forn||dest!==E.hdr.dest;
+  if(!headerChanged&&!removed.length&&!changed.length&&!added.length&&!extraUpd){showToast('Nessuna modifica','toast-info');return;}
+  // Variazione di giacenza per articolo (le righe non a bilancio non la toccano)
+  const diff={}; const addD=(id,d)=>{diff[id]=(diff[id]||0)+d;};
+  removed.forEach(l=>{if(!l.neb) addD(l.itemId,-l.delta);});
+  changed.forEach(b=>{const o=origById.get(b.loadId);if(!o.neb) addD(b.itemId,b.qty-o.delta);});
+  added.forEach(b=>{if(!E.neb) addD(b.itemId,b.qty);});
+  const riduzioni=removed.length>0||changed.some(b=>b.qty<origById.get(b.loadId).delta);
+  _batchCommitBusy=true; renderBatchList();
+  try{
+    const fresh=await _ddtFreshQty([...new Set([...Object.keys(diff),...batchLines.map(b=>b.itemId)])]);
+    const assente=added.concat(changed).find(b=>fresh[b.itemId]==null);
+    if(assente){const it=itemsList.find(x=>x.id===assente.itemId);showToast('Articolo '+(it?it.code:'')+' non più presente in magazzino: toglilo dall\'elenco','toast-danger');return;}
+    const qty={...fresh}; const sottoZero=[];
+    Object.keys(diff).forEach(id=>{
+      if(qty[id]==null) return;
+      let nv=qty[id]+diff[id];
+      if(nv<0){const it=itemsList.find(i=>i.id===id);sottoZero.push(it?it.code:id);nv=0;}
+      qty[id]=nv;
+    });
+    const nome=id=>{const it=itemsList.find(x=>x.id===id);return it?it.code:id;};
+    const unit=id=>{const it=itemsList.find(x=>x.id===id);return it?it.unit:'';};
+    const rie=[].concat(
+      removed.map(l=>l.code+': tolto ('+l.delta+' '+unit(l.itemId)+')'),
+      changed.map(b=>nome(b.itemId)+': '+origById.get(b.loadId).delta+' → '+b.qty+' '+unit(b.itemId)),
+      added.map(b=>nome(b.itemId)+': aggiunto (+'+b.qty+' '+unit(b.itemId)+')'),
+      headerChanged?['Dati del documento aggiornati']:[]);
+    if(!confirm('Salvare le modifiche a '+E.hdr.tipo+' n° '+E.hdr.num+'?\n\n'+rie.join('\n')+'\n\n'+
+      (E.neb?'Documento non a bilancio: le giacenze non cambiano.':(Object.keys(diff).length?'Le giacenze verranno corrette di conseguenza.':'Le giacenze non cambiano.'))+
+      (sottoZero.length?'\n\n⚠️ Per '+sottoZero.join(', ')+' la giacenza andrebbe sotto zero: verrà portata a 0.':''))) return;
+    // Il codice di sblocco serve solo se si riducono o tolgono quantità già caricate
+    if(riduzioni&&!requireUnlockCode()) return;
+
+    const batch=writeBatch(db);
+    const header={tipo_doc:tipo,num_doc:num,data_doc:data,fornitore:forn,destinatario:dest};
+    removed.forEach(l=>batch.delete(doc(db,'movimenti',l.id)));
+    for(const o of E.lines){
+      if(removed.includes(o)) continue;
+      const b=batchLines.find(x=>x.loadId===o.id);
+      const upd={...header};
+      if(b&&!o.locked&&b.qty!==o.delta) upd.delta=b.qty;
+      if(b&&b.cod_art) upd.cod_art=b.cod_art;
+      batch.update(doc(db,'movimenti',o.id),upd);
+      if(o.scarico_mov_id&&(tipo!==E.hdr.tipo||num!==E.hdr.num||forn!==E.hdr.forn)){
+        try{
+          if((await getDoc(doc(db,'movimenti',o.scarico_mov_id))).exists())
+            batch.update(doc(db,'movimenti',o.scarico_mov_id),{rif_tipo_doc:tipo,rif_num_doc:num,rif_fornitore:forn});
+        }catch(e){}
+      }
+    }
+    const base=getBackdatedTime('batch'), bd=isBackdated('batch'), now=Date.now();
+    added.forEach((b,i)=>{
+      const it=itemsList.find(x=>x.id===b.itemId)||{};
+      const prz=(b.prezzo!=null&&!isNaN(b.prezzo))?b.prezzo:(it.prezzo!=null?it.prezzo:null);
+      const m={itemId:b.itemId,code:it.code||'',name:it.name||'',delta:b.qty,prevQty:fresh[b.itemId],
+        operator:currentUser.nome,operatorUid:currentUser.uid,time:base+i,backdated:bd,createdAt:now+i,type:'load',...header};
+      const ca=b.cod_art||it.cod_art; if(ca) m.cod_art=ca;
+      if(E.neb){m.fuori_bilancio=true;m.prezzo_unit=prz;}
+      batch.set(doc(db,'movimenti',genId()),m);
+    });
+    // Articoli: giacenza (se varia), prezzo (solo a bilancio) e codice articolo
+    const invUpd={};
+    Object.keys(qty).forEach(id=>{if(fresh[id]!=null&&qty[id]!==fresh[id]) (invUpd[id]=invUpd[id]||{}).qty=qty[id];});
+    batchLines.forEach(b=>{
+      const it=itemsList.find(x=>x.id===b.itemId); if(!it) return;
+      const o=b.loadId?origById.get(b.loadId):null;
+      const lineNeb=o?o.neb:E.neb;
+      if(b.prezzo!=null&&!isNaN(b.prezzo)&&!lineNeb) (invUpd[b.itemId]=invUpd[b.itemId]||{}).prezzo=b.prezzo;
+      if(b.cod_art&&b.cod_art!==_normCodArt(it.cod_art)) (invUpd[b.itemId]=invUpd[b.itemId]||{}).cod_art=b.cod_art;
+    });
+    Object.keys(invUpd).forEach(id=>batch.update(doc(db,'inventario',id),invUpd[id]));
+    await batch.commit();
+    Object.keys(invUpd).forEach(id=>{const it=itemsList.find(x=>x.id===id);if(it) Object.assign(it,invUpd[id]);});
+    const tit=tipo+' n° '+num;
+    batchLines=[];
+    batchDdt={active:false,tipo:'DDT',num:'',data:'',dest:'',forn:'',neb:false};
+    _resetBackdate('batch');
+    _saveBatchState();
+    _applyBatchUi();
+    caricaOpenId=null;
+    renderCaricaNew();
+    renderCaricaList();
+    renderDashboard();
+    showToast('✓ '+tit+' aggiornato'+(added.length?' · '+added.length+' prodott'+(added.length===1?'o aggiunto':'i aggiunti'):''),'toast-return');
+    showPage('ricerca-ddt');
+  }catch(e){
+    showToast('Errore durante il salvataggio: '+e.message+' — nessuna modifica salvata','toast-danger');
+  }finally{
+    _batchCommitBusy=false;
+    renderBatchList();
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  ANALISI ARTICOLO — entrate e uscite di un singolo articolo
