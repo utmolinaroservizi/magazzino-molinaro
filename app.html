@@ -575,6 +575,12 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);backgro
 .ddt-mod-x{width:28px;height:28px;border-radius:50%;border:1px solid #F0C0C0;background:transparent;color:#B33A3A;cursor:pointer;font-family:inherit}
 .ddt-sc-line{display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:12px}
 .ddt-sc-line.short{color:#B33A3A}
+.ddt-sc-line.sel{grid-template-columns:22px 1fr auto;align-items:center;cursor:pointer}
+.ddt-sc-line.sel input{width:18px;height:18px;accent-color:var(--brand-500);margin:0}
+.ddt-sc-line.off{opacity:.45}
+.ddt-sc-all{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:12.5px;font-weight:700;padding:7px 0 4px;cursor:pointer}
+.ddt-sc-all input{width:18px;height:18px;accent-color:var(--brand-500);margin:0 4px 0 0}
+.ddt-sc-hint{flex-basis:100%;font-size:10.5px;font-weight:500;color:var(--text-muted);padding-left:26px}
 .batch-ddt-hint{font-size:11px;color:var(--text-muted);margin-top:9px;line-height:1.45}
 .carica-cat-select{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;background:var(--bg-card);color:var(--text);outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
 .carica-cat-select:focus{border-color:var(--brand-500)}
@@ -6427,7 +6433,7 @@ function _ddtCardHtml(g,fProd){
   h+='<div class="ddt-actions">'+
     '<button class="ddt-act" onclick="modificaDdtInCarica('+jsAttr(g.key)+')">✏️ Modifica</button>'+
     (allSc?'':'<button class="ddt-act primary" onclick="openScaricoDdt('+jsAttr(g.key)+')">📤 Scarica su cantiere</button>')+
-    (anySc?'<button class="ddt-act" onclick="annullaScaricoDdt('+jsAttr(g.key)+')">↩️ Annulla scarico</button>':'')+
+    (anySc?'<button class="ddt-act" onclick="openAnnullaScaricoDdt('+jsAttr(g.key)+')">↩️ Annulla scarico</button>':'')+
     '<button class="ddt-act danger" onclick="eliminaDdt('+jsAttr(g.key)+')">🗑️ Elimina</button>'+
   '</div></div>';
   return h;
@@ -6463,12 +6469,13 @@ window.openScaricoDdt=async function(key){
   const fresh=await _ddtFreshQty(lines.map(l=>l.itemId));
   const avail={...fresh};
   let rows='',short=0;
+  const chk=(l,on)=>'<input type="checkbox" class="ddt-sc-chk" value="'+_ddtEsc(l.id)+'"'+(on?' checked':' disabled')+' onchange="ddtScCount()">';
   lines.forEach(l=>{
     if(l.fuori_bilancio){
       // Non a bilancio: si scarica tutta la quantità del documento, la giacenza non cambia
-      rows+='<div class="ddt-sc-line neb"><div><b>'+_ddtEsc(l.code)+'</b> — '+_ddtEsc(l.name)+
+      rows+='<label class="ddt-sc-line sel neb">'+chk(l,true)+'<div><b>'+_ddtEsc(l.code)+'</b> — '+_ddtEsc(l.name)+
         '<br><span style="font-size:10.5px">non a bilancio · giacenza invariata</span></div>'+
-        '<div style="font-weight:700;white-space:nowrap">−'+l.delta+' '+_ddtEsc(_ddtUnit(l))+'</div></div>';
+        '<div style="font-weight:700;white-space:nowrap">−'+l.delta+' '+_ddtEsc(_ddtUnit(l))+'</div></label>';
       return;
     }
     const a=avail[l.itemId];
@@ -6477,23 +6484,43 @@ window.openScaricoDdt=async function(key){
     const un=_ddtUnit(l);
     const isShort=q<l.delta;
     if(isShort) short++;
-    rows+='<div class="ddt-sc-line'+(isShort?' short':'')+'"><div><b>'+_ddtEsc(l.code)+'</b> — '+_ddtEsc(l.name)+
+    rows+='<label class="ddt-sc-line sel'+(isShort?' short':'')+(q<=0?' off':'')+'">'+chk(l,q>0)+'<div><b>'+_ddtEsc(l.code)+'</b> — '+_ddtEsc(l.name)+
       (isShort?'<br><span style="font-size:10.5px">'+(a==null?'articolo non più presente':'disponibili solo '+Math.max(0,a)+' '+_ddtEsc(un))+'</span>':'')+'</div>'+
-      '<div style="font-weight:700;white-space:nowrap">−'+q+' '+_ddtEsc(un)+(isShort?' <span style="font-weight:500">/ '+l.delta+'</span>':'')+'</div></div>';
+      '<div style="font-weight:700;white-space:nowrap">−'+q+' '+_ddtEsc(un)+(isShort?' <span style="font-weight:500">/ '+l.delta+'</span>':'')+'</div></label>';
   });
   const opts='<option value="">— Seleziona cantiere —</option>'+destOptionsHtml(g.destinatario,true).replace('<option value="">— Nessun destinatario —</option>','');
   const destNota=g.destinatario&&!cantieriList.some(c=>c.nome===g.destinatario)?g.destinatario:'';
   document.getElementById('form-modal').innerHTML=
     '<h2>📤 Scarica su cantiere</h2>'+
-    '<div style="font-size:12.5px;color:var(--text-muted);margin:-8px 0 14px">'+_ddtEsc(_ddtTitle(g))+' · '+lines.length+' prodott'+(lines.length===1?'o':'i')+' in un\'unica operazione</div>'+
+    '<div style="font-size:12.5px;color:var(--text-muted);margin:-8px 0 14px">'+_ddtEsc(_ddtTitle(g))+' · '+lines.length+' prodott'+(lines.length===1?'o':'i')+' da scaricare'+
+      (g.scaricate>0?' (altri '+g.scaricate+' già scaricati)':'')+'</div>'+
     (destNota?'<div style="font-size:11.5px;background:var(--brand-50);color:var(--brand-600);border-radius:8px;padding:7px 10px;margin-bottom:10px">📝 Destinazione annotata al carico: <b>'+_ddtEsc(destNota)+'</b></div>':'')+
     '<div class="form-group"><label>Cantiere</label><select id="ddt-sc-cant" onchange="onDestSelectChange(this)">'+opts+'</select></div>'+
     (short?'<div style="font-size:11.5px;background:#FDECEC;color:#B33A3A;border-radius:8px;padding:8px 10px;margin-bottom:10px">⚠️ Per '+short+' articol'+(short===1?'o':'i')+' la giacenza attuale è inferiore alla quantità del documento: verrà scaricato solo il disponibile.</div>':'')+
+    '<label class="ddt-sc-all"><input type="checkbox" id="ddt-sc-all" checked onchange="ddtScToggleAll(this.checked)"> <span>Seleziona tutti</span><span class="ddt-sc-hint">togli la spunta ai prodotti che vanno su un altro cantiere</span></label>'+
     '<div style="max-height:40vh;overflow-y:auto;margin-bottom:14px">'+rows+'</div>'+
     '<div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Annulla</button><button class="btn-confirm" id="ddt-sc-btn" onclick="confermaScaricoDdt('+jsAttr(key)+')">Scarica</button></div>';
   const sel=document.getElementById('ddt-sc-cant');
   if(sel&&g.destinatario&&!destNota) sel.value=g.destinatario;
+  ddtScCount();
   document.getElementById('form-backdrop').classList.add('open');
+};
+// Selezione dei prodotti nella finestra di scarico / annullamento
+window.ddtScToggleAll=function(on){
+  document.querySelectorAll('#form-modal .ddt-sc-chk:not(:disabled)').forEach(c=>{c.checked=on;});
+  ddtScCount();
+};
+window.ddtScCount=function(){
+  const all=[...document.querySelectorAll('#form-modal .ddt-sc-chk:not(:disabled)')];
+  const n=all.filter(c=>c.checked).length;
+  all.forEach(c=>c.closest('.ddt-sc-line')?.classList.toggle('off',!c.checked));
+  document.querySelectorAll('#form-modal .ddt-sc-chk:disabled').forEach(c=>c.closest('.ddt-sc-line')?.classList.add('off'));
+  const tAll=document.getElementById('ddt-sc-all');
+  if(tAll){tAll.checked=all.length>0&&n===all.length;tAll.indeterminate=n>0&&n<all.length;}
+  const btn=document.getElementById('ddt-sc-btn');
+  if(btn&&!btn.dataset.busy){btn.textContent='Scarica'+(n?' ('+n+')':'');btn.disabled=n===0;}
+  const ab=document.getElementById('ddt-an-btn');
+  if(ab&&!ab.dataset.busy){ab.textContent='Annulla scarico'+(n?' ('+n+')':'');ab.disabled=n===0;}
 };
 
 let _ddtBusy=false;
@@ -6502,10 +6529,14 @@ window.confermaScaricoDdt=async function(key){
   const g=_ddtGroups.get(key); if(!g) return;
   const cantiere=document.getElementById('ddt-sc-cant')?.value||'';
   if(!cantiere||_isDestSpecial(cantiere)||!cantieriList.some(c=>c.nome===cantiere)){showToast('⚠️ Seleziona il cantiere!','toast-danger');return;}
-  const lines=g.lines.filter(l=>!l.scarico_mov_id);
-  if(lines.length===0) return;
+  const daScaricare=g.lines.filter(l=>!l.scarico_mov_id);
+  // Solo i prodotti spuntati (se la finestra non ha spunte, si scarica tutto come prima)
+  const chks=document.querySelectorAll('#form-modal .ddt-sc-chk');
+  const scelti=chks.length?new Set([...chks].filter(c=>c.checked).map(c=>c.value)):null;
+  const lines=scelti?daScaricare.filter(l=>scelti.has(l.id)):daScaricare;
+  if(lines.length===0){showToast('Seleziona almeno un prodotto da scaricare','toast-danger');return;}
   _ddtBusy=true;
-  const btn=document.getElementById('ddt-sc-btn'); if(btn){btn.disabled=true;btn.textContent='Scarico in corso...';}
+  const btn=document.getElementById('ddt-sc-btn'); if(btn){btn.disabled=true;btn.dataset.busy='1';btn.textContent='Scarico in corso...';}
   try{
     const fresh=await _ddtFreshQty(lines.map(l=>l.itemId));
     const qty={...fresh};
@@ -6546,23 +6577,46 @@ window.confermaScaricoDdt=async function(key){
     await batch.commit();
     Object.keys(qty).forEach(id=>{const it=itemsList.find(i=>i.id===id);if(it&&qty[id]!=null) it.qty=qty[id];});
     closeForm();
-    showToast('📤 '+nScaricati+' articol'+(nScaricati===1?'o scaricato':'i scaricati')+' su '+cantiere+(nSaltati?' · '+nSaltati+' senza disponibilità':''),'toast-take');
+    const restano=daScaricare.length-nScaricati;
+    showToast('📤 '+nScaricati+' articol'+(nScaricati===1?'o scaricato':'i scaricati')+' su '+cantiere+(nSaltati?' · '+nSaltati+' senza disponibilità':'')+
+      (restano>0?' · restano '+restano+' da scaricare':''),'toast-take');
     _ddtRefresh();
   }catch(e){
     showToast('Errore scarico: '+e.message,'toast-danger');
   }finally{
     _ddtBusy=false;
-    if(btn){btn.disabled=false;btn.textContent='Scarica';}
+    if(btn){btn.disabled=false;delete btn.dataset.busy;btn.textContent='Scarica';}
   }
 };
 
 // ── ANNULLA SCARICO ────────────────────────────────────────────
-window.annullaScaricoDdt=async function(key){
-  if(_ddtBusy) return;
+window.openAnnullaScaricoDdt=function(key){
   const g=_ddtGroups.get(key); if(!g) return;
   const lines=g.lines.filter(l=>l.scarico_mov_id);
   if(lines.length===0) return;
-  if(!confirm('Annullare lo scarico di '+_ddtTitle(g)+'?\n\nI '+lines.length+' prelievi generati verranno eliminati e le quantità torneranno in magazzino.')) return;
+  const rows=lines.map(l=>'<label class="ddt-sc-line sel'+(l.fuori_bilancio?' neb':'')+'">'+
+    '<input type="checkbox" class="ddt-sc-chk" value="'+_ddtEsc(l.id)+'" checked onchange="ddtScCount()">'+
+    '<div><b>'+_ddtEsc(l.code)+'</b> — '+_ddtEsc(l.name)+'<br><span style="font-size:10.5px">🏗️ '+_ddtEsc(l.scarico_cantiere||'')+(l.fuori_bilancio?' · non a bilancio':'')+'</span></div>'+
+    '<div style="font-weight:700;white-space:nowrap">−'+(Number(l.scarico_qty)||0)+' '+_ddtEsc(_ddtUnit(l))+'</div></label>').join('');
+  document.getElementById('form-modal').innerHTML=
+    '<h2>↩️ Annulla scarico</h2>'+
+    '<div style="font-size:12.5px;color:var(--text-muted);margin:-8px 0 14px">'+_ddtEsc(_ddtTitle(g))+' · scegli quali prelievi annullare: le quantità tornano in magazzino</div>'+
+    '<label class="ddt-sc-all"><input type="checkbox" id="ddt-sc-all" checked onchange="ddtScToggleAll(this.checked)"> <span>Seleziona tutti</span></label>'+
+    '<div style="max-height:40vh;overflow-y:auto;margin-bottom:14px">'+rows+'</div>'+
+    '<div class="form-btns"><button class="btn-cancel" onclick="closeForm()">Chiudi</button><button class="btn-confirm" id="ddt-an-btn" style="background:#B33A3A" onclick="annullaScaricoDdt('+jsAttr(key)+')">Annulla scarico</button></div>';
+  ddtScCount();
+  document.getElementById('form-backdrop').classList.add('open');
+};
+window.annullaScaricoDdt=async function(key){
+  if(_ddtBusy) return;
+  const g=_ddtGroups.get(key); if(!g) return;
+  const tutti=g.lines.filter(l=>l.scarico_mov_id);
+  const chks=document.querySelectorAll('#form-modal .ddt-sc-chk');
+  const daFinestra=!!document.getElementById('ddt-an-btn')&&chks.length>0;
+  const scelti=daFinestra?new Set([...chks].filter(c=>c.checked).map(c=>c.value)):null;
+  const lines=scelti?tutti.filter(l=>scelti.has(l.id)):tutti;
+  if(lines.length===0){if(daFinestra) showToast('Seleziona almeno un prodotto','toast-danger');return;}
+  if(!daFinestra&&!confirm('Annullare lo scarico di '+_ddtTitle(g)+'?\n\nI '+lines.length+' prelievi generati verranno eliminati e le quantità torneranno in magazzino.')) return;
   if(!requireUnlockCode()) return;
   _ddtBusy=true;
   try{
@@ -6582,7 +6636,8 @@ window.annullaScaricoDdt=async function(key){
     Object.keys(qty).forEach(id=>{if(fresh[id]!=null&&qty[id]!==fresh[id]) batch.update(doc(db,'inventario',id),{qty:qty[id]});});
     await batch.commit();
     Object.keys(qty).forEach(id=>{const it=itemsList.find(i=>i.id===id);if(it&&qty[id]!=null) it.qty=qty[id];});
-    showToast('Scarico annullato, giacenze ripristinate','toast-info');
+    if(daFinestra) closeForm();
+    showToast('Scarico annullato'+(lines.length<tutti.length?' per '+lines.length+' prodott'+(lines.length===1?'o':'i'):'')+', giacenze ripristinate','toast-info');
     _ddtRefresh();
   }catch(e){showToast('Errore: '+e.message,'toast-danger');}
   finally{_ddtBusy=false;}
